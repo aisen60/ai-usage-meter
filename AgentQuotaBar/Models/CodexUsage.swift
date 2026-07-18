@@ -1,12 +1,11 @@
 import Foundation
 
-/// Codex 用量数据
-/// MVP 阶段支持手动录入 + 自动获取 (如果找到数据源)
+/// Codex 周额度数据。
 struct CodexUsage: Codable, Equatable {
     /// 套餐类型描述 (如 "Pro", "Plus")
     let planName: String
 
-    /// 剩余额度百分比 (0-100)，手动录入或自动获取
+    /// 剩余额度百分比 (0-100)
     let percentRemaining: Double
 
     /// 账期结束时间 (可选)
@@ -24,8 +23,6 @@ struct CodexUsage: Codable, Equatable {
     enum Source: String, Codable {
         /// 自动从 API 或本地数据源获取
         case automatic
-        /// 用户手动录入
-        case manual
         /// 尚未连接
         case disconnected
     }

@@ -10,6 +10,9 @@ final class QuotaController: ObservableObject {
     /// Cursor 用量数据
     @Published var cursorUsage: CursorUsage?
 
+    /// 从 Cursor 桌面客户端本地状态动态读取的套餐名称
+    @Published var cursorPlanName = "Cursor"
+
     /// Codex 用量数据
     @Published var codexUsage: CodexUsage = .disconnected
 
@@ -59,8 +62,12 @@ final class QuotaController: ObservableObject {
     // MARK: - Lifecycle
 
     init() {
-        // 启动时加载缓存
+        // 菜单栏标题在弹层打开前就需要有缓存和最新数据。
         loadCache()
+        startAutoRefresh()
+        Task { [weak self] in
+            await self?.refresh()
+        }
     }
 
     // 注意: @MainActor 类的 deinit 不能调用 actor 隔离方法
@@ -68,9 +75,8 @@ final class QuotaController: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// 启动应用时调用 - 加载缓存并执行首次刷新
+    /// 供将来重新启动刷新任务时调用。
     func start() {
-        loadCache()
         Task {
             await refresh()
         }
@@ -79,7 +85,10 @@ final class QuotaController: ObservableObject {
 
     /// 手动刷新
     func refresh() async {
-        guard !isRefreshing else { return }
+        guard !isRefreshing else {
+            AppLog.app.debug("Refresh skipped because one is already running")
+            return
+        }
         isRefreshing = true
         errorMessage = nil
         showError = false
@@ -123,28 +132,16 @@ final class QuotaController: ObservableObject {
         return nil
     }
 
-    /// 保存手动录入的 Codex 数据
-    func saveManualCodexUsage(
-        planName: String,
-        percentRemaining: Double,
-        cycleEndDate: Date?,
-        note: String?
-    ) {
-        codexUsage = CodexUsage(
-            planName: planName,
-            percentRemaining: max(0, min(100, percentRemaining)),
-            cycleEndDate: cycleEndDate,
-            source: .manual,
-            fetchedAt: Date(),
-            note: note
-        )
-        saveCache()
-    }
-
     // MARK: - Private Methods
 
     private func refreshCursor() async {
+        AppLog.cursor.debug(
+            "Cursor local state detection: \(CursorTokenReader.isCursorInstalled ? "installed" : "not-installed", privacy: .public)"
+        )
+        cursorPlanName = CursorTokenReader.readPlanName()
+
         guard let token = resolveCursorToken() else {
+            AppLog.cursor.notice("Cursor credentials were not found")
             cursorConnectionState = .disconnected
             // 如果没有 token 但有缓存，保持缓存状态
             if cursorUsage != nil {
@@ -157,6 +154,7 @@ final class QuotaController: ObservableObject {
             let usage = try await CursorAPIClient.fetchCurrentPeriodUsage(token: token)
             cursorUsage = usage
             cursorConnectionState = .connected
+            AppLog.cursor.info("Cursor usage refresh succeeded")
         } catch {
             // 失败时保持缓存数据
             if cursorUsage != nil {
@@ -164,19 +162,24 @@ final class QuotaController: ObservableObject {
             } else {
                 cursorConnectionState = .error(error.localizedDescription)
             }
+            let category = (error as? CursorError)?.logCategory ?? "unexpected"
+            AppLog.cursor.error("Cursor usage refresh failed: \(category, privacy: .public)")
             handleError(error)
         }
     }
 
     private func refreshCodex() async {
-        if let usage = await CodexIntegration.fetchUsage() {
-            codexUsage = usage
+        do {
+            codexUsage = try await CodexIntegration.fetchUsage()
             codexConnectionState = .connected
-        } else if codexUsage.isConnected {
-            // 保持手动录入的数据
-            codexConnectionState = .connected
-        } else {
+            AppLog.codex.info("Codex usage refresh succeeded")
+        } catch {
+            // Codex 读取失败时不展示旧数据，避免把过期额度误认为当前额度。
+            codexUsage = .disconnected
             codexConnectionState = .disconnected
+            let category = (error as? CodexIntegration.IntegrationError)?.logCategory
+                ?? "unexpected"
+            AppLog.codex.error("Codex usage refresh failed: \(category, privacy: .public)")
         }
     }
 
@@ -204,13 +207,15 @@ final class QuotaController: ObservableObject {
     // MARK: - Cache
 
     private func loadCache() {
-        let (cursor, codex) = UsageCache.load()
+        let (cursor, _) = UsageCache.load()
         if let cursor { cursorUsage = cursor }
-        if let codex { codexUsage = codex }
+        cursorPlanName = CursorTokenReader.readPlanName()
+        codexUsage = .disconnected
+        codexConnectionState = .disconnected
     }
 
     private func saveCache() {
-        UsageCache.save(cursor: cursorUsage, codex: codexUsage)
+        UsageCache.save(cursor: cursorUsage, codex: nil)
     }
 
     // MARK: - Error Handling

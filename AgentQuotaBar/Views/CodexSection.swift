@@ -1,95 +1,61 @@
 import SwiftUI
 
-/// Codex 详情分区
+/// Codex 周额度区域。Codex 与 Cursor 的口径不同，这里展示剩余额度。
 struct CodexSection: View {
     let usage: CodexUsage
     let connectionState: QuotaController.ConnectionState
-    let onOpenUsagePage: () -> Void
-    let onManualInput: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            // 标题
-            HStack {
-                Image(systemName: "sparkles")
-                    .foregroundColor(.purple)
-                Text("Codex Pro")
-                    .font(.headline)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 9) {
+                ServiceLogo(resourceName: "CodexIcon", fallbackSymbol: "terminal.fill")
+                Text(isConnected ? usage.planName : "Codex")
+                    .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
                 Spacer()
-                connectionBadge
+                ConnectionStatus(state: connectionState)
             }
+            .padding(.horizontal, MenuMetrics.horizontalPadding)
+            .padding(.top, 12)
+            .padding(.bottom, 11)
 
-            if usage.isConnected {
-                // 剩余百分比
-                UsageRow(
-                    label: "剩余额度",
-                    percent: usage.percentUsed,
-                    color: usage.percentUsed > 80 ? .red : .purple
-                )
-
-                // 账期
-                if let cycleEnd = usage.cycleEndDate {
-                    Text("账期截止: \(formattedDate(cycleEnd))")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                // 备注
-                if let note = usage.note, !note.isEmpty {
-                    Text(note)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                // 来源标签
-                Text(usage.source == .automatic ? "自动获取" : "手动录入")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-
-            } else {
-                // 未连接状态
-                Text("Codex 用量数据暂未接入")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.vertical, 4)
-
-                HStack(spacing: 8) {
-                    Button("手动录入") { onManualInput() }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-
-                    Button("打开用量页面") { onOpenUsagePage() }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                }
-            }
+            UsageBarCard(
+                label: "本周剩余",
+                percent: remainingPercent,
+                tint: isConnected ? .green : .gray,
+                detail: resetDetail
+            )
+            .padding(.horizontal, MenuMetrics.horizontalPadding)
+            .padding(.bottom, 11)
         }
     }
 
-    /// 连接状态小标签
-    @ViewBuilder
-    private var connectionBadge: some View {
-        switch connectionState {
-        case .connected:
-            Text("已连接")
-                .font(.caption2)
-                .foregroundColor(.green)
-        case .disconnected:
-            Text("未连接")
-                .font(.caption2)
-                .foregroundColor(.gray)
-        case .error(let msg):
-            Text(msg)
-                .font(.caption2)
-                .foregroundColor(.orange)
-        case .unknown:
-            EmptyView()
-        }
+    private var isConnected: Bool {
+        connectionState.isConnected && usage.isConnected
     }
 
-    private func formattedDate(_ date: Date) -> String {
+    private var remainingPercent: Double {
+        isConnected ? usage.percentRemaining : 0
+    }
+
+    private var resetDetail: String? {
+        guard isConnected, let resetDate = usage.cycleEndDate else { return nil }
+
+        let calendar = Calendar.current
+        let days = max(
+            0,
+            calendar.dateComponents(
+                [.day],
+                from: calendar.startOfDay(for: Date()),
+                to: calendar.startOfDay(for: resetDate)
+            ).day ?? 0
+        )
+
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/M/d"
-        return formatter.string(from: date)
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "M月d日"
+        let dateText = formatter.string(from: resetDate)
+
+        if days == 0 { return "今天重置（\(dateText)）" }
+        return "重置于 \(days) 天后（\(dateText)）"
     }
 }

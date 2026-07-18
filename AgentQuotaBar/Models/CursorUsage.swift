@@ -81,20 +81,26 @@ struct CursorUsage: Codable, Equatable {
         let spendLimit = json["spendLimitUsage"] as? [String: Any] ?? [:]
 
         return CursorUsage(
-            billingCycleStart: (json["billingCycleStart"] as? Double) ?? 0,
-            billingCycleEnd: (json["billingCycleEnd"] as? Double) ?? 0,
-            totalPercentUsed: (planUsage["totalPercentUsed"] as? Double) ?? 0,
-            autoPercentUsed: (planUsage["autoPercentUsed"] as? Double) ?? 0,
-            apiPercentUsed: (planUsage["apiPercentUsed"] as? Double) ?? 0,
-            totalSpend: (planUsage["totalSpend"] as? Double) ?? 0,
-            includedSpend: (planUsage["includedSpend"] as? Double) ?? 0,
-            bonusSpend: (planUsage["bonusSpend"] as? Double) ?? 0,
-            limit: (planUsage["limit"] as? Double) ?? 0,
-            individualLimit: (spendLimit["individualLimit"] as? Double) ?? 0,
-            individualRemaining: (spendLimit["individualRemaining"] as? Double) ?? 0,
+            billingCycleStart: number(json["billingCycleStart"]),
+            billingCycleEnd: number(json["billingCycleEnd"]),
+            totalPercentUsed: number(planUsage["totalPercentUsed"]),
+            autoPercentUsed: number(planUsage["autoPercentUsed"]),
+            apiPercentUsed: number(planUsage["apiPercentUsed"]),
+            totalSpend: number(planUsage["totalSpend"]),
+            includedSpend: number(planUsage["includedSpend"]),
+            bonusSpend: number(planUsage["bonusSpend"]),
+            limit: number(planUsage["limit"]),
+            individualLimit: number(spendLimit["individualLimit"]),
+            individualRemaining: number(spendLimit["individualRemaining"]),
             displayMessage: json["displayMessage"] as? String,
             fetchedAt: fetchedAt,
             isUnlimited: (json["isUnlimited"] as? Bool) ?? false
         )
+    }
+
+    private static func number(_ value: Any?) -> Double {
+        if let number = value as? NSNumber { return number.doubleValue }
+        if let string = value as? String, let number = Double(string) { return number }
+        return 0
     }
 }

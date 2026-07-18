@@ -7,6 +7,13 @@ struct CursorAPIClient {
     /// 基础 URL
     private static let baseURL = "https://cursor.com"
 
+    private static var userAgent: String {
+        let version = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String ?? "0.0.0"
+        return "AgentQuotaBar/\(version)"
+    }
+
     /// 从 token 构造完整的 Cookie header 值
     /// Cookie 格式: WorkosCursorSessionToken=<sub>::<jwt>
     /// 其中 :: 需要 URL 编码为 %3A%3A
@@ -66,10 +73,7 @@ struct CursorAPIClient {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(baseURL, forHTTPHeaderField: "Origin")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue(
-            "AgentQuotaBar/1.0",
-            forHTTPHeaderField: "User-Agent"
-        )
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue(cookieValue, forHTTPHeaderField: "Cookie")
 
         do {
@@ -111,10 +115,7 @@ struct CursorAPIClient {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue(
-            "AgentQuotaBar/1.0",
-            forHTTPHeaderField: "User-Agent"
-        )
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue(cookieValue, forHTTPHeaderField: "Cookie")
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -152,6 +153,16 @@ enum CursorError: LocalizedError {
             return "数据解析失败"
         case .httpError(let code):
             return "服务器错误 (\(code))"
+        }
+    }
+
+    var logCategory: String {
+        switch self {
+        case .invalidToken: return "invalid-token"
+        case .unauthorized: return "unauthorized"
+        case .networkError: return "network"
+        case .decodingError: return "decoding"
+        case .httpError: return "http"
         }
     }
 }
