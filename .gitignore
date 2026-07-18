@@ -1,0 +1,24 @@
+# Xcode
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+
+# Build
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+Package.resensitive
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# ZCode
+.zcode/
