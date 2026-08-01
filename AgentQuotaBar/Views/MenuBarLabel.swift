@@ -12,18 +12,20 @@ struct MenuBarLabel: View {
                 Image(nsImage: image)
                     .renderingMode(.original)
             } else {
-                Text("CC \(cursorPercentText) \(codexPercentText)")
+                Text("CC \(cursorPercentText) \(otherPercentText) \(codexPercentText)")
             }
         }
-        .accessibilityLabel("Cursor \(cursorPercentText)，Codex \(codexPercentText)")
+        .accessibilityLabel("Cursor \(cursorPercentText)，Other \(otherPercentText)，Codex \(codexPercentText)")
     }
 
     private var renderedLabel: NSImage? {
         let renderer = ImageRenderer(
             content: StatusBarBadge(
                 cursorText: cursorPercentText,
+                otherText: otherPercentText,
                 codexText: codexPercentText,
                 cursorConnected: cursorConnected,
+                otherConnected: otherConnected,
                 codexConnected: codexConnected
             )
             .fixedSize()
@@ -37,12 +39,21 @@ struct MenuBarLabel: View {
         return "\(Int(usage.autoPercentUsed.rounded()))%"
     }
 
+    private var otherPercentText: String {
+        guard otherConnected, let usage = controller.cursorUsage else { return "0%" }
+        return "\(Int(usage.apiPercentUsed.rounded()))%"
+    }
+
     private var codexPercentText: String {
         guard codexConnected else { return "0%" }
         return "\(Int(controller.codexUsage.percentRemaining.rounded()))%"
     }
 
     private var cursorConnected: Bool {
+        controller.cursorConnectionState.isConnected && controller.cursorUsage != nil
+    }
+
+    private var otherConnected: Bool {
         controller.cursorConnectionState.isConnected && controller.cursorUsage != nil
     }
 
@@ -53,8 +64,10 @@ struct MenuBarLabel: View {
 
 private struct StatusBarBadge: View {
     let cursorText: String
+    let otherText: String
     let codexText: String
     let cursorConnected: Bool
+    let otherConnected: Bool
     let codexConnected: Bool
 
     var body: some View {
@@ -67,6 +80,12 @@ private struct StatusBarBadge: View {
                 cursorText,
                 color: cursorConnected
                     ? Color(red: 0.04, green: 0.45, blue: 0.96)
+                    : unavailableColor
+            )
+            pill(
+                otherText,
+                color: otherConnected
+                    ? Color(red: 0.39, green: 0.39, blue: 0.39)
                     : unavailableColor
             )
             pill(

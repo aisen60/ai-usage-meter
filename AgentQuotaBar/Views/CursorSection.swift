@@ -31,7 +31,7 @@ struct CursorSection: View {
                         Text("用量概览")
                             .font(.system(size: MenuMetrics.sectionTitle, weight: .bold))
                             .foregroundStyle(.primary)
-                        Text("\(percent(autoPercent)) Composer · \(percent(apiPercent)) API 已使用")
+                        Text("\(percent(autoPercent)) Cursor Models · \(percent(apiPercent)) Other Models")
                             .font(.system(size: MenuMetrics.summaryText))
                             .foregroundStyle(.secondary)
                     }
@@ -50,16 +50,16 @@ struct CursorSection: View {
             if isExpanded {
                 VStack(spacing: 7) {
                     UsageBarCard(
-                        label: "Composer",
+                        label: "Cursor Models",
                         percent: autoPercent,
                         tint: isConnected ? .blue : .gray,
-                        detail: "超出限制的使用将消耗 API 额度或按需计费。"
+                        detail: nil
                     )
                     UsageBarCard(
-                        label: "API",
+                        label: "Other Models",
                         percent: apiPercent,
-                        tint: isConnected ? .green : .gray,
-                        detail: apiDetail
+                        tint: isConnected ? Color(red: 0.39, green: 0.39, blue: 0.39) : .gray,
+                        detail: nil
                     )
                 }
                 .padding(.horizontal, MenuMetrics.horizontalPadding)
