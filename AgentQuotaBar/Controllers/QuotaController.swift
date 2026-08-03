@@ -34,6 +34,9 @@ final class QuotaController: ObservableObject {
     /// Codex 连接状态
     @Published var codexConnectionState: ConnectionState = .unknown
 
+    /// 菜单栏显示项目设置（变更即持久化到 UserDefaults）
+    @Published var displaySettings: MenuBarDisplaySettings
+
     // MARK: - Properties
 
     /// 刷新间隔 (默认 15 分钟)
@@ -50,6 +53,7 @@ final class QuotaController: ObservableObject {
     enum ConnectionState {
         case unknown
         case connected
+        case stale
         case disconnected
         case error(String)
 
@@ -57,16 +61,25 @@ final class QuotaController: ObservableObject {
             if case .connected = self { return true }
             return false
         }
+
+        /// 当前是否有可展示的数据。Cursor 缓存可在降级状态继续展示，
+        /// Codex 失败时不会进入 stale，因此不会误用旧额度。
+        var canDisplayUsage: Bool {
+            switch self {
+            case .connected, .stale:
+                return true
+            case .unknown, .disconnected, .error:
+                return false
+            }
+        }
     }
 
     // MARK: - Lifecycle
 
-    init() {
-        // 菜单栏标题在弹层打开前就需要有缓存和最新数据。
-        loadCache()
-        startAutoRefresh()
-        Task { [weak self] in
-            await self?.refresh()
+    init(autoStart: Bool = true) {
+        displaySettings = MenuBarDisplaySettings.load()
+        if autoStart {
+            start()
         }
     }
 
@@ -77,10 +90,12 @@ final class QuotaController: ObservableObject {
 
     /// 供将来重新启动刷新任务时调用。
     func start() {
-        Task {
-            await refresh()
-        }
+        // 菜单栏标题在弹层打开前就需要有缓存和最新数据。
+        loadCache()
         startAutoRefresh()
+        Task { [weak self] in
+            await self?.refresh()
+        }
     }
 
     /// 手动刷新
@@ -132,6 +147,16 @@ final class QuotaController: ObservableObject {
         return nil
     }
 
+    /// 切换菜单栏显示项目。至少保留一项，关闭最后一项的请求会被拒绝。
+    func setDisplayItem(_ item: MenuBarDisplaySettings.Item, visible: Bool) {
+        guard let next = displaySettings.toggling(item, to: visible) else {
+            AppLog.app.debug("Display item change rejected: at least one item must stay visible")
+            return
+        }
+        displaySettings = next
+        next.save()
+    }
+
     // MARK: - Private Methods
 
     private func refreshCursor() async {
@@ -142,10 +167,10 @@ final class QuotaController: ObservableObject {
 
         guard let token = resolveCursorToken() else {
             AppLog.cursor.notice("Cursor credentials were not found")
-            cursorConnectionState = .disconnected
-            // 如果没有 token 但有缓存，保持缓存状态
             if cursorUsage != nil {
-                cursorConnectionState = .connected
+                cursorConnectionState = .stale
+            } else {
+                cursorConnectionState = .disconnected
             }
             return
         }
@@ -158,7 +183,7 @@ final class QuotaController: ObservableObject {
         } catch {
             // 失败时保持缓存数据
             if cursorUsage != nil {
-                cursorConnectionState = .error("已显示缓存数据")
+                cursorConnectionState = .stale
             } else {
                 cursorConnectionState = .error(error.localizedDescription)
             }

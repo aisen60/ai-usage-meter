@@ -11,7 +11,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct AgentQuotaBarApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var controller = QuotaController()
+    @StateObject private var controller: QuotaController
+
+    init() {
+        // macOS 单元测试会启动宿主 App。测试期间禁用缓存、凭据和真实服务访问，
+        // 保证普通测试只运行受控的本地逻辑。
+        let isRunningTests = ProcessInfo.processInfo.environment[
+            "XCTestConfigurationFilePath"
+        ] != nil
+        _controller = StateObject(
+            wrappedValue: QuotaController(autoStart: !isRunningTests)
+        )
+    }
 
     var body: some Scene {
         MenuBarExtra {

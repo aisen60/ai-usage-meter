@@ -24,7 +24,11 @@
 		A1000016 /* CodexIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A2000018 /* CodexIcon.png */; };
 		A1000017 /* AppLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* AppLog.swift */; };
 		A1000018 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* LaunchAtLoginService.swift */; };
+		A1000019 /* MenuBarDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000021 /* MenuBarDisplaySettings.swift */; };
+		A1000020 /* StatusBarBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022 /* StatusBarBadge.swift */; };
+		A1000021 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000023 /* SettingsView.swift */; };
 		B1000001 /* QuotaParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000001 /* QuotaParsingTests.swift */; };
+		B1000002 /* MenuBarDisplaySettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000003 /* MenuBarDisplaySettingsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +61,11 @@
 		A2000018 /* CodexIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CodexIcon.png; sourceTree = "<group>"; };
 		A2000019 /* AppLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLog.swift; sourceTree = "<group>"; };
 		A2000020 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
+		A2000021 /* MenuBarDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettings.swift; sourceTree = "<group>"; };
+		A2000022 /* StatusBarBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarBadge.swift; sourceTree = "<group>"; };
+		A2000023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B2000001 /* QuotaParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaParsingTests.swift; sourceTree = "<group>"; };
+		B2000003 /* MenuBarDisplaySettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettingsTests.swift; sourceTree = "<group>"; };
 		B2000002 /* AgentQuotaBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgentQuotaBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -117,6 +125,7 @@
 			children = (
 				A2000002 /* CursorUsage.swift */,
 				A2000003 /* CodexUsage.swift */,
+				A2000021 /* MenuBarDisplaySettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -150,6 +159,8 @@
 				A2000011 /* MenuBarView.swift */,
 				A2000012 /* CursorSection.swift */,
 				A2000013 /* CodexSection.swift */,
+				A2000022 /* StatusBarBadge.swift */,
+				A2000023 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -185,6 +196,7 @@
 			isa = PBXGroup;
 			children = (
 				B2000001 /* QuotaParsingTests.swift */,
+				B2000003 /* MenuBarDisplaySettingsTests.swift */,
 			);
 			path = AgentQuotaBarTests;
 			sourceTree = "<group>";
@@ -284,6 +296,9 @@
 				A1000013 /* CodexSection.swift in Sources */,
 				A1000017 /* AppLog.swift in Sources */,
 				A1000018 /* LaunchAtLoginService.swift in Sources */,
+				A1000019 /* MenuBarDisplaySettings.swift in Sources */,
+				A1000020 /* StatusBarBadge.swift in Sources */,
+				A1000021 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +307,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B1000001 /* QuotaParsingTests.swift in Sources */,
+				B1000002 /* MenuBarDisplaySettingsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

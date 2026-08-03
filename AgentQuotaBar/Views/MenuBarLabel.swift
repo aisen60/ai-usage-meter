@@ -12,10 +12,10 @@ struct MenuBarLabel: View {
                 Image(nsImage: image)
                     .renderingMode(.original)
             } else {
-                Text("CC \(cursorPercentText) \(otherPercentText) \(codexPercentText)")
+                Text(fallbackText)
             }
         }
-        .accessibilityLabel("Cursor \(cursorPercentText)，Other \(otherPercentText)，Codex \(codexPercentText)")
+        .accessibilityLabel(accessibilityDescription)
     }
 
     private var renderedLabel: NSImage? {
@@ -26,7 +26,8 @@ struct MenuBarLabel: View {
                 codexText: codexPercentText,
                 cursorConnected: cursorConnected,
                 otherConnected: otherConnected,
-                codexConnected: codexConnected
+                codexConnected: codexConnected,
+                settings: controller.displaySettings
             )
             .fixedSize()
         )
@@ -50,73 +51,62 @@ struct MenuBarLabel: View {
     }
 
     private var cursorConnected: Bool {
-        controller.cursorConnectionState.isConnected && controller.cursorUsage != nil
+        controller.cursorConnectionState.canDisplayUsage && controller.cursorUsage != nil
     }
 
     private var otherConnected: Bool {
-        controller.cursorConnectionState.isConnected && controller.cursorUsage != nil
+        cursorConnected
     }
 
     private var codexConnected: Bool {
         controller.codexConnectionState.isConnected && controller.codexUsage.isConnected
     }
-}
 
-private struct StatusBarBadge: View {
-    let cursorText: String
-    let otherText: String
-    let codexText: String
-    let cursorConnected: Bool
-    let otherConnected: Bool
-    let codexConnected: Bool
+    private var fallbackText: String {
+        let values = controller.displaySettings.visibleItems.map(valueText(for:))
+        return (["CC"] + values).joined(separator: " ")
+    }
 
-    var body: some View {
-        HStack(spacing: 3) {
-            Text("CC")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color(nsColor: .labelColor))
+    private var accessibilityDescription: String {
+        controller.displaySettings.visibleItems
+            .map(accessibilityText(for:))
+            .joined(separator: "，")
+    }
 
-            pill(
-                cursorText,
-                color: cursorConnected
-                    ? Color(red: 0.04, green: 0.45, blue: 0.96)
-                    : unavailableColor
-            )
-            pill(
-                otherText,
-                color: otherConnected
-                    ? Color(red: 0.39, green: 0.39, blue: 0.39)
-                    : unavailableColor
-            )
-            pill(
-                codexText,
-                color: codexConnected
-                    ? Color(red: 0.00, green: 0.62, blue: 0.32)
-                    : unavailableColor
-            )
+    private func valueText(for item: MenuBarDisplaySettings.Item) -> String {
+        switch item {
+        case .cursorModels: return cursorPercentText
+        case .otherModels: return otherPercentText
+        case .codexWeeklyRemaining: return codexPercentText
         }
-        .padding(.horizontal, 5)
-        .padding(.vertical, 1.5)
-        .background(
-            RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .fill(Color(nsColor: .controlBackgroundColor))
-        )
     }
 
-    private var unavailableColor: Color {
-        Color(nsColor: .tertiaryLabelColor)
+    private func accessibilityText(for item: MenuBarDisplaySettings.Item) -> String {
+        switch item {
+        case .cursorModels:
+            return "Cursor Models 已用 \(cursorPercentText)\(cursorStateSuffix)"
+        case .otherModels:
+            return "Other Models 已用 \(otherPercentText)\(cursorStateSuffix)"
+        case .codexWeeklyRemaining:
+            return "Codex 本周剩余 \(codexPercentText)\(codexStateSuffix)"
+        }
     }
 
-    private func pill(_ text: String, color: Color) -> some View {
-        Text(text)
-            .font(.system(size: 10, weight: .semibold))
-            .monospacedDigit()
-            .foregroundStyle(.white)
-            .padding(.horizontal, 4)
-            .padding(.vertical, 1)
-            .background(
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                    .fill(color)
-            )
+    private var cursorStateSuffix: String {
+        stateSuffix(for: controller.cursorConnectionState)
+    }
+
+    private var codexStateSuffix: String {
+        stateSuffix(for: controller.codexConnectionState)
+    }
+
+    private func stateSuffix(for state: QuotaController.ConnectionState) -> String {
+        switch state {
+        case .connected: return ""
+        case .stale: return "，缓存数据"
+        case .disconnected: return "，未连接"
+        case .error: return "，连接异常"
+        case .unknown: return "，检测中"
+        }
     }
 }
