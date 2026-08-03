@@ -24,7 +24,7 @@
 | Credential storage | `AgentQuotaBar/Services/TokenKeychain.swift` | Manual Cursor token persistence in Keychain |
 | Cache and diagnostics | `AgentQuotaBar/Services/UsageCache.swift`, `AppLog.swift` | Non-secret cached usage and privacy-safe logging |
 | Login item | `AgentQuotaBar/Services/LaunchAtLoginService.swift` | Release-only registration through ServiceManagement |
-| Unit tests | `AgentQuotaBarTests/QuotaParsingTests.swift` | Parser, mapping, clamping, failure, and child-process cleanup behavior |
+| Unit tests | `AgentQuotaBarTests/` | Parser, mapping, display settings, persistence constraints, failure, and child-process cleanup behavior |
 | Packaging | `scripts/build-release.sh` | Universal build, metadata checks, ad-hoc signing, archive and checksum verification |
 
 ## Dependency Direction
@@ -42,8 +42,9 @@ Do not force a broad MVVM or repository-layer rewrite. Add a new abstraction onl
 
 ## Current UI Contract
 
-- The status item shows a blue Cursor capsule and a green Codex capsule when connected.
+- The status item shows configurable Cursor Models, Other Models, and Codex weekly-remaining capsules, with at least one value always visible.
 - Disconnected service values fall back to a neutral gray `0%` presentation.
+- Cursor cache remains displayable in an explicit stale state; Codex never presents stale quota as current.
 - `.menuBarExtraStyle(.window)` is intentional because `.menu` reinterprets custom SwiftUI content as menu items and breaks the card layout.
-- Refresh and quit controls live in the bottom toolbar.
+- Settings, refresh status, and quit controls live in the segmented bottom toolbar.
 - Preserve compact sizing and avoid window-oriented navigation patterns unless the product direction changes.

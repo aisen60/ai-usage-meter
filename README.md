@@ -2,7 +2,15 @@
 
 Agent Quota Bar 是一个 macOS 菜单栏工具，用来同时查看 Cursor 和 Codex 的订阅额度。
 
-菜单栏蓝色胶囊显示 Cursor Composer **已用百分比**，绿色胶囊显示 Codex **本周剩余百分比**。服务未连接时统一显示灰色 `0%`。
+菜单栏标签以「CC」前缀加三个彩色胶囊呈现：蓝色胶囊显示 Cursor Models **已用百分比**，灰色胶囊显示 Other Models **已用百分比**，绿色胶囊显示 Codex **本周剩余百分比**。服务未连接时统一显示灰色 `0%`。
+
+## v0.2.0 功能
+
+- 新增设置页：弹层底部工具栏的齿轮入口进入，左上角返回
+- 设置页内提供状态栏预览，调整开关时可实时看到菜单栏效果
+- 可分别开关 Cursor Models、Other Models、本周剩余三个菜单栏胶囊；至少保留一项，「CC」前缀固定显示
+- 显示设置本地持久化，默认全开，从 v0.1.0 升级无感知
+- 底部工具栏改为三等分分段布局：设置 ｜ 刷新状态 ｜ 退出
 
 ## v0.1.0 功能
 
@@ -23,12 +31,12 @@ Agent Quota Bar 是一个 macOS 菜单栏工具，用来同时查看 Cursor 和 
 
 ## 安装
 
-1. 从私有 GitHub Release 下载 `AgentQuotaBar-0.1.0.zip` 和 `.sha256` 文件。
-2. 可选：运行 `shasum -a 256 -c AgentQuotaBar-0.1.0.zip.sha256` 校验文件。
+1. 从 [GitHub Releases](https://github.com/aisen60/agent-quota-bar/releases) 下载 `AgentQuotaBar-0.2.0.zip` 和 `.sha256` 文件。
+2. 可选：运行 `shasum -a 256 -c AgentQuotaBar-0.2.0.zip.sha256` 校验文件。
 3. 解压后将 `AgentQuotaBar.app` 拖入 `/Applications`。
 4. 首次启动时，在 Finder 中右键应用并选择“打开”。若仍被拦截，请前往“系统设置 → 隐私与安全性”确认打开。
 
-v0.1.0 使用 ad-hoc 签名，未进行 Apple Developer ID 签名和公证，因此首次启动出现系统安全提示属于预期行为。
+v0.2.0 使用 ad-hoc 签名，未进行 Apple Developer ID 签名和公证，因此首次启动出现系统安全提示属于预期行为。
 
 ### 开机启动
 
@@ -55,10 +63,11 @@ open AgentQuotaBar.xcodeproj
 xcodebuild test \
   -project AgentQuotaBar.xcodeproj \
   -scheme AgentQuotaBar \
-  -destination 'platform=macOS'
+  -destination 'platform=macOS' \
+  -derivedDataPath /private/tmp/AgentQuotaBar-DerivedData
 ```
 
-生成 v0.1.0 Universal 发行包：
+生成 v0.2.0 Universal 发行包：
 
 ```bash
 ./scripts/build-release.sh

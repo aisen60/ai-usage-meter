@@ -17,6 +17,7 @@ xcodebuild test \
 ```
 
 Use a task-specific temporary Derived Data directory if parallel work might collide. Do not write new generated build output into the repository.
+The XCTest host disables `QuotaController` startup effects; a normal unit-test run must not read user credentials or call live Cursor/Codex services.
 
 ### Focused evidence
 
@@ -40,10 +41,10 @@ The script writes release artifacts under `dist/` and replaces the version-match
 
 ## Distribution Constraints
 
-- Current distribution is private and ad-hoc signed, without Developer ID notarization.
+- Source code is MIT-licensed. Release artifacts are currently ad-hoc signed, without Developer ID notarization.
 - Preserve bundle identifier `com.agentquotabar.app` unless an explicit migration covers Keychain and login-item consequences.
 - Preserve universal architecture support while the release script promises `arm64 + x86_64`.
-- Keep release notes, README requirements, and the script's version metadata aligned when preparing a release.
+- Treat `CHANGELOG.md` as the single checked-in version history. Keep its current entry, README requirements, GitHub Release text, and the script's version metadata aligned when preparing a release; do not add per-version release-note files unless automation requires one.
 - Do not claim Gatekeeper, login-item, Keychain persistence, or live-service compatibility from unit tests alone.
 
 ## Common Validation Noise

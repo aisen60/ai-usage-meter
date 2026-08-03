@@ -19,8 +19,8 @@ The dashboard cookie is derived in memory and must never be persisted or logged.
 
 Failure policy:
 
-- If no credential exists and cached Cursor usage exists, keep the cached value available.
-- If refresh fails and cached usage exists, retain it and expose a degraded/error connection state.
+- If no credential exists and cached Cursor usage exists, keep the cached value available in the explicit `.stale` state.
+- If refresh fails and cached usage exists, retain it and expose `.stale` rather than claiming a current connection.
 - If no current or cached usage exists, display disconnected state.
 
 ## Codex
@@ -47,6 +47,7 @@ Concurrency notes:
 - Cache contains displayable usage data, never credentials or raw responses.
 - Treat cache timestamps as part of truthfulness: cached data is a fallback, not proof of a successful current refresh.
 - Codex deliberately does not load or save quota cache under the current product policy.
+- The XCTest host disables controller startup side effects so ordinary unit tests do not read credentials, caches, or live services.
 
 ## Logging
 
