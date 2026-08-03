@@ -87,4 +87,6 @@ Cursor 用量接口和 Codex `app-server` 都不是面向此应用承诺稳定�
 
 ## License
 
-Private project. All rights reserved.
+本项目采用 [MIT License](LICENSE) 开源。
+
+Copyright © 2026 aisen60.
