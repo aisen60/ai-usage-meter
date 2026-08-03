@@ -8,6 +8,7 @@ This is **Agent Quota Bar**, a native macOS menu bar app for viewing Cursor and 
 - For `MenuBarExtra`, AppKit bridging, application lifecycle, Keychain, login items, privacy, signing, or distribution work, also load `macos-menu-bar-app`.
 - Load `swift-testing-pro` only when writing Swift Testing tests or when the user explicitly requests an XCTest migration. Preserve the existing XCTest suite otherwise.
 - For staging changes, drafting commit messages, or creating commits, load `git-commit`. Keep the Conventional Commit type token when useful, and default all human-readable commit subject and body text to Simplified Chinese unless the user explicitly requests another language for that commit.
+- Load `planning-gate` only when the user explicitly asks for detailed planning, brainstorming, a complete plan, or the planning gate workflow. Do not activate it automatically from task complexity alone.
 - Treat the checked-in Xcode project as authoritative. The current product baseline is macOS 13 and Swift 5 language mode; do not raise the deployment target, change Swift language mode, or enable broad concurrency migrations unless the task requires and validates that change.
 - Preserve the product's data semantics: Cursor may display cached data after refresh failure, while Codex must become disconnected rather than presenting stale quota as current.
 - Never log, persist outside Keychain, expose, or include in fixtures any token, cookie, account identifier, authentication payload, or complete private API response.

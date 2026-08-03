@@ -1,0 +1,25 @@
+---
+description: Git commit message generation rules
+alwaysApply: true
+---
+
+# Git Commit Message Rules
+
+When generating git commit messages:
+
+- Always write in Chinese.
+- Use Conventional Commits format.
+- Keep messages concise.
+- Describe the user-facing change.
+
+Format:
+
+<type>: <中文描述>
+
+Examples:
+
+feat: 新增 AI 额度查询功能
+
+fix: 修复菜单栏刷新失败问题
+
+refactor: 重构 API 请求逻辑

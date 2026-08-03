@@ -1,0 +1,7 @@
+interface:
+  display_name: "Planning Gate"
+  short_description: "Opt-in reviewed planning for Agent Quota Bar changes."
+  default_prompt: "Use $planning-gate to explore and review a complete design and implementation plan before coding."
+
+policy:
+  allow_implicit_invocation: true

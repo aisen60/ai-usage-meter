@@ -47,5 +47,6 @@ Treat this file as a router. Read only the smallest reference that covers the ta
 - Use `macos-menu-bar-app` for menu bar lifecycle, AppKit integration, credential storage, login items, signing, and distribution.
 - Use `swift-testing-pro` only when Swift Testing is already being used or the user asks to adopt or migrate to it.
 - Use `git-commit` when staging or committing changes. It preserves unrelated work and defaults human-readable commit text to Simplified Chinese unless the user explicitly requests another language.
+- Use `planning-gate` only when the user explicitly requests detailed planning, brainstorming, a complete plan, or the planning gate workflow. Do not activate it from task complexity alone.
 
 The vendored `*-pro` skills are project-local adaptations of Paul Hudson's MIT-licensed agent skills. Repository rules and the checked-in toolchain take precedence over their general recommendations.
