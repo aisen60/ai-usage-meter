@@ -1,0 +1,7 @@
+interface:
+  display_name: "Git Commit"
+  short_description: "Creates safe atomic commits with Chinese messages."
+  default_prompt: "Use $git-commit to analyze the current changes and create an atomic commit with a Simplified Chinese message."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,10 @@
+interface:
+  display_name: "Swift Concurrency Pro"
+  short_description: "Writes and reviews safe Swift concurrency code."
+  icon_small: "./assets/swift-concurrency-pro-icon.svg"
+  icon_large: "./assets/swift-concurrency-pro-icon.png"
+  brand_color: "#FF412E"
+  default_prompt: "Use $swift-concurrency-pro to implement or review this async code for isolation, cancellation, and cleanup safety."
+
+policy:
+  allow_implicit_invocation: true
