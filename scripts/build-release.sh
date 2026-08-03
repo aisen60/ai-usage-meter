@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-readonly VERSION="0.1.0"
+readonly VERSION="0.2.0"
+readonly BUILD_NUMBER="20260801"
 readonly BUNDLE_ID="com.agentquotabar.app"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -37,7 +38,7 @@ readonly EXECUTABLE="$APP_PATH/Contents/MacOS/AgentQuotaBar"
 
 test -d "$APP_PATH"
 test "$(plutil -extract CFBundleShortVersionString raw "$INFO_PLIST")" = "$VERSION"
-test "$(plutil -extract CFBundleVersion raw "$INFO_PLIST")" = "1"
+test "$(plutil -extract CFBundleVersion raw "$INFO_PLIST")" = "$BUILD_NUMBER"
 test "$(plutil -extract CFBundleIdentifier raw "$INFO_PLIST")" = "$BUNDLE_ID"
 
 readonly ARCHITECTURES="$(lipo -archs "$EXECUTABLE")"
@@ -68,6 +69,7 @@ ditto -x -k "$ZIP_PATH" "$VERIFY_DIR"
 readonly PACKAGED_APP="$VERIFY_DIR/AgentQuotaBar.app"
 test -d "$PACKAGED_APP"
 test "$(plutil -extract CFBundleShortVersionString raw "$PACKAGED_APP/Contents/Info.plist")" = "$VERSION"
+test "$(plutil -extract CFBundleVersion raw "$PACKAGED_APP/Contents/Info.plist")" = "$BUILD_NUMBER"
 test "$(plutil -extract CFBundleIdentifier raw "$PACKAGED_APP/Contents/Info.plist")" = "$BUNDLE_ID"
 test "$(lipo -archs "$PACKAGED_APP/Contents/MacOS/AgentQuotaBar")" = "$ARCHITECTURES"
 codesign --verify --strict --verbose=2 "$PACKAGED_APP"
