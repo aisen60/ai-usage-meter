@@ -1,0 +1,4 @@
+interface:
+  display_name: "macOS Menu Bar App"
+  short_description: "Build safe native macOS menu bar applications."
+  default_prompt: "Use $macos-menu-bar-app to implement this macOS menu bar feature safely."

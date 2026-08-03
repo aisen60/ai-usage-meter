@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Quota Bar"
+  short_description: "Repository guidance for Agent Quota Bar development."
+  default_prompt: "Use $agent-quota-bar to make a safe, repository-aware change."

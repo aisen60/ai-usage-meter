@@ -21,5 +21,8 @@ Package.resensitive
 *.swp
 *~
 
-# ZCode
 .zcode/
+.workbuddy
+
+# Agent working plans
+.agent-plans/

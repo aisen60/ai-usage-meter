@@ -12,7 +12,7 @@ struct CursorSection: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 9) {
                 ServiceLogo(resourceName: "CursorIcon", fallbackSymbol: "cursorarrow.rays")
-                Text(isConnected ? planName : "Cursor")
+                Text(canDisplayUsage ? planName : "Cursor")
                     .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
                 Spacer()
                 ConnectionStatus(state: connectionState)
@@ -31,7 +31,7 @@ struct CursorSection: View {
                         Text("用量概览")
                             .font(.system(size: MenuMetrics.sectionTitle, weight: .bold))
                             .foregroundStyle(.primary)
-                        Text("\(percent(autoPercent)) Composer · \(percent(apiPercent)) API 已使用")
+                        Text("\(percent(autoPercent)) Cursor Models · \(percent(apiPercent)) Other Models")
                             .font(.system(size: MenuMetrics.summaryText))
                             .foregroundStyle(.secondary)
                     }
@@ -50,16 +50,16 @@ struct CursorSection: View {
             if isExpanded {
                 VStack(spacing: 7) {
                     UsageBarCard(
-                        label: "Composer",
+                        label: "Cursor Models",
                         percent: autoPercent,
-                        tint: isConnected ? .blue : .gray,
-                        detail: "超出限制的使用将消耗 API 额度或按需计费。"
+                        tint: canDisplayUsage ? .blue : .gray,
+                        detail: nil
                     )
                     UsageBarCard(
-                        label: "API",
+                        label: "Other Models",
                         percent: apiPercent,
-                        tint: isConnected ? .green : .gray,
-                        detail: apiDetail
+                        tint: canDisplayUsage ? Color(red: 0.39, green: 0.39, blue: 0.39) : .gray,
+                        detail: nil
                     )
                 }
                 .padding(.horizontal, MenuMetrics.horizontalPadding)
@@ -68,16 +68,18 @@ struct CursorSection: View {
         }
     }
 
-    private var isConnected: Bool { connectionState.isConnected && usage != nil }
-    private var autoPercent: Double { isConnected ? usage?.autoPercentUsed ?? 0 : 0 }
-    private var apiPercent: Double { isConnected ? usage?.apiPercentUsed ?? 0 : 0 }
+    private var canDisplayUsage: Bool {
+        connectionState.canDisplayUsage && usage != nil
+    }
+    private var autoPercent: Double { canDisplayUsage ? usage?.autoPercentUsed ?? 0 : 0 }
+    private var apiPercent: Double { canDisplayUsage ? usage?.apiPercentUsed ?? 0 : 0 }
 
     private func percent(_ value: Double) -> String {
         "\(Int(value.rounded()))%"
     }
 
     private var apiDetail: String {
-        if let usage, isConnected, usage.includedSpend > 0 {
+        if let usage, canDisplayUsage, usage.includedSpend > 0 {
             let amount = usage.includedSpend / 100
             return "超出限制的使用将按需计费。计划包含至少 $\(Int(amount)) 的 API 使用额度。"
         }
@@ -173,6 +175,7 @@ struct ConnectionStatus: View {
     private var label: String {
         switch state {
         case .connected: return "已连接"
+        case .stale: return "缓存数据"
         case .disconnected: return "未连接"
         case .error: return "连接异常"
         case .unknown: return "检测中"
@@ -182,6 +185,7 @@ struct ConnectionStatus: View {
     private var color: Color {
         switch state {
         case .connected: return .green
+        case .stale: return .orange
         case .disconnected, .unknown: return .secondary
         case .error: return .orange
         }
