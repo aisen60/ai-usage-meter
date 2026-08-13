@@ -12,6 +12,7 @@ struct StatusBarBadge: View {
     let otherConnected: Bool
     let codexConnected: Bool
     let settings: MenuBarDisplaySettings
+    let cursorAvailable: Bool
 
     var body: some View {
         HStack(spacing: 3) {
@@ -19,7 +20,7 @@ struct StatusBarBadge: View {
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color(nsColor: .labelColor))
 
-            if settings.showCursorModels {
+            if cursorAvailable && settings.showCursorModels {
                 pill(
                     cursorText,
                     color: cursorConnected
@@ -27,7 +28,7 @@ struct StatusBarBadge: View {
                         : unavailableColor
                 )
             }
-            if settings.showOtherModels {
+            if cursorAvailable && settings.showOtherModels {
                 pill(
                     otherText,
                     color: otherConnected

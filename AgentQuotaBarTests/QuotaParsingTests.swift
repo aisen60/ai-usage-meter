@@ -3,6 +3,27 @@ import XCTest
 @testable import AgentQuotaBar
 
 final class QuotaParsingTests: XCTestCase {
+
+    func testCursorInstallationDetectionUsesApplicationBundle() throws {
+        let temporaryDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let cursorApplication = temporaryDirectory
+            .appendingPathComponent("Cursor.app", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+
+        XCTAssertFalse(
+            CursorTokenReader.isCursorInstalled(applicationURLs: [cursorApplication])
+        )
+
+        try FileManager.default.createDirectory(
+            at: cursorApplication,
+            withIntermediateDirectories: true
+        )
+        XCTAssertTrue(
+            CursorTokenReader.isCursorInstalled(applicationURLs: [cursorApplication])
+        )
+    }
+
     func testCursorPlanMapping() {
         XCTAssertEqual(CursorTokenReader.displayPlanName(for: "free"), "Cursor Hobby")
         XCTAssertEqual(CursorTokenReader.displayPlanName(for: "pro"), "Cursor Pro")

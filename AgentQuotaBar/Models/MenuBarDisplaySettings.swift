@@ -51,9 +51,27 @@ struct MenuBarDisplaySettings: Codable, Equatable {
         Item.allCases.filter { isVisible($0) }
     }
 
+    /// 当前环境中实际可展示的项目。Cursor 集成不可用时仅临时过滤其项目，
+    /// 不修改用户偏好，集成恢复后可自动恢复原有设置。
+    func visibleItems(cursorAvailable: Bool) -> [Item] {
+        visibleItems.filter { item in
+            switch item {
+            case .cursorModels, .otherModels:
+                return cursorAvailable
+            case .codexWeeklyRemaining:
+                return true
+            }
+        }
+    }
+
     /// 该项目是否是唯一仍开启的项目（视图据此将其开关置灰）
     func isLastVisible(_ item: Item) -> Bool {
         isVisible(item) && visibleItems.count == 1
+    }
+
+    /// 该项目是否是当前环境中唯一仍开启且可用的项目。
+    func isLastVisible(_ item: Item, cursorAvailable: Bool) -> Bool {
+        isVisible(item) && visibleItems(cursorAvailable: cursorAvailable) == [item]
     }
 
     // MARK: - Mutation
@@ -69,6 +87,19 @@ struct MenuBarDisplaySettings: Codable, Equatable {
         case .codexWeeklyRemaining: next.showCodexWeeklyRemaining = value
         }
         guard !next.visibleItems.isEmpty else { return nil }
+        return next
+    }
+
+    /// 返回切换项目后的新设置，并保证当前环境至少有一项可展示。
+    func toggling(
+        _ item: Item,
+        to value: Bool,
+        cursorAvailable: Bool
+    ) -> MenuBarDisplaySettings? {
+        guard let next = toggling(item, to: value),
+              !next.visibleItems(cursorAvailable: cursorAvailable).isEmpty else {
+            return nil
+        }
         return next
     }
 
