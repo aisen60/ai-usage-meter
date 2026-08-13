@@ -178,4 +178,42 @@ final class QuotaControllerStateTests: XCTestCase {
 
         XCTAssertFalse(controller.shouldShowCursor)
     }
+
+    @MainActor
+    func testCursorShowsCurrentUsage() {
+        let controller = QuotaController(autoStart: false, cursorInstalled: true)
+        controller.cursorUsage = cursorUsage()
+        controller.cursorConnectionState = .connected
+
+        XCTAssertTrue(controller.shouldShowCursor)
+    }
+
+    @MainActor
+    func testCursorShowsExplicitlyStaleUsage() {
+        let controller = QuotaController(autoStart: false, cursorInstalled: true)
+        controller.cursorUsage = cursorUsage()
+        controller.cursorConnectionState = .stale
+
+        XCTAssertTrue(controller.shouldShowCursor)
+    }
+
+    @MainActor
+    private func cursorUsage() -> CursorUsage {
+        CursorUsage(
+            billingCycleStart: 0,
+            billingCycleEnd: 0,
+            totalPercentUsed: 10,
+            autoPercentUsed: 10,
+            apiPercentUsed: 5,
+            totalSpend: 0,
+            includedSpend: 0,
+            bonusSpend: 0,
+            limit: 0,
+            individualLimit: 0,
+            individualRemaining: 0,
+            displayMessage: nil,
+            fetchedAt: Date(),
+            isUnlimited: false
+        )
+    }
 }
