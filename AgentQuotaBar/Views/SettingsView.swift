@@ -71,7 +71,7 @@ struct SettingsView: View {
                 otherConnected: otherConnected,
                 codexConnected: codexConnected,
                 settings: controller.displaySettings,
-                cursorInstalled: controller.isCursorInstalled
+                cursorAvailable: controller.shouldShowCursor
             )
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -90,7 +90,7 @@ struct SettingsView: View {
             sectionTitle("显示项目")
 
             VStack(spacing: 0) {
-                if controller.isCursorInstalled {
+                if controller.shouldShowCursor {
                     displayItemRow(
                         item: .cursorModels,
                         name: "Cursor Models",
@@ -170,7 +170,7 @@ struct SettingsView: View {
             .disabled(
                 controller.displaySettings.isLastVisible(
                     item,
-                    cursorInstalled: controller.isCursorInstalled
+                    cursorAvailable: controller.shouldShowCursor
                 )
             )
         }

@@ -51,13 +51,13 @@ struct MenuBarDisplaySettings: Codable, Equatable {
         Item.allCases.filter { isVisible($0) }
     }
 
-    /// 当前环境中实际可展示的项目。未安装 Cursor 时仅临时过滤其项目，
-    /// 不修改用户偏好，安装 Cursor 后可自动恢复原有设置。
-    func visibleItems(cursorInstalled: Bool) -> [Item] {
+    /// 当前环境中实际可展示的项目。Cursor 集成不可用时仅临时过滤其项目，
+    /// 不修改用户偏好，集成恢复后可自动恢复原有设置。
+    func visibleItems(cursorAvailable: Bool) -> [Item] {
         visibleItems.filter { item in
             switch item {
             case .cursorModels, .otherModels:
-                return cursorInstalled
+                return cursorAvailable
             case .codexWeeklyRemaining:
                 return true
             }
@@ -70,8 +70,8 @@ struct MenuBarDisplaySettings: Codable, Equatable {
     }
 
     /// 该项目是否是当前环境中唯一仍开启且可用的项目。
-    func isLastVisible(_ item: Item, cursorInstalled: Bool) -> Bool {
-        isVisible(item) && visibleItems(cursorInstalled: cursorInstalled) == [item]
+    func isLastVisible(_ item: Item, cursorAvailable: Bool) -> Bool {
+        isVisible(item) && visibleItems(cursorAvailable: cursorAvailable) == [item]
     }
 
     // MARK: - Mutation
@@ -94,10 +94,10 @@ struct MenuBarDisplaySettings: Codable, Equatable {
     func toggling(
         _ item: Item,
         to value: Bool,
-        cursorInstalled: Bool
+        cursorAvailable: Bool
     ) -> MenuBarDisplaySettings? {
         guard let next = toggling(item, to: value),
-              !next.visibleItems(cursorInstalled: cursorInstalled).isEmpty else {
+              !next.visibleItems(cursorAvailable: cursorAvailable).isEmpty else {
             return nil
         }
         return next

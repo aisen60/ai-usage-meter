@@ -92,33 +92,33 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
         XCTAssertFalse(cursorAndCodex.isLastVisible(.codexWeeklyRemaining))
     }
 
-    func testCursorItemsAreTemporarilyFilteredWhenCursorIsNotInstalled() {
+    func testCursorItemsAreTemporarilyFilteredWhenIntegrationIsUnavailable() {
         let settings = MenuBarDisplaySettings.default
 
         XCTAssertEqual(
-            settings.visibleItems(cursorInstalled: false),
+            settings.visibleItems(cursorAvailable: false),
             [.codexWeeklyRemaining]
         )
         XCTAssertEqual(
-            settings.visibleItems(cursorInstalled: true),
+            settings.visibleItems(cursorAvailable: true),
             settings.visibleItems
         )
     }
 
-    func testCannotHideOnlyAvailableItemWhenCursorIsNotInstalled() {
+    func testCannotHideOnlyAvailableItemWhenCursorIntegrationIsUnavailable() {
         let settings = MenuBarDisplaySettings.default
 
         XCTAssertTrue(
             settings.isLastVisible(
                 .codexWeeklyRemaining,
-                cursorInstalled: false
+                cursorAvailable: false
             )
         )
         XCTAssertNil(
             settings.toggling(
                 .codexWeeklyRemaining,
                 to: false,
-                cursorInstalled: false
+                cursorAvailable: false
             )
         )
     }
@@ -168,5 +168,14 @@ final class QuotaControllerStateTests: XCTestCase {
         XCTAssertTrue(QuotaController.ConnectionState.stale.canDisplayUsage)
         XCTAssertFalse(QuotaController.ConnectionState.disconnected.canDisplayUsage)
         XCTAssertFalse(QuotaController.ConnectionState.error("failure").canDisplayUsage)
+    }
+
+    @MainActor
+    func testCursorStaysHiddenWithoutDisplayableUsage() {
+        let controller = QuotaController(autoStart: false, cursorInstalled: true)
+
+        controller.cursorConnectionState = .error("failure")
+
+        XCTAssertFalse(controller.shouldShowCursor)
     }
 }

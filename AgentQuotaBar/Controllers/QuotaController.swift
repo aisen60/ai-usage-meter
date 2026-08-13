@@ -22,17 +22,17 @@ final class QuotaController: ObservableObject {
     /// 上次刷新时间
     @Published var lastRefreshTime: Date?
 
-    /// 错误信息
-    @Published var errorMessage: String?
-
-    /// 是否显示错误
-    @Published var showError = false
-
     /// Cursor 连接状态
     @Published var cursorConnectionState: ConnectionState = .unknown
 
     /// 当前是否检测到 Cursor 本地状态。未安装时不展示 Cursor 相关界面。
     @Published private(set) var isCursorInstalled: Bool
+
+    /// Cursor 只有在存在当前或可明确标记的缓存用量时才进入界面。
+    /// 单纯安装了客户端并不代表集成可用。
+    var shouldShowCursor: Bool {
+        cursorConnectionState.canDisplayUsage && cursorUsage != nil
+    }
 
     /// Codex 连接状态
     @Published var codexConnectionState: ConnectionState = .unknown
@@ -112,8 +112,6 @@ final class QuotaController: ObservableObject {
             return
         }
         isRefreshing = true
-        errorMessage = nil
-        showError = false
 
         // 并行获取 Cursor 和 Codex
         async let cursorTask = refreshCursor()
@@ -159,7 +157,7 @@ final class QuotaController: ObservableObject {
         guard let next = displaySettings.toggling(
             item,
             to: visible,
-            cursorInstalled: isCursorInstalled
+            cursorAvailable: shouldShowCursor
         ) else {
             AppLog.app.debug("Display item change rejected: at least one item must stay visible")
             return
@@ -208,7 +206,6 @@ final class QuotaController: ObservableObject {
             }
             let category = (error as? CursorError)?.logCategory ?? "unexpected"
             AppLog.cursor.error("Cursor usage refresh failed: \(category, privacy: .public)")
-            handleError(error)
         }
     }
 
@@ -262,10 +259,4 @@ final class QuotaController: ObservableObject {
         UsageCache.save(cursor: cursorUsage, codex: nil)
     }
 
-    // MARK: - Error Handling
-
-    private func handleError(_ error: Error) {
-        errorMessage = error.localizedDescription
-        showError = true
-    }
 }
