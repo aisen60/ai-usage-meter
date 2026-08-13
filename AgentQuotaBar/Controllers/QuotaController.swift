@@ -31,6 +31,9 @@ final class QuotaController: ObservableObject {
     /// Cursor 连接状态
     @Published var cursorConnectionState: ConnectionState = .unknown
 
+    /// 当前是否检测到 Cursor 本地状态。未安装时不展示 Cursor 相关界面。
+    @Published private(set) var isCursorInstalled: Bool
+
     /// Codex 连接状态
     @Published var codexConnectionState: ConnectionState = .unknown
 
@@ -76,7 +79,11 @@ final class QuotaController: ObservableObject {
 
     // MARK: - Lifecycle
 
-    init(autoStart: Bool = true) {
+    init(
+        autoStart: Bool = true,
+        cursorInstalled: Bool = CursorTokenReader.isCursorInstalled
+    ) {
+        isCursorInstalled = cursorInstalled
         displaySettings = MenuBarDisplaySettings.load()
         if autoStart {
             start()
@@ -149,7 +156,11 @@ final class QuotaController: ObservableObject {
 
     /// 切换菜单栏显示项目。至少保留一项，关闭最后一项的请求会被拒绝。
     func setDisplayItem(_ item: MenuBarDisplaySettings.Item, visible: Bool) {
-        guard let next = displaySettings.toggling(item, to: visible) else {
+        guard let next = displaySettings.toggling(
+            item,
+            to: visible,
+            cursorInstalled: isCursorInstalled
+        ) else {
             AppLog.app.debug("Display item change rejected: at least one item must stay visible")
             return
         }
@@ -160,9 +171,17 @@ final class QuotaController: ObservableObject {
     // MARK: - Private Methods
 
     private func refreshCursor() async {
+        isCursorInstalled = CursorTokenReader.isCursorInstalled
         AppLog.cursor.debug(
-            "Cursor local state detection: \(CursorTokenReader.isCursorInstalled ? "installed" : "not-installed", privacy: .public)"
+            "Cursor local state detection: \(self.isCursorInstalled ? "installed" : "not-installed", privacy: .public)"
         )
+
+        guard isCursorInstalled else {
+            cursorConnectionState = .disconnected
+            AppLog.cursor.notice("Cursor is not installed; usage refresh skipped")
+            return
+        }
+
         cursorPlanName = CursorTokenReader.readPlanName()
 
         guard let token = resolveCursorToken() else {

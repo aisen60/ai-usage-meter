@@ -92,6 +92,37 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
         XCTAssertFalse(cursorAndCodex.isLastVisible(.codexWeeklyRemaining))
     }
 
+    func testCursorItemsAreTemporarilyFilteredWhenCursorIsNotInstalled() {
+        let settings = MenuBarDisplaySettings.default
+
+        XCTAssertEqual(
+            settings.visibleItems(cursorInstalled: false),
+            [.codexWeeklyRemaining]
+        )
+        XCTAssertEqual(
+            settings.visibleItems(cursorInstalled: true),
+            settings.visibleItems
+        )
+    }
+
+    func testCannotHideOnlyAvailableItemWhenCursorIsNotInstalled() {
+        let settings = MenuBarDisplaySettings.default
+
+        XCTAssertTrue(
+            settings.isLastVisible(
+                .codexWeeklyRemaining,
+                cursorInstalled: false
+            )
+        )
+        XCTAssertNil(
+            settings.toggling(
+                .codexWeeklyRemaining,
+                to: false,
+                cursorInstalled: false
+            )
+        )
+    }
+
     // MARK: - Persistence
 
     func testSaveThenLoadRoundTrips() {

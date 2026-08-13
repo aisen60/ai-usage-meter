@@ -24,7 +24,7 @@ Agent Quota Bar 是一个 macOS 菜单栏工具，用来同时查看 Cursor 和 
 ## 系统要求
 
 - macOS 13 Ventura 或更高版本
-- Cursor 桌面客户端已安装并登录
+- 如需查看 Cursor 用量，请安装并登录 Cursor 桌面客户端；未安装时应用会自动隐藏 Cursor 区域
 - ChatGPT/Codex 桌面应用或 Codex CLI 已安装并登录
 
 两项服务彼此独立。只安装或登录其中一个时，另一个会显示灰色 `0%`。

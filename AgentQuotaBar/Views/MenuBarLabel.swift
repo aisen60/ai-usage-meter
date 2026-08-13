@@ -27,7 +27,8 @@ struct MenuBarLabel: View {
                 cursorConnected: cursorConnected,
                 otherConnected: otherConnected,
                 codexConnected: codexConnected,
-                settings: controller.displaySettings
+                settings: controller.displaySettings,
+                cursorInstalled: controller.isCursorInstalled
             )
             .fixedSize()
         )
@@ -63,12 +64,15 @@ struct MenuBarLabel: View {
     }
 
     private var fallbackText: String {
-        let values = controller.displaySettings.visibleItems.map(valueText(for:))
+        let values = controller.displaySettings
+            .visibleItems(cursorInstalled: controller.isCursorInstalled)
+            .map(valueText(for:))
         return (["CC"] + values).joined(separator: " ")
     }
 
     private var accessibilityDescription: String {
-        controller.displaySettings.visibleItems
+        controller.displaySettings
+            .visibleItems(cursorInstalled: controller.isCursorInstalled)
             .map(accessibilityText(for:))
             .joined(separator: "，")
     }

@@ -59,7 +59,25 @@ enum CursorTokenReader {
 
     /// 检查 Cursor 是否已安装
     static var isCursorInstalled: Bool {
-        FileManager.default.fileExists(atPath: stateDBPath)
+        isCursorInstalled(applicationURLs: cursorApplicationURLs)
+    }
+
+    static func isCursorInstalled(applicationURLs: [URL]) -> Bool {
+        applicationURLs.contains { url in
+            FileManager.default.fileExists(atPath: url.path)
+        }
+    }
+
+    /// Cursor 通常安装在系统或当前用户的 Applications 目录。
+    /// 不使用状态数据库作为安装依据，因为卸载后它可能继续残留。
+    private static var cursorApplicationURLs: [URL] {
+        let homeApplications = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Applications", isDirectory: true)
+            .appendingPathComponent("Cursor.app", isDirectory: true)
+        return [
+            URL(fileURLWithPath: "/Applications/Cursor.app", isDirectory: true),
+            homeApplications,
+        ]
     }
 
     /// 只读查询单个 Cursor 状态值，使用绑定参数避免拼接 SQL。

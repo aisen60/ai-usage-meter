@@ -70,7 +70,8 @@ struct SettingsView: View {
                 cursorConnected: cursorConnected,
                 otherConnected: otherConnected,
                 codexConnected: codexConnected,
-                settings: controller.displaySettings
+                settings: controller.displaySettings,
+                cursorInstalled: controller.isCursorInstalled
             )
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -89,24 +90,26 @@ struct SettingsView: View {
             sectionTitle("显示项目")
 
             VStack(spacing: 0) {
-                displayItemRow(
-                    item: .cursorModels,
-                    name: "Cursor Models",
-                    subtitle: "Cursor",
-                    percentText: cursorPercentText,
-                    tint: Color(red: 0.04, green: 0.45, blue: 0.96),
-                    connected: cursorConnected
-                )
-                rowDivider
-                displayItemRow(
-                    item: .otherModels,
-                    name: "Other Models",
-                    subtitle: "Cursor",
-                    percentText: otherPercentText,
-                    tint: Color(red: 0.39, green: 0.39, blue: 0.39),
-                    connected: otherConnected
-                )
-                rowDivider
+                if controller.isCursorInstalled {
+                    displayItemRow(
+                        item: .cursorModels,
+                        name: "Cursor Models",
+                        subtitle: "Cursor",
+                        percentText: cursorPercentText,
+                        tint: Color(red: 0.04, green: 0.45, blue: 0.96),
+                        connected: cursorConnected
+                    )
+                    rowDivider
+                    displayItemRow(
+                        item: .otherModels,
+                        name: "Other Models",
+                        subtitle: "Cursor",
+                        percentText: otherPercentText,
+                        tint: Color(red: 0.39, green: 0.39, blue: 0.39),
+                        connected: otherConnected
+                    )
+                    rowDivider
+                }
                 displayItemRow(
                     item: .codexWeeklyRemaining,
                     name: "本周剩余",
@@ -164,7 +167,12 @@ struct SettingsView: View {
             .labelsHidden()
             .toggleStyle(.switch)
             .controlSize(.small)
-            .disabled(controller.displaySettings.isLastVisible(item))
+            .disabled(
+                controller.displaySettings.isLastVisible(
+                    item,
+                    cursorInstalled: controller.isCursorInstalled
+                )
+            )
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
