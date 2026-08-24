@@ -42,11 +42,6 @@ struct MenuBarView: View {
         .onAppear {
             controller.menuDidOpen()
         }
-        .alert("错误", isPresented: $controller.showError) {
-            Button("确定", role: .cancel) {}
-        } message: {
-            Text(controller.errorMessage ?? "未知错误")
-        }
     }
 
     /// 主页面：配额区块 + 底部工具栏
