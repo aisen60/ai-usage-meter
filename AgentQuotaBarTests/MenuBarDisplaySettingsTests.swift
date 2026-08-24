@@ -92,6 +92,37 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
         XCTAssertFalse(cursorAndCodex.isLastVisible(.codexWeeklyRemaining))
     }
 
+    func testCursorItemsAreTemporarilyFilteredWhenIntegrationIsUnavailable() {
+        let settings = MenuBarDisplaySettings.default
+
+        XCTAssertEqual(
+            settings.visibleItems(cursorAvailable: false),
+            [.codexWeeklyRemaining]
+        )
+        XCTAssertEqual(
+            settings.visibleItems(cursorAvailable: true),
+            settings.visibleItems
+        )
+    }
+
+    func testCannotHideOnlyAvailableItemWhenCursorIntegrationIsUnavailable() {
+        let settings = MenuBarDisplaySettings.default
+
+        XCTAssertTrue(
+            settings.isLastVisible(
+                .codexWeeklyRemaining,
+                cursorAvailable: false
+            )
+        )
+        XCTAssertNil(
+            settings.toggling(
+                .codexWeeklyRemaining,
+                to: false,
+                cursorAvailable: false
+            )
+        )
+    }
+
     // MARK: - Persistence
 
     func testSaveThenLoadRoundTrips() {
@@ -137,5 +168,52 @@ final class QuotaControllerStateTests: XCTestCase {
         XCTAssertTrue(QuotaController.ConnectionState.stale.canDisplayUsage)
         XCTAssertFalse(QuotaController.ConnectionState.disconnected.canDisplayUsage)
         XCTAssertFalse(QuotaController.ConnectionState.error("failure").canDisplayUsage)
+    }
+
+    @MainActor
+    func testCursorStaysHiddenWithoutDisplayableUsage() {
+        let controller = QuotaController(autoStart: false, cursorInstalled: true)
+
+        controller.cursorConnectionState = .error("failure")
+
+        XCTAssertFalse(controller.shouldShowCursor)
+    }
+
+    @MainActor
+    func testCursorShowsCurrentUsage() {
+        let controller = QuotaController(autoStart: false, cursorInstalled: true)
+        controller.cursorUsage = cursorUsage()
+        controller.cursorConnectionState = .connected
+
+        XCTAssertTrue(controller.shouldShowCursor)
+    }
+
+    @MainActor
+    func testCursorShowsExplicitlyStaleUsage() {
+        let controller = QuotaController(autoStart: false, cursorInstalled: true)
+        controller.cursorUsage = cursorUsage()
+        controller.cursorConnectionState = .stale
+
+        XCTAssertTrue(controller.shouldShowCursor)
+    }
+
+    @MainActor
+    private func cursorUsage() -> CursorUsage {
+        CursorUsage(
+            billingCycleStart: 0,
+            billingCycleEnd: 0,
+            totalPercentUsed: 10,
+            autoPercentUsed: 10,
+            apiPercentUsed: 5,
+            totalSpend: 0,
+            includedSpend: 0,
+            bonusSpend: 0,
+            limit: 0,
+            individualLimit: 0,
+            individualRemaining: 0,
+            displayMessage: nil,
+            fetchedAt: Date(),
+            isUnlimited: false
+        )
     }
 }
