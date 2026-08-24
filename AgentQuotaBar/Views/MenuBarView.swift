@@ -39,6 +39,14 @@ struct MenuBarView: View {
         // 两个页面共用同一宽度，切换时弹层不跳动
         .frame(width: MenuMetrics.width)
         .background(Color(nsColor: .windowBackgroundColor))
+        .onAppear {
+            controller.menuDidOpen()
+        }
+        .alert("错误", isPresented: $controller.showError) {
+            Button("确定", role: .cancel) {}
+        } message: {
+            Text(controller.errorMessage ?? "未知错误")
+        }
     }
 
     /// 主页面：配额区块 + 底部工具栏

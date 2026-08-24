@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import SwiftUI
 
@@ -42,11 +43,17 @@ final class QuotaController: ObservableObject {
 
     // MARK: - Properties
 
-    /// 刷新间隔 (默认 15 分钟)
-    var refreshInterval: TimeInterval = 15 * 60
-
     /// 定时刷新任务
     private var refreshTask: Task<Void, Never>?
+
+    /// 系统唤醒监听任务
+    private var wakeObserverTask: Task<Void, Never>?
+
+    /// 最近一次打开菜单的时间，用于判断用户是否正在关注额度。
+    private var lastInteractionTime: Date?
+
+    /// 自适应刷新策略
+    private let refreshPolicy = AdaptiveRefreshPolicy()
 
     /// Token 来源
     private let tokenAccount = "cursor-token"
@@ -99,6 +106,7 @@ final class QuotaController: ObservableObject {
     func start() {
         // 菜单栏标题在弹层打开前就需要有缓存和最新数据。
         loadCache()
+        startWakeMonitoring()
         startAutoRefresh()
         Task { [weak self] in
             await self?.refresh()
@@ -114,8 +122,8 @@ final class QuotaController: ObservableObject {
         isRefreshing = true
 
         // 并行获取 Cursor 和 Codex
-        async let cursorTask = refreshCursor()
-        async let codexTask = refreshCodex()
+        async let cursorTask: Void = refreshCursor()
+        async let codexTask: Void = refreshCodex()
         _ = await (cursorTask, codexTask)
 
         isRefreshing = false
@@ -123,6 +131,17 @@ final class QuotaController: ObservableObject {
 
         // 保存缓存
         saveCache()
+    }
+
+    /// 菜单打开时记录交互，并只在数据已经过期时刷新。
+    func menuDidOpen() {
+        let now = Date()
+        lastInteractionTime = now
+        startAutoRefresh()
+
+        Task { [weak self] in
+            await self?.refreshIfNeeded(now: now)
+        }
     }
 
     /// 保存手动输入的 Cursor token
@@ -229,20 +248,69 @@ final class QuotaController: ObservableObject {
         refreshTask = Task { [weak self] in
             while !Task.isCancelled {
                 guard let self else { break }
-                // 等待刷新间隔
-                try? await Task.sleep(
-                    for: .seconds(self.refreshInterval)
+                let schedule = self.refreshPolicy.schedule(
+                    now: Date(),
+                    lastInteractionTime: self.lastInteractionTime,
+                    isSystemConstrained: self.isSystemConstrained
                 )
-                if !Task.isCancelled {
-                    await self.refresh()
+                AppLog.app.debug(
+                    "Next automatic refresh in \(Int(schedule.interval), privacy: .public)s (\(schedule.reason.rawValue, privacy: .public))"
+                )
+
+                do {
+                    try await Task.sleep(for: .seconds(schedule.interval))
+                } catch {
+                    break
+                }
+                // 调度任务只负责计时；重新排期时不会取消已经发出的网络刷新。
+                Task { [weak self] in
+                    await self?.refresh()
                 }
             }
+        }
+    }
+
+    /// 睡眠期间定时任务可能暂停；唤醒后重新排期，并补一次必要的刷新。
+    private func startWakeMonitoring() {
+        wakeObserverTask?.cancel()
+        wakeObserverTask = Task { [weak self] in
+            for await _ in NSWorkspace.shared.notificationCenter.notifications(
+                named: NSWorkspace.didWakeNotification
+            ) {
+                guard !Task.isCancelled, let self else { break }
+                let now = Date()
+                self.startAutoRefresh()
+                await self.refreshIfNeeded(now: now)
+            }
+        }
+    }
+
+    private func refreshIfNeeded(now: Date) async {
+        guard refreshPolicy.shouldRefresh(
+            now: now,
+            lastRefreshTime: lastRefreshTime
+        ) else {
+            AppLog.app.debug("Interactive refresh skipped because data is still fresh")
+            return
+        }
+        await refresh()
+    }
+
+    private var isSystemConstrained: Bool {
+        let processInfo = ProcessInfo.processInfo
+        switch processInfo.thermalState {
+        case .serious, .critical:
+            return true
+        default:
+            return processInfo.isLowPowerModeEnabled
         }
     }
 
     func stopAutoRefresh() {
         refreshTask?.cancel()
         refreshTask = nil
+        wakeObserverTask?.cancel()
+        wakeObserverTask = nil
     }
 
     // MARK: - Cache

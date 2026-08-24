@@ -27,8 +27,10 @@
 		A1000019 /* MenuBarDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000021 /* MenuBarDisplaySettings.swift */; };
 		A1000020 /* StatusBarBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022 /* StatusBarBadge.swift */; };
 		A1000021 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000023 /* SettingsView.swift */; };
+		A1000022 /* AdaptiveRefreshPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000024 /* AdaptiveRefreshPolicy.swift */; };
 		B1000001 /* QuotaParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000001 /* QuotaParsingTests.swift */; };
 		B1000002 /* MenuBarDisplaySettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000003 /* MenuBarDisplaySettingsTests.swift */; };
+		B1000003 /* AdaptiveRefreshPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000004 /* AdaptiveRefreshPolicyTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,8 +66,10 @@
 		A2000021 /* MenuBarDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettings.swift; sourceTree = "<group>"; };
 		A2000022 /* StatusBarBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarBadge.swift; sourceTree = "<group>"; };
 		A2000023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A2000024 /* AdaptiveRefreshPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRefreshPolicy.swift; sourceTree = "<group>"; };
 		B2000001 /* QuotaParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaParsingTests.swift; sourceTree = "<group>"; };
 		B2000003 /* MenuBarDisplaySettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettingsTests.swift; sourceTree = "<group>"; };
+		B2000004 /* AdaptiveRefreshPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRefreshPolicyTests.swift; sourceTree = "<group>"; };
 		B2000002 /* AgentQuotaBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgentQuotaBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -126,6 +130,7 @@
 				A2000002 /* CursorUsage.swift */,
 				A2000003 /* CodexUsage.swift */,
 				A2000021 /* MenuBarDisplaySettings.swift */,
+				A2000024 /* AdaptiveRefreshPolicy.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -197,6 +202,7 @@
 			children = (
 				B2000001 /* QuotaParsingTests.swift */,
 				B2000003 /* MenuBarDisplaySettingsTests.swift */,
+				B2000004 /* AdaptiveRefreshPolicyTests.swift */,
 			);
 			path = AgentQuotaBarTests;
 			sourceTree = "<group>";
@@ -299,6 +305,7 @@
 				A1000019 /* MenuBarDisplaySettings.swift in Sources */,
 				A1000020 /* StatusBarBadge.swift in Sources */,
 				A1000021 /* SettingsView.swift in Sources */,
+				A1000022 /* AdaptiveRefreshPolicy.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,6 +315,7 @@
 			files = (
 				B1000001 /* QuotaParsingTests.swift in Sources */,
 				B1000002 /* MenuBarDisplaySettingsTests.swift in Sources */,
+				B1000003 /* AdaptiveRefreshPolicyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
