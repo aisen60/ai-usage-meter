@@ -52,14 +52,16 @@ struct MenuBarView: View {
     /// 主页面：配额区块 + 底部工具栏
     private var mainPage: some View {
         VStack(alignment: .leading, spacing: 0) {
-            CursorSection(
-                usage: controller.cursorUsage,
-                planName: controller.cursorPlanName,
-                connectionState: controller.cursorConnectionState
-            )
+            if controller.shouldShowCursor {
+                CursorSection(
+                    usage: controller.cursorUsage,
+                    planName: controller.cursorPlanName,
+                    connectionState: controller.cursorConnectionState
+                )
 
-            Divider()
-                .padding(.leading, 16)
+                Divider()
+                    .padding(.leading, 16)
+            }
 
             CodexSection(
                 usage: controller.codexUsage,
