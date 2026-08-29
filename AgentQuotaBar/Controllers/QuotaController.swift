@@ -14,7 +14,7 @@ final class QuotaController: ObservableObject {
     /// 从 Cursor 桌面客户端本地状态动态读取的套餐名称
     @Published var cursorPlanName = "Cursor"
 
-    /// Codex 用量数据
+    /// ChatGPT 用量数据（内部仍使用 CodexUsage 类型名）
     @Published var codexUsage: CodexUsage = .disconnected
 
     /// 是否正在刷新
@@ -35,7 +35,12 @@ final class QuotaController: ObservableObject {
         cursorConnectionState.canDisplayUsage && cursorUsage != nil
     }
 
-    /// Codex 连接状态
+    /// On Demand 个人额度是否有有效上限，决定该项是否展示。
+    var shouldShowOnDemand: Bool {
+        shouldShowCursor && (cursorUsage?.onDemandAvailable ?? false)
+    }
+
+    /// ChatGPT 连接状态（内部仍使用 codex 命名）
     @Published var codexConnectionState: ConnectionState = .unknown
 
     /// 菜单栏显示项目设置（变更即持久化到 UserDefaults）
@@ -73,7 +78,7 @@ final class QuotaController: ObservableObject {
         }
 
         /// 当前是否有可展示的数据。Cursor 缓存可在降级状态继续展示，
-        /// Codex 失败时不会进入 stale，因此不会误用旧额度。
+        /// ChatGPT 失败时不会进入 stale，因此不会误用旧额度。
         var canDisplayUsage: Bool {
             switch self {
             case .connected, .stale:
@@ -121,7 +126,7 @@ final class QuotaController: ObservableObject {
         }
         isRefreshing = true
 
-        // 并行获取 Cursor 和 Codex
+        // 并行获取 Cursor 和 ChatGPT
         async let cursorTask: Void = refreshCursor()
         async let codexTask: Void = refreshCodex()
         _ = await (cursorTask, codexTask)
@@ -176,7 +181,8 @@ final class QuotaController: ObservableObject {
         guard let next = displaySettings.toggling(
             item,
             to: visible,
-            cursorAvailable: shouldShowCursor
+            cursorAvailable: shouldShowCursor,
+            onDemandAvailable: shouldShowOnDemand
         ) else {
             AppLog.app.debug("Display item change rejected: at least one item must stay visible")
             return
@@ -232,14 +238,14 @@ final class QuotaController: ObservableObject {
         do {
             codexUsage = try await CodexIntegration.fetchUsage()
             codexConnectionState = .connected
-            AppLog.codex.info("Codex usage refresh succeeded")
+            AppLog.codex.info("ChatGPT usage refresh succeeded")
         } catch {
-            // Codex 读取失败时不展示旧数据，避免把过期额度误认为当前额度。
+            // ChatGPT 读取失败时不展示旧数据，避免把过期额度误认为当前额度。
             codexUsage = .disconnected
             codexConnectionState = .disconnected
             let category = (error as? CodexIntegration.IntegrationError)?.logCategory
                 ?? "unexpected"
-            AppLog.codex.error("Codex usage refresh failed: \(category, privacy: .public)")
+            AppLog.codex.error("ChatGPT usage refresh failed: \(category, privacy: .public)")
         }
     }
 

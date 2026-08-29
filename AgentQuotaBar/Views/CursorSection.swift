@@ -1,70 +1,83 @@
 import SwiftUI
 import AppKit
 
-/// Cursor 区域，采用设计稿中的标题、概览和两个额度卡片。
+/// Cursor 服务组卡片：header 与最多三条额度行共处同一圆角容器，
+/// 行之间使用组内细分隔线（design/v0.3.0/home.png）。
 struct CursorSection: View {
     let usage: CursorUsage?
     let planName: String
     let connectionState: QuotaController.ConnectionState
-    @State private var isExpanded = true
 
     var body: some View {
+        ServiceGroupCard {
+            VStack(alignment: .leading, spacing: 0) {
+                header
+                rows
+            }
+        }
+    }
+
+    private var header: some View {
+        HStack(spacing: 9) {
+            ServiceLogo(resourceName: "CursorIcon", fallbackSymbol: "cursorarrow.rays")
+            Text(canDisplayUsage ? planName : "Cursor")
+                .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .layoutPriority(1)
+            Spacer(minLength: 8)
+            ConnectionStatus(state: connectionState)
+                .layoutPriority(2)
+        }
+        .padding(.horizontal, MenuMetrics.groupInset)
+        .padding(.top, MenuMetrics.groupHeaderTop)
+        .padding(.bottom, MenuMetrics.groupHeaderBottom)
+    }
+
+    private var rows: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 9) {
-                ServiceLogo(resourceName: "CursorIcon", fallbackSymbol: "cursorarrow.rays")
-                Text(canDisplayUsage ? planName : "Cursor")
-                    .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
-                Spacer()
-                ConnectionStatus(state: connectionState)
-            }
-            .padding(.horizontal, MenuMetrics.horizontalPadding)
-            .padding(.top, 12)
-            .padding(.bottom, 11)
-
-            Divider()
-
-            Button {
-                withAnimation(.easeInOut(duration: 0.18)) { isExpanded.toggle() }
-            } label: {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("用量概览")
-                            .font(.system(size: MenuMetrics.sectionTitle, weight: .bold))
-                            .foregroundStyle(.primary)
-                        Text("\(percent(autoPercent)) Cursor Models · \(percent(apiPercent)) Other Models")
-                            .font(.system(size: MenuMetrics.summaryText))
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(.primary)
+            ForEach(
+                Array(cursorRowKinds(onDemandAvailable: onDemandAvailable).enumerated()),
+                id: \.element
+            ) { index, kind in
+                if index > 0 {
+                    rowDivider
                 }
-                .contentShape(Rectangle())
+                row(for: kind)
             }
-            .buttonStyle(.plain)
-            .padding(.horizontal, MenuMetrics.horizontalPadding)
-            .padding(.top, 12)
-            .padding(.bottom, isExpanded ? 9 : 12)
+        }
+        .padding(.horizontal, MenuMetrics.groupInset)
+        .padding(.bottom, MenuMetrics.groupContentBottom)
+    }
 
-            if isExpanded {
-                VStack(spacing: 7) {
-                    UsageBarCard(
-                        label: "Cursor Models",
-                        percent: autoPercent,
-                        tint: canDisplayUsage ? .blue : .gray,
-                        detail: nil
-                    )
-                    UsageBarCard(
-                        label: "Other Models",
-                        percent: apiPercent,
-                        tint: canDisplayUsage ? Color(red: 0.39, green: 0.39, blue: 0.39) : .gray,
-                        detail: nil
-                    )
-                }
-                .padding(.horizontal, MenuMetrics.horizontalPadding)
-                .padding(.bottom, 11)
-            }
+    private var rowDivider: some View {
+        Divider()
+    }
+
+    private func row(for kind: CursorRowKind) -> some View {
+        switch kind {
+        case .cursorModels:
+            return QuotaRow(
+                label: "Cursor Models",
+                percent: autoPercent,
+                tint: canDisplayUsage ? QuotaPalette.cursorModels : .gray,
+                detail: nil
+            )
+        case .otherModels:
+            return QuotaRow(
+                label: "Other Models",
+                percent: apiPercent,
+                tint: canDisplayUsage ? QuotaPalette.otherModels : .gray,
+                detail: nil
+            )
+        case .onDemand:
+            return QuotaRow(
+                label: "On Demand",
+                percent: onDemandPercent,
+                tint: QuotaPalette.onDemand,
+                detail: onDemandDetail,
+                trailingText: onDemandText
+            )
         }
     }
 
@@ -74,35 +87,87 @@ struct CursorSection: View {
     private var autoPercent: Double { canDisplayUsage ? usage?.autoPercentUsed ?? 0 : 0 }
     private var apiPercent: Double { canDisplayUsage ? usage?.apiPercentUsed ?? 0 : 0 }
 
-    private func percent(_ value: Double) -> String {
-        "\(Int(value.rounded()))%"
+    /// On Demand 仅在存在有效个人上限时展示（由模型层判定）。
+    private var onDemandAvailable: Bool {
+        canDisplayUsage && (usage?.onDemandAvailable ?? false)
+    }
+    private var onDemandPercent: Double {
+        canDisplayUsage ? usage?.onDemandPercentUsed ?? 0 : 0
+    }
+    private var onDemandText: String {
+        usage?.onDemandAmountText ?? "$0 / $0"
     }
 
-    private var apiDetail: String {
-        if let usage, canDisplayUsage, usage.includedSpend > 0 {
-            let amount = usage.includedSpend / 100
-            return "超出限制的使用将按需计费。计划包含至少 $\(Int(amount)) 的 API 使用额度。"
-        }
-        return "超出限制的使用将按需额度计费。"
+    private var onDemandDetail: String {
+        "超出套餐额度的使用将按需计费。"
     }
 }
 
-/// 设计稿内的白色额度卡片。
-struct UsageBarCard: View {
+/// Cursor 服务组内的行类型。
+enum CursorRowKind: Equatable, Hashable {
+    case cursorModels
+    case otherModels
+    case onDemand
+}
+
+/// 按 On Demand 可用性构建 Cursor 行序列（不含分隔线）。
+/// 纯辅助逻辑：无有效上限时不生成第三行，也就不会产生多余分隔线。
+func cursorRowKinds(onDemandAvailable: Bool) -> [CursorRowKind] {
+    var kinds: [CursorRowKind] = [.cursorModels, .otherModels]
+    if onDemandAvailable {
+        kinds.append(.onDemand)
+    }
+    return kinds
+}
+
+/// 相邻行之间的分隔线数量 = max(0, 行数 - 1)。
+func rowDividerCount(for rowCount: Int) -> Int {
+    max(0, rowCount - 1)
+}
+
+/// 服务组卡片：统一圆角、描边与内容容器；header 与额度行共处同一容器。
+struct ServiceGroupCard<Content: View>: View {
+    private let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            content
+        }
+        .background(Color(nsColor: .controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: MenuMetrics.groupCornerRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: MenuMetrics.groupCornerRadius, style: .continuous)
+                .stroke(.black.opacity(MenuMetrics.groupBorderOpacity))
+        )
+    }
+}
+
+/// 服务组内的一条额度内容行：标签、右侧数值、单色进度条与可选说明。
+/// 无独立圆角卡片背景或边框；行间分隔由所属服务组容器绘制。
+struct QuotaRow: View {
     let label: String
     let percent: Double
     let tint: Color
     let detail: String?
+    var trailingText: String? = nil
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
+        VStack(alignment: .leading, spacing: MenuMetrics.rowSpacing) {
+            HStack(spacing: 8) {
                 Text(label)
                     .font(.system(size: MenuMetrics.cardTitle, weight: .semibold))
-                Spacer()
-                Text("\(Int(clampedPercent.rounded()))%")
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                Spacer(minLength: 8)
+                Text(valueText)
                     .font(.system(size: MenuMetrics.cardTitle, weight: .bold))
+                    .monospacedDigit()
                     .foregroundStyle(tint)
+                    .lineLimit(1)
             }
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
@@ -112,7 +177,7 @@ struct UsageBarCard: View {
                         .frame(width: max(0, proxy.size.width * clampedPercent / 100))
                 }
             }
-            .frame(height: 6)
+            .frame(height: MenuMetrics.rowBarHeight)
             if let detail, !detail.isEmpty {
                 Text(detail)
                     .font(.system(size: MenuMetrics.bodyText))
@@ -120,10 +185,11 @@ struct UsageBarCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(11)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(.black.opacity(0.05)))
+        .padding(.vertical, MenuMetrics.rowVerticalPadding)
+    }
+
+    private var valueText: String {
+        trailingText ?? "\(Int(clampedPercent.rounded()))%"
     }
 
     private var clampedPercent: Double { min(100, max(0, percent)) }
@@ -169,6 +235,7 @@ struct ConnectionStatus: View {
             Text(label)
                 .font(.system(size: MenuMetrics.statusText, weight: .medium))
                 .foregroundStyle(.primary)
+                .lineLimit(1)
         }
     }
 

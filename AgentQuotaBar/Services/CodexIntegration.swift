@@ -1,10 +1,22 @@
 import AppKit
 import Foundation
 
-/// 通过本机 Codex CLI 的 app-server 协议读取当前登录账号的额度。
+/// 通过本机 codex CLI 的 app-server 协议读取当前 ChatGPT 登录账号的额度。
 enum CodexIntegration {
     private static let requestID = 2
     private static let timeout: Duration = .seconds(10)
+
+    /// 5 小时窗口的典型时长（分钟）
+    private static let shortWindowMins: Double = 300
+
+    /// 1 周窗口的典型时长（分钟）
+    private static let weeklyWindowMins: Double = 10_080
+
+    /// 额度窗口分类。依赖窗口时长而非 `primary` / `secondary` 字段顺序。
+    private enum QuotaWindowKind {
+        case short
+        case weekly
+    }
 
     enum IntegrationError: LocalizedError {
         case executableNotFound
@@ -16,15 +28,15 @@ enum CodexIntegration {
         var errorDescription: String? {
             switch self {
             case .executableNotFound:
-                return "未找到 Codex CLI"
+                return "未找到 ChatGPT CLI"
             case .launchFailed(let message):
-                return "无法启动 Codex：\(message)"
+                return "无法启动 ChatGPT：\(message)"
             case .timedOut:
-                return "读取 Codex 用量超时"
+                return "读取 ChatGPT 用量超时"
             case .protocolError(let message):
-                return "Codex 返回错误：\(message)"
+                return "ChatGPT 返回错误：\(message)"
             case .invalidResponse:
-                return "Codex 返回了无法识别的用量数据"
+                return "ChatGPT 返回了无法识别的用量数据"
             }
         }
 
@@ -39,14 +51,14 @@ enum CodexIntegration {
         }
     }
 
-    /// 自动读取当前 Codex 登录账号的周额度。
+    /// 自动读取当前 ChatGPT 登录账号的额度（5 小时与 1 周）。
     static func fetchUsage() async throws -> CodexUsage {
         guard let executableURL = findExecutable() else {
-            AppLog.codex.notice("Codex executable was not found")
+            AppLog.codex.notice("ChatGPT executable was not found")
             throw IntegrationError.executableNotFound
         }
 
-        AppLog.codex.debug("Codex executable detected")
+        AppLog.codex.debug("ChatGPT executable detected")
 
         return try await fetchUsage(
             executableURL: executableURL,
@@ -134,33 +146,63 @@ enum CodexIntegration {
             ?? (result["rateLimits"] as? [String: Any])
 
         guard let rateLimits,
-              let window = longestWindow(in: rateLimits),
-              let usedPercent = number(window["usedPercent"]) else {
+              let primary = rateLimits["primary"] as? [String: Any],
+              let secondary = rateLimits["secondary"] as? [String: Any] else {
             throw IntegrationError.invalidResponse
         }
 
-        let remaining = max(0, min(100, 100 - usedPercent))
-        let resetDate = number(window["resetsAt"])
-            .map { Date(timeIntervalSince1970: $0) }
+        // 按时长分类到两个窗口，不依赖 primary / secondary 的字段顺序。
+        var short: [String: Any]?
+        var weekly: [String: Any]?
+        for window in [primary, secondary] {
+            guard let duration = number(window["windowDurationMins"]),
+                  let kind = windowKind(durationMins: duration) else {
+                throw IntegrationError.invalidResponse
+            }
+            switch kind {
+            case .short where short == nil:
+                short = window
+            case .weekly where weekly == nil:
+                weekly = window
+            default:
+                // 未知窗口时长或两个窗口重复归类为同一周期。
+                throw IntegrationError.invalidResponse
+            }
+        }
+
+        guard let short, let weekly else {
+            throw IntegrationError.invalidResponse
+        }
 
         return CodexUsage(
             planName: displayPlanName(rateLimits["planType"] as? String),
-            percentRemaining: remaining,
-            cycleEndDate: resetDate,
+            shortWindow: try parseWindow(short),
+            weeklyWindow: try parseWindow(weekly),
             source: .automatic,
             fetchedAt: Date(),
             note: nil
         )
     }
 
-    private static func longestWindow(in rateLimits: [String: Any]) -> [String: Any]? {
-        let windows = ["primary", "secondary"]
-            .compactMap { rateLimits[$0] as? [String: Any] }
-
-        return windows.max { lhs, rhs in
-            (number(lhs["windowDurationMins"]) ?? 0)
-                < (number(rhs["windowDurationMins"]) ?? 0)
+    private static func parseWindow(_ window: [String: Any]) throws -> QuotaWindow {
+        guard let usedPercent = number(window["usedPercent"]) else {
+            throw IntegrationError.invalidResponse
         }
+        let remaining = max(0, min(100, 100 - usedPercent))
+        let resetsAt = number(window["resetsAt"])
+            .map { Date(timeIntervalSince1970: $0) }
+        return QuotaWindow(percentRemaining: remaining, resetsAt: resetsAt)
+    }
+
+    /// 按窗口时长归类：约 300 分钟为 5 小时，约 10080 分钟为 1 周。
+    /// 时长未知或为非有限正数时返回 nil。
+    private static func windowKind(durationMins: Double) -> QuotaWindowKind? {
+        guard durationMins.isFinite, durationMins > 0 else { return nil }
+        let shortError = abs(durationMins - shortWindowMins) / shortWindowMins
+        let weeklyError = abs(durationMins - weeklyWindowMins) / weeklyWindowMins
+        if shortError <= 0.5 { return .short }
+        if weeklyError <= 0.5 { return .weekly }
+        return nil
     }
 
     private static func displayPlanName(_ planType: String?) -> String {
@@ -177,7 +219,7 @@ enum CodexIntegration {
         case "edu": suffix = "Edu"
         default: suffix = nil
         }
-        return suffix.map { "Codex \($0)" } ?? "Codex"
+        return suffix.map { "ChatGPT \($0)" } ?? "ChatGPT"
     }
 
     private static func number(_ value: Any?) -> Double? {

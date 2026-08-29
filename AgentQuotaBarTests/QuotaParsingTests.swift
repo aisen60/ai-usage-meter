@@ -49,6 +49,7 @@ final class QuotaParsingTests: XCTestCase {
             ],
             "spendLimitUsage": [
                 "individualLimit": 600,
+                "individualUsed": 200,
                 "individualRemaining": 400
             ],
             "displayMessage": "usage summary"
@@ -59,29 +60,108 @@ final class QuotaParsingTests: XCTestCase {
         XCTAssertEqual(usage.autoPercentUsed, 15)
         XCTAssertEqual(usage.apiPercentUsed, 2)
         XCTAssertEqual(usage.autoPercentRemaining, 85)
+        XCTAssertEqual(usage.individualUsed, 200)
         XCTAssertEqual(usage.individualRemaining, 400)
         XCTAssertEqual(usage.fetchedAt, fetchedAt)
     }
 
-    func testCodexUsesLongestWindowAndConvertsRemainingPercent() throws {
-        let response = codexResponse(
-            planType: "pro",
-            primary: [
-                "usedPercent": 65,
-                "windowDurationMins": 300,
-                "resetsAt": 1_800_000_000
-            ],
-            secondary: [
-                "usedPercent": 20,
-                "windowDurationMins": 10_080,
-                "resetsAt": 1_800_500_000
-            ]
+    // MARK: - Cursor On Demand
+
+    func testCursorOnDemandAmountAndPercent() throws {
+        let usage = try XCTUnwrap(
+            CursorUsage.from(json: cursorOnDemandJSON(individualUsed: 392, individualLimit: 1000))
         )
 
-        let usage = try CodexIntegration.parseResponse(response)
-        XCTAssertEqual(usage.planName, "Codex Pro")
-        XCTAssertEqual(usage.percentRemaining, 80)
-        XCTAssertEqual(usage.cycleEndDate, Date(timeIntervalSince1970: 1_800_500_000))
+        XCTAssertTrue(usage.onDemandAvailable)
+        XCTAssertEqual(usage.onDemandAmountText, "$3.92 / $10")
+        XCTAssertEqual(usage.onDemandPercentUsed, 39.2, accuracy: 0.001)
+        XCTAssertEqual(usage.onDemandUsedDollars, 3.92, accuracy: 0.001)
+        XCTAssertEqual(usage.onDemandLimitDollars, 10.0, accuracy: 0.001)
+    }
+
+    func testCursorOnDemandZeroLimitIsUnavailable() throws {
+        let usage = try XCTUnwrap(
+            CursorUsage.from(json: cursorOnDemandJSON(individualUsed: 50, individualLimit: 0))
+        )
+        XCTAssertFalse(usage.onDemandAvailable)
+    }
+
+    func testCursorOnDemandMissingFieldsIsUnavailable() throws {
+        let usage = try XCTUnwrap(CursorUsage.from(json: cursorOnDemandJSON()))
+        XCTAssertFalse(usage.onDemandAvailable)
+    }
+
+    func testCursorOnDemandOverLimitClampsToHundred() throws {
+        let usage = try XCTUnwrap(
+            CursorUsage.from(json: cursorOnDemandJSON(individualUsed: 1500, individualLimit: 1000))
+        )
+        XCTAssertEqual(usage.onDemandPercentUsed, 100)
+    }
+
+    func testCursorOnDemandParsesNumericStrings() throws {
+        let usage = try XCTUnwrap(
+            CursorUsage.from(json: cursorOnDemandJSON(individualUsed: "392", individualLimit: "1000"))
+        )
+        XCTAssertTrue(usage.onDemandAvailable)
+        XCTAssertEqual(usage.onDemandAmountText, "$3.92 / $10")
+    }
+
+    func testCursorUsageDecodesLegacyCacheWithoutIndividualUsed() throws {
+        // v0.2.0 缓存的 CursorUsage 不含 individualUsed，应由 limit - remaining 反推。
+        let fetchedAt = Date(timeIntervalSince1970: 1_800_000_000)
+        let legacyJSON: [String: Any] = [
+            "billingCycleStart": 0,
+            "billingCycleEnd": 0,
+            "totalPercentUsed": 10,
+            "autoPercentUsed": 15,
+            "apiPercentUsed": 2,
+            "totalSpend": 0,
+            "includedSpend": 0,
+            "bonusSpend": 0,
+            "limit": 0,
+            "individualLimit": 1000,
+            "individualRemaining": 400,
+            "fetchedAt": fetchedAt.timeIntervalSinceReferenceDate,
+            "isUnlimited": false
+        ]
+
+        let data = try JSONSerialization.data(withJSONObject: legacyJSON)
+        let usage = try JSONDecoder().decode(CursorUsage.self, from: data)
+
+        XCTAssertEqual(usage.individualUsed, 600)
+        XCTAssertEqual(usage.fetchedAt, fetchedAt)
+    }
+
+    // MARK: - ChatGPT 双窗口
+
+    func testCodexParsesBothWindowsByDuration() throws {
+        let usage = try CodexIntegration.parseResponse(codexResponse(planType: "pro"))
+
+        XCTAssertEqual(usage.planName, "ChatGPT Pro")
+        XCTAssertEqual(usage.shortWindow.percentRemaining, 80)
+        XCTAssertEqual(
+            usage.shortWindow.resetsAt,
+            Date(timeIntervalSince1970: 1_800_000_000)
+        )
+        XCTAssertEqual(usage.weeklyWindow.percentRemaining, 35)
+        XCTAssertEqual(
+            usage.weeklyWindow.resetsAt,
+            Date(timeIntervalSince1970: 1_800_500_000)
+        )
+    }
+
+    func testCodexClassifiesWindowsRegardlessOfFieldOrder() throws {
+        // primary 是周窗口、secondary 是短窗口，仍应按时长正确归类。
+        let usage = try CodexIntegration.parseResponse(codexResponse(
+            planType: "plus",
+            primary: ["usedPercent": 30, "windowDurationMins": 10_080, "resetsAt": 1_800_500_000],
+            secondary: ["usedPercent": 10, "windowDurationMins": 300, "resetsAt": 1_800_000_000]
+        ))
+
+        XCTAssertEqual(usage.shortWindow.percentRemaining, 90)
+        XCTAssertEqual(usage.weeklyWindow.percentRemaining, 70)
+        XCTAssertEqual(usage.shortWindow.resetsAt, Date(timeIntervalSince1970: 1_800_000_000))
+        XCTAssertEqual(usage.weeklyWindow.resetsAt, Date(timeIntervalSince1970: 1_800_500_000))
     }
 
     func testCodexPlanMappingThroughResponse() throws {
@@ -92,20 +172,57 @@ final class QuotaParsingTests: XCTestCase {
             codexResponse(planType: "future_plan")
         )
 
-        XCTAssertEqual(business.planName, "Codex Business")
-        XCTAssertEqual(unknown.planName, "Codex")
+        XCTAssertEqual(business.planName, "ChatGPT Business")
+        XCTAssertEqual(unknown.planName, "ChatGPT")
     }
 
     func testCodexRemainingPercentIsClamped() throws {
-        let belowZero = try CodexIntegration.parseResponse(
-            codexResponse(planType: "plus", usedPercent: 120)
-        )
-        let aboveHundred = try CodexIntegration.parseResponse(
-            codexResponse(planType: "plus", usedPercent: -10)
-        )
+        let usage = try CodexIntegration.parseResponse(codexResponse(
+            planType: "plus",
+            primary: ["usedPercent": 120, "windowDurationMins": 300, "resetsAt": 1_800_000_000],
+            secondary: ["usedPercent": -10, "windowDurationMins": 10_080, "resetsAt": 1_800_500_000]
+        ))
 
-        XCTAssertEqual(belowZero.percentRemaining, 0)
-        XCTAssertEqual(aboveHundred.percentRemaining, 100)
+        XCTAssertEqual(usage.shortWindow.percentRemaining, 0)
+        XCTAssertEqual(usage.weeklyWindow.percentRemaining, 100)
+    }
+
+    func testCodexMissingWindowThrows() {
+        XCTAssertThrowsError(
+            try CodexIntegration.parseResponse(codexResponse(planType: "plus", includeSecondary: false))
+        )
+        XCTAssertThrowsError(
+            try CodexIntegration.parseResponse(codexResponse(planType: "plus", includePrimary: false))
+        )
+    }
+
+    func testCodexUnknownWindowDurationThrows() {
+        // 1 天 = 1440 分钟，既不是约 300 分钟也不是约 10080 分钟。
+        XCTAssertThrowsError(
+            try CodexIntegration.parseResponse(codexResponse(
+                planType: "plus",
+                primary: ["usedPercent": 20, "windowDurationMins": 1440, "resetsAt": 1_800_000_000]
+            ))
+        )
+    }
+
+    func testCodexDuplicateWindowClassificationThrows() {
+        // 两个窗口都是短周期，无法映射为 5 小时 + 1 周。
+        XCTAssertThrowsError(
+            try CodexIntegration.parseResponse(codexResponse(
+                planType: "plus",
+                secondary: ["usedPercent": 65, "windowDurationMins": 300, "resetsAt": 1_800_500_000]
+            ))
+        )
+    }
+
+    func testCodexMissingUsedPercentThrows() {
+        XCTAssertThrowsError(
+            try CodexIntegration.parseResponse(codexResponse(
+                planType: "plus",
+                primary: ["windowDurationMins": 300, "resetsAt": 1_800_000_000]
+            ))
+        )
     }
 
     func testCodexMalformedResponseThrows() {
@@ -161,22 +278,60 @@ final class QuotaParsingTests: XCTestCase {
         XCTAssertNotEqual(kill(pid, 0), 0, "Codex child process is still running")
     }
 
+    // MARK: - Helpers
+
+    private func cursorOnDemandJSON(
+        individualUsed: Any? = nil,
+        individualLimit: Any? = nil,
+        individualRemaining: Any? = nil
+    ) -> [String: Any] {
+        var spendLimit: [String: Any] = [:]
+        if let individualUsed {
+            spendLimit["individualUsed"] = individualUsed
+        }
+        if let individualLimit {
+            spendLimit["individualLimit"] = individualLimit
+        }
+        if let individualRemaining {
+            spendLimit["individualRemaining"] = individualRemaining
+        }
+        return [
+            "planUsage": [
+                "totalPercentUsed": 10,
+                "autoPercentUsed": 15,
+                "apiPercentUsed": 2,
+                "totalSpend": 0,
+                "includedSpend": 0,
+                "bonusSpend": 0,
+                "limit": 0
+            ],
+            "spendLimitUsage": spendLimit
+        ]
+    }
+
     private func codexResponse(
         planType: String,
-        usedPercent: Double = 15,
         primary: [String: Any]? = nil,
-        secondary: [String: Any]? = nil
+        secondary: [String: Any]? = nil,
+        includePrimary: Bool = true,
+        includeSecondary: Bool = true
     ) -> [String: Any] {
         var limits: [String: Any] = [
-            "planType": planType,
-            "primary": primary ?? [
-                "usedPercent": usedPercent,
-                "windowDurationMins": 10_080,
+            "planType": planType
+        ]
+        if includePrimary {
+            limits["primary"] = primary ?? [
+                "usedPercent": 20,
+                "windowDurationMins": 300,
                 "resetsAt": 1_800_000_000
             ]
-        ]
-        if let secondary {
-            limits["secondary"] = secondary
+        }
+        if includeSecondary {
+            limits["secondary"] = secondary ?? [
+                "usedPercent": 65,
+                "windowDurationMins": 10_080,
+                "resetsAt": 1_800_500_000
+            ]
         }
 
         return [

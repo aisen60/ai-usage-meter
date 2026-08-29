@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// 设置页（设计稿 design/v0.2.0/settings-page.png）。
+/// 设置页（设计稿 design/v0.3.0/setting.png）。
 ///
 /// 与主视图共处于同一个 MenuBarExtra 弹层内，通过 onBack 回调返回。
-/// 包含状态栏预览、显示项目开关，以及「至少保留一项」的约束提示。
+/// 包含状态栏预览、五个显示项目开关，以及「至少保留一项」的约束提示。
 struct SettingsView: View {
     @ObservedObject var controller: QuotaController
     let onBack: () -> Void
@@ -63,61 +63,46 @@ struct SettingsView: View {
             sectionTitle("状态栏预览")
 
             // 深色底板模拟菜单栏环境，浅/深色模式下观感一致
-            StatusBarBadge(
-                cursorText: cursorPercentText,
-                otherText: otherPercentText,
-                codexText: codexPercentText,
-                cursorConnected: cursorConnected,
-                otherConnected: otherConnected,
-                codexConnected: codexConnected,
-                settings: controller.displaySettings,
-                cursorAvailable: controller.shouldShowCursor
-            )
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color(white: 0.12))
-            )
-            .padding(.horizontal, MenuMetrics.horizontalPadding)
+            StatusBarBadge(presentation: presentation)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Color(white: 0.12))
+                )
+                .padding(.horizontal, MenuMetrics.horizontalPadding)
         }
     }
 
     // MARK: - Display Items
+
+    /// 设置页中实际可配置的项目：Cursor 未集成时隐藏两个 Cursor 百分比，
+    /// On Demand 无有效上限时隐藏，ChatGPT 两项始终可配置。
+    private var availableItems: [MenuBarDisplaySettings.Item] {
+        var items: [MenuBarDisplaySettings.Item] = []
+        if controller.shouldShowCursor {
+            items.append(.cursorModels)
+            items.append(.otherModels)
+        }
+        if controller.shouldShowOnDemand {
+            items.append(.onDemand)
+        }
+        items.append(.chatgptFiveHour)
+        items.append(.chatgptWeekly)
+        return items
+    }
 
     private var displayItemsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("显示项目")
 
             VStack(spacing: 0) {
-                if controller.shouldShowCursor {
-                    displayItemRow(
-                        item: .cursorModels,
-                        name: "Cursor Models",
-                        subtitle: "Cursor",
-                        percentText: cursorPercentText,
-                        tint: Color(red: 0.04, green: 0.45, blue: 0.96),
-                        connected: cursorConnected
-                    )
-                    rowDivider
-                    displayItemRow(
-                        item: .otherModels,
-                        name: "Other Models",
-                        subtitle: "Cursor",
-                        percentText: otherPercentText,
-                        tint: Color(red: 0.39, green: 0.39, blue: 0.39),
-                        connected: otherConnected
-                    )
-                    rowDivider
+                ForEach(Array(availableItems.enumerated()), id: \.element) { index, item in
+                    displayItemRow(item: item)
+                    if index < availableItems.count - 1 {
+                        rowDivider
+                    }
                 }
-                displayItemRow(
-                    item: .codexWeeklyRemaining,
-                    name: "本周剩余",
-                    subtitle: codexSubtitle,
-                    percentText: codexPercentText,
-                    tint: Color(red: 0.00, green: 0.62, blue: 0.32),
-                    connected: codexConnected
-                )
             }
             .background(Color(nsColor: .controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -129,36 +114,33 @@ struct SettingsView: View {
         }
     }
 
-    private func displayItemRow(
-        item: MenuBarDisplaySettings.Item,
-        name: String,
-        subtitle: String,
-        percentText: String,
-        tint: Color,
-        connected: Bool
-    ) -> some View {
+    private func displayItemRow(item: MenuBarDisplaySettings.Item) -> some View {
         HStack(spacing: 10) {
             Circle()
-                .fill(tint)
+                .fill(QuotaPalette.tint(for: item))
                 .frame(width: 8, height: 8)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(name)
+                Text(name(for: item))
                     .font(.system(size: MenuMetrics.cardTitle, weight: .semibold))
-                Text(subtitle)
+                Text(subtitle(for: item))
                     .font(.system(size: MenuMetrics.summaryText))
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            Text(percentText)
+            Text(valueText(for: item))
                 .font(.system(size: MenuMetrics.cardTitle, weight: .bold))
                 .monospacedDigit()
-                .foregroundStyle(connected ? tint : Color(nsColor: .tertiaryLabelColor))
+                .foregroundStyle(
+                    isConnected(for: item)
+                        ? QuotaPalette.tint(for: item)
+                        : Color(nsColor: .tertiaryLabelColor)
+                )
 
             Toggle(
-                name,
+                name(for: item),
                 isOn: Binding(
                     get: { controller.displaySettings.isVisible(item) },
                     set: { controller.setDisplayItem(item, visible: $0) }
@@ -170,7 +152,8 @@ struct SettingsView: View {
             .disabled(
                 controller.displaySettings.isLastVisible(
                     item,
-                    cursorAvailable: controller.shouldShowCursor
+                    cursorAvailable: controller.shouldShowCursor,
+                    onDemandAvailable: controller.shouldShowOnDemand
                 )
             )
         }
@@ -218,34 +201,61 @@ struct SettingsView: View {
 
     // MARK: - Data
 
-    private var cursorConnected: Bool {
-        controller.cursorConnectionState.canDisplayUsage && controller.cursorUsage != nil
+    /// 状态栏预览与 MenuBarLabel 使用同一展示模型，避免数值或顺序不一致。
+    private var presentation: StatusBarPresentation {
+        StatusBarPresentation(
+            settings: controller.displaySettings,
+            cursorUsage: controller.cursorUsage,
+            cursorAvailable: controller.shouldShowCursor,
+            cursorState: controller.cursorConnectionState,
+            codexUsage: controller.codexUsage,
+            codexState: controller.codexConnectionState
+        )
     }
 
-    private var otherConnected: Bool {
-        cursorConnected
+    private var cursorConnected: Bool {
+        controller.cursorConnectionState.canDisplayUsage && controller.cursorUsage != nil
     }
 
     private var codexConnected: Bool {
         controller.codexConnectionState.isConnected && controller.codexUsage.isConnected
     }
 
-    private var cursorPercentText: String {
-        guard cursorConnected, let usage = controller.cursorUsage else { return "0%" }
-        return "\(Int(usage.autoPercentUsed.rounded()))%"
+    private func name(for item: MenuBarDisplaySettings.Item) -> String {
+        switch item {
+        case .cursorModels: return "Cursor Models"
+        case .otherModels: return "Other Models"
+        case .onDemand: return "On Demand"
+        case .chatgptFiveHour: return "5 小时"
+        case .chatgptWeekly: return "1 周"
+        }
     }
 
-    private var otherPercentText: String {
-        guard otherConnected, let usage = controller.cursorUsage else { return "0%" }
-        return "\(Int(usage.apiPercentUsed.rounded()))%"
+    private func subtitle(for item: MenuBarDisplaySettings.Item) -> String {
+        switch item {
+        case .cursorModels, .otherModels, .onDemand: return "Cursor"
+        case .chatgptFiveHour, .chatgptWeekly: return "ChatGPT"
+        }
     }
 
-    private var codexPercentText: String {
-        guard codexConnected else { return "0%" }
-        return "\(Int(controller.codexUsage.percentRemaining.rounded()))%"
+    private func valueText(for item: MenuBarDisplaySettings.Item) -> String {
+        switch item {
+        case .cursorModels: return percentText(cursorConnected ? controller.cursorUsage?.autoPercentUsed : nil)
+        case .otherModels: return percentText(cursorConnected ? controller.cursorUsage?.apiPercentUsed : nil)
+        case .onDemand: return controller.cursorUsage?.onDemandAmountText ?? "$0 / $0"
+        case .chatgptFiveHour: return codexConnected ? percentText(controller.codexUsage.shortWindow.percentRemaining) : "0%"
+        case .chatgptWeekly: return codexConnected ? percentText(controller.codexUsage.weeklyWindow.percentRemaining) : "0%"
+        }
     }
 
-    private var codexSubtitle: String {
-        codexConnected ? controller.codexUsage.planName : "Codex"
+    private func isConnected(for item: MenuBarDisplaySettings.Item) -> Bool {
+        switch item {
+        case .cursorModels, .otherModels, .onDemand: return cursorConnected
+        case .chatgptFiveHour, .chatgptWeekly: return codexConnected
+        }
+    }
+
+    private func percentText(_ value: Double?) -> String {
+        "\(Int((value ?? 0).rounded()))%"
     }
 }
