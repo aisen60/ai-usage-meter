@@ -2,25 +2,25 @@
 
 set -euo pipefail
 
-readonly VERSION="0.2.0"
-readonly BUILD_NUMBER="20260801"
-readonly BUNDLE_ID="com.agentquotabar.app"
+readonly VERSION="0.3.0"
+readonly BUILD_NUMBER="20260829"
+readonly BUNDLE_ID="com.aisen.aiusagemeter"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-readonly PROJECT="$PROJECT_DIR/AgentQuotaBar.xcodeproj"
-readonly SCHEME="AgentQuotaBar"
+readonly PROJECT="$PROJECT_DIR/AIUsageMeter.xcodeproj"
+readonly SCHEME="AIUsageMeter"
 readonly DIST_DIR="$PROJECT_DIR/dist"
-readonly ZIP_PATH="$DIST_DIR/AgentQuotaBar-$VERSION.zip"
+readonly ZIP_PATH="$DIST_DIR/AIUsageMeter-$VERSION.zip"
 readonly CHECKSUM_PATH="$ZIP_PATH.sha256"
-readonly DERIVED_DATA="$(mktemp -d /private/tmp/AgentQuotaBar-Release.XXXXXX)"
-readonly VERIFY_DIR="$(mktemp -d /private/tmp/AgentQuotaBar-Verify.XXXXXX)"
+readonly DERIVED_DATA="$(mktemp -d /private/tmp/AIUsageMeter-Release.XXXXXX)"
+readonly VERIFY_DIR="$(mktemp -d /private/tmp/AIUsageMeter-Verify.XXXXXX)"
 
 cleanup() {
     rm -rf "$DERIVED_DATA" "$VERIFY_DIR"
 }
 trap cleanup EXIT
 
-echo "Building Agent Quota Bar $VERSION (arm64 + x86_64)..."
+echo "Building AI Usage Meter $VERSION (arm64 + x86_64)..."
 xcodebuild \
     -project "$PROJECT" \
     -scheme "$SCHEME" \
@@ -32,9 +32,9 @@ xcodebuild \
     CODE_SIGNING_ALLOWED=NO \
     build
 
-readonly APP_PATH="$DERIVED_DATA/Build/Products/Release/AgentQuotaBar.app"
+readonly APP_PATH="$DERIVED_DATA/Build/Products/Release/AIUsageMeter.app"
 readonly INFO_PLIST="$APP_PATH/Contents/Info.plist"
-readonly EXECUTABLE="$APP_PATH/Contents/MacOS/AgentQuotaBar"
+readonly EXECUTABLE="$APP_PATH/Contents/MacOS/AIUsageMeter"
 
 test -d "$APP_PATH"
 test "$(plutil -extract CFBundleShortVersionString raw "$INFO_PLIST")" = "$VERSION"
@@ -66,12 +66,12 @@ ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
 unzip -t "$ZIP_PATH"
 ditto -x -k "$ZIP_PATH" "$VERIFY_DIR"
 
-readonly PACKAGED_APP="$VERIFY_DIR/AgentQuotaBar.app"
+readonly PACKAGED_APP="$VERIFY_DIR/AIUsageMeter.app"
 test -d "$PACKAGED_APP"
 test "$(plutil -extract CFBundleShortVersionString raw "$PACKAGED_APP/Contents/Info.plist")" = "$VERSION"
 test "$(plutil -extract CFBundleVersion raw "$PACKAGED_APP/Contents/Info.plist")" = "$BUILD_NUMBER"
 test "$(plutil -extract CFBundleIdentifier raw "$PACKAGED_APP/Contents/Info.plist")" = "$BUNDLE_ID"
-test "$(lipo -archs "$PACKAGED_APP/Contents/MacOS/AgentQuotaBar")" = "$ARCHITECTURES"
+test "$(lipo -archs "$PACKAGED_APP/Contents/MacOS/AIUsageMeter")" = "$ARCHITECTURES"
 codesign --verify --strict --verbose=2 "$PACKAGED_APP"
 
 echo "Release artifacts:"

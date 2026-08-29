@@ -1,0 +1,497 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1000001 /* AIUsageMeterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001 /* AIUsageMeterApp.swift */; };
+		A1000002 /* CursorUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* CursorUsage.swift */; };
+		A1000003 /* CodexUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* CodexUsage.swift */; };
+		A1000004 /* CursorTokenReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000004 /* CursorTokenReader.swift */; };
+		A1000005 /* CursorAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000005 /* CursorAPIClient.swift */; };
+		A1000006 /* CodexIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* CodexIntegration.swift */; };
+		A1000007 /* TokenKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* TokenKeychain.swift */; };
+		A1000008 /* UsageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* UsageCache.swift */; };
+		A1000009 /* QuotaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009 /* QuotaController.swift */; };
+		A1000010 /* MenuBarLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010 /* MenuBarLabel.swift */; };
+		A1000011 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011 /* MenuBarView.swift */; };
+		A1000012 /* CursorSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000012 /* CursorSection.swift */; };
+		A1000013 /* CodexSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000013 /* CodexSection.swift */; };
+		A1000015 /* CursorIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A2000017 /* CursorIcon.png */; };
+		A1000016 /* CodexIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A2000018 /* CodexIcon.png */; };
+		A1000017 /* AppLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* AppLog.swift */; };
+		A1000018 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* LaunchAtLoginService.swift */; };
+		A1000019 /* MenuBarDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000021 /* MenuBarDisplaySettings.swift */; };
+		A1000020 /* StatusBarBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022 /* StatusBarBadge.swift */; };
+		A1000021 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000023 /* SettingsView.swift */; };
+		A1000022 /* AdaptiveRefreshPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000024 /* AdaptiveRefreshPolicy.swift */; };
+		B1000001 /* QuotaParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000001 /* QuotaParsingTests.swift */; };
+		B1000002 /* MenuBarDisplaySettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000003 /* MenuBarDisplaySettingsTests.swift */; };
+		B1000003 /* AdaptiveRefreshPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000004 /* AdaptiveRefreshPolicyTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B9000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A5000001;
+			remoteInfo = AIUsageMeter;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A2000001 /* AIUsageMeterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIUsageMeterApp.swift; sourceTree = "<group>"; };
+		A2000002 /* CursorUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorUsage.swift; sourceTree = "<group>"; };
+		A2000003 /* CodexUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUsage.swift; sourceTree = "<group>"; };
+		A2000004 /* CursorTokenReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorTokenReader.swift; sourceTree = "<group>"; };
+		A2000005 /* CursorAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorAPIClient.swift; sourceTree = "<group>"; };
+		A2000006 /* CodexIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexIntegration.swift; sourceTree = "<group>"; };
+		A2000007 /* TokenKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenKeychain.swift; sourceTree = "<group>"; };
+		A2000008 /* UsageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageCache.swift; sourceTree = "<group>"; };
+		A2000009 /* QuotaController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaController.swift; sourceTree = "<group>"; };
+		A2000010 /* MenuBarLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabel.swift; sourceTree = "<group>"; };
+		A2000011 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		A2000012 /* CursorSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorSection.swift; sourceTree = "<group>"; };
+		A2000013 /* CodexSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexSection.swift; sourceTree = "<group>"; };
+		A2000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A2000016 /* AIUsageMeter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIUsageMeter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2000017 /* CursorIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CursorIcon.png; sourceTree = "<group>"; };
+		A2000018 /* CodexIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CodexIcon.png; sourceTree = "<group>"; };
+		A2000019 /* AppLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLog.swift; sourceTree = "<group>"; };
+		A2000020 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
+		A2000021 /* MenuBarDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettings.swift; sourceTree = "<group>"; };
+		A2000022 /* StatusBarBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarBadge.swift; sourceTree = "<group>"; };
+		A2000023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A2000024 /* AdaptiveRefreshPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRefreshPolicy.swift; sourceTree = "<group>"; };
+		B2000001 /* QuotaParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaParsingTests.swift; sourceTree = "<group>"; };
+		B2000003 /* MenuBarDisplaySettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettingsTests.swift; sourceTree = "<group>"; };
+		B2000004 /* AdaptiveRefreshPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRefreshPolicyTests.swift; sourceTree = "<group>"; };
+		B2000002 /* AIUsageMeterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIUsageMeterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A4000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B4000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A4000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000015 /* CursorIcon.png in Resources */,
+				A1000016 /* CodexIcon.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B4000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXGroup section */
+		A3000001 /* AIUsageMeter */ = {
+			isa = PBXGroup;
+			children = (
+				A2000001 /* AIUsageMeterApp.swift */,
+				A2000015 /* Info.plist */,
+				A3000010 /* Models */,
+				A3000011 /* Services */,
+				A3000012 /* Controllers */,
+				A3000013 /* Views */,
+				A3000014 /* Resources */,
+			);
+			path = AIUsageMeter;
+			sourceTree = "<group>";
+		};
+		A3000010 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A2000002 /* CursorUsage.swift */,
+				A2000003 /* CodexUsage.swift */,
+				A2000021 /* MenuBarDisplaySettings.swift */,
+				A2000024 /* AdaptiveRefreshPolicy.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A3000011 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A2000004 /* CursorTokenReader.swift */,
+				A2000005 /* CursorAPIClient.swift */,
+				A2000006 /* CodexIntegration.swift */,
+				A2000007 /* TokenKeychain.swift */,
+				A2000008 /* UsageCache.swift */,
+				A2000019 /* AppLog.swift */,
+				A2000020 /* LaunchAtLoginService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A3000012 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				A2000009 /* QuotaController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		A3000013 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A2000010 /* MenuBarLabel.swift */,
+				A2000011 /* MenuBarView.swift */,
+				A2000012 /* CursorSection.swift */,
+				A2000013 /* CodexSection.swift */,
+				A2000022 /* StatusBarBadge.swift */,
+				A2000023 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A3000014 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A2000017 /* CursorIcon.png */,
+				A2000018 /* CodexIcon.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A3000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A2000016 /* AIUsageMeter.app */,
+				B2000002 /* AIUsageMeterTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A3000000 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				A3000001 /* AIUsageMeter */,
+				B3000001 /* AIUsageMeterTests */,
+				A3000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B3000001 /* AIUsageMeterTests */ = {
+			isa = PBXGroup;
+			children = (
+				B2000001 /* QuotaParsingTests.swift */,
+				B2000003 /* MenuBarDisplaySettingsTests.swift */,
+				B2000004 /* AdaptiveRefreshPolicyTests.swift */,
+			);
+			path = AIUsageMeterTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A5000001 /* AIUsageMeter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A6000001 /* configuration list for NativeTarget "AIUsageMeter" */;
+			buildPhases = (
+				A4000002 /* Sources */,
+				A4000001 /* Frameworks */,
+				A4000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AIUsageMeter;
+			productName = AIUsageMeter;
+			productReference = A2000016 /* AIUsageMeter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B5000001 /* AIUsageMeterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B6000001 /* configuration list for NativeTarget "AIUsageMeterTests" */;
+			buildPhases = (
+				B4000003 /* Sources */,
+				B4000001 /* Frameworks */,
+				B4000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B9000002 /* PBXTargetDependency */,
+			);
+			name = AIUsageMeterTests;
+			productName = AIUsageMeterTests;
+			productReference = B2000002 /* AIUsageMeterTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A7000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				TargetAttributes = {
+					A5000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					B5000001 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = A5000001;
+					};
+				};
+			};
+			buildConfigurationList = A6000002 /* configuration list for PBXProject "AIUsageMeter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A3000000 /* Root */;
+			productRefGroup = A3000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A5000001 /* AIUsageMeter */,
+				B5000001 /* AIUsageMeterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A4000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000001 /* AIUsageMeterApp.swift in Sources */,
+				A1000002 /* CursorUsage.swift in Sources */,
+				A1000003 /* CodexUsage.swift in Sources */,
+				A1000004 /* CursorTokenReader.swift in Sources */,
+				A1000005 /* CursorAPIClient.swift in Sources */,
+				A1000006 /* CodexIntegration.swift in Sources */,
+				A1000007 /* TokenKeychain.swift in Sources */,
+				A1000008 /* UsageCache.swift in Sources */,
+				A1000009 /* QuotaController.swift in Sources */,
+				A1000010 /* MenuBarLabel.swift in Sources */,
+				A1000011 /* MenuBarView.swift in Sources */,
+				A1000012 /* CursorSection.swift in Sources */,
+				A1000013 /* CodexSection.swift in Sources */,
+				A1000017 /* AppLog.swift in Sources */,
+				A1000018 /* LaunchAtLoginService.swift in Sources */,
+				A1000019 /* MenuBarDisplaySettings.swift in Sources */,
+				A1000020 /* StatusBarBadge.swift in Sources */,
+				A1000021 /* SettingsView.swift in Sources */,
+				A1000022 /* AdaptiveRefreshPolicy.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B4000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1000001 /* QuotaParsingTests.swift in Sources */,
+				B1000002 /* MenuBarDisplaySettingsTests.swift in Sources */,
+				B1000003 /* AdaptiveRefreshPolicyTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A8000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCLABLE_SYMBOL_LEVEL = NO;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A8000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCLABLE_SYMBOL_LEVEL = NO;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A8000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 20260829;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AIUsageMeter/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APPLICATION_GUID = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A8000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 20260829;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AIUsageMeter/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APPLICATION_GUID = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B8000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 20260829;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AIUsageMeter.app/Contents/MacOS/AIUsageMeter";
+			};
+			name = Debug;
+		};
+		B8000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 20260829;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AIUsageMeter.app/Contents/MacOS/AIUsageMeter";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A6000002 /* configuration list for PBXProject "AIUsageMeter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A8000001 /* Debug */,
+				A8000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A6000001 /* configuration list for NativeTarget "AIUsageMeter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A8000003 /* Debug */,
+				A8000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B6000001 /* configuration list for NativeTarget "AIUsageMeterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8000001 /* Debug */,
+				B8000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin PBXTargetDependency section */
+		B9000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A5000001 /* AIUsageMeter */;
+			targetProxy = B9000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+	};
+	rootObject = A7000001 /* Project object */;
+}

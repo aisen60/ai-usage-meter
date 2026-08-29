@@ -1,0 +1,7 @@
+interface:
+  display_name: "PR Update"
+  short_description: "审核摘要后更新既有 GitHub PR 的标题、状态或追加提交。"
+  default_prompt: "Use $pr-update to review this branch and update the existing pull request."
+
+policy:
+  allow_implicit_invocation: true

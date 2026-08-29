@@ -1,6 +1,6 @@
 # 隐私说明
 
-Agent Quota Bar 只在本机读取 Cursor 和 Codex 的用量。应用不运营任何中转服务器，不包含遥测、统计或分析功能，也不会把任何数据发送给开发者或第三方。
+AI Usage Meter 只在本机读取 Cursor 和 Codex 的用量。应用不运营任何中转服务器，不包含遥测、统计或分析功能，也不会把任何数据发送给开发者或第三方。
 
 ## 应用在本机读取什么
 
@@ -11,12 +11,12 @@ Agent Quota Bar 只在本机读取 Cursor 和 Codex 的用量。应用不运营�
 | Codex 用量 | 本机 `codex app-server` 复用其现有登录会话 | 读取周剩余额度 |
 | 用量数据 | 上述两个服务 | 菜单栏与弹层展示 |
 
-Agent Quota Bar 不读取、保存或上传 ChatGPT Token。
+AI Usage Meter 不读取、保存或上传 ChatGPT Token。
 
 ## 数据保存在哪里
 
-- **Cursor 手动 Token**：仅保存在 macOS Keychain，service 固定为 `com.agentquotabar.app`，不落盘到任何普通文件。
-- **用量缓存**：仅保存在当前 macOS 用户的本地应用数据目录（`~/Library/Application Support/AgentQuotaBar`），内容为用量数值和获取时间，不含凭据。
+- **Cursor 手动 Token**：仅保存在 macOS Keychain，service 固定为 `com.aisen.aiusagemeter`，不落盘到任何普通文件。
+- **用量缓存**：仅保存在当前 macOS 用户的本地应用数据目录（`~/Library/Application Support/AIUsageMeter`），内容为用量数值和获取时间，不含凭据。
 - **显示设置**：菜单栏显示项目的开关状态保存在 macOS 用户偏好设置（UserDefaults）中，仅含三个布尔值，不含任何账号信息。
 
 ## 网络请求发给谁
@@ -33,8 +33,8 @@ Agent Quota Bar 不读取、保存或上传 ChatGPT Token。
 
 删除应用本身不会自动清除以下残留，如需彻底移除：
 
-1. **Keychain 凭据**：打开“钥匙串访问”，搜索 `com.agentquotabar.app`，删除对应项目。
-2. **用量缓存**：删除 `~/Library/Application Support/AgentQuotaBar` 目录。
-3. **显示设置**：随用户偏好设置一并删除应用域即可（终端执行 `defaults delete com.agentquotabar.app`）。
+1. **Keychain 凭据**：打开“钥匙串访问”，搜索 `com.aisen.aiusagemeter`，删除对应项目。
+2. **用量缓存**：删除 `~/Library/Application Support/AIUsageMeter` 目录。
+3. **显示设置**：随用户偏好设置一并删除应用域即可（终端执行 `defaults delete com.aisen.aiusagemeter`）。
 
 更简要的产品说明见 [README.md](README.md)。
