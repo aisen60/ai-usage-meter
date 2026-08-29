@@ -75,7 +75,7 @@ struct CursorSection: View {
                 label: "On Demand",
                 percent: onDemandPercent,
                 tint: QuotaPalette.onDemand,
-                detail: onDemandDetail,
+                detail: nil,
                 trailingText: onDemandText
             )
         }
@@ -96,10 +96,6 @@ struct CursorSection: View {
     }
     private var onDemandText: String {
         usage?.onDemandAmountText ?? "$0 / $0"
-    }
-
-    private var onDemandDetail: String {
-        "超出套餐额度的使用将按需计费。"
     }
 }
 

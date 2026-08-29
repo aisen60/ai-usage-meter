@@ -3,7 +3,7 @@ import SwiftUI
 /// 设置页（设计稿 design/v0.3.0/setting.png）。
 ///
 /// 与主视图共处于同一个 MenuBarExtra 弹层内，通过 onBack 回调返回。
-/// 包含状态栏预览、五个显示项目开关，以及「至少保留一项」的约束提示。
+/// 包含五个显示项目开关，以及「至少保留一项」的约束提示。
 struct SettingsView: View {
     @ObservedObject var controller: QuotaController
     let onBack: () -> Void
@@ -13,9 +13,6 @@ struct SettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             navigationBar
-
-            previewSection
-                .padding(.top, 4)
 
             displayItemsSection
                 .padding(.top, 16)
@@ -54,24 +51,6 @@ struct SettingsView: View {
         .padding(.horizontal, MenuMetrics.horizontalPadding)
         .padding(.top, 12)
         .padding(.bottom, 10)
-    }
-
-    // MARK: - Preview
-
-    private var previewSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sectionTitle("状态栏预览")
-
-            // 深色底板模拟菜单栏环境，浅/深色模式下观感一致
-            StatusBarBadge(presentation: presentation)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(Color(white: 0.12))
-                )
-                .padding(.horizontal, MenuMetrics.horizontalPadding)
-        }
     }
 
     // MARK: - Display Items
@@ -200,18 +179,6 @@ struct SettingsView: View {
     }
 
     // MARK: - Data
-
-    /// 状态栏预览与 MenuBarLabel 使用同一展示模型，避免数值或顺序不一致。
-    private var presentation: StatusBarPresentation {
-        StatusBarPresentation(
-            settings: controller.displaySettings,
-            cursorUsage: controller.cursorUsage,
-            cursorAvailable: controller.shouldShowCursor,
-            cursorState: controller.cursorConnectionState,
-            codexUsage: controller.codexUsage,
-            codexState: controller.codexConnectionState
-        )
-    }
 
     private var cursorConnected: Bool {
         controller.cursorConnectionState.canDisplayUsage && controller.cursorUsage != nil
