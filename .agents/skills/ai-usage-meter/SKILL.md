@@ -1,9 +1,9 @@
 ---
-name: agent-quota-bar
-description: Repository map and development workflow for the Agent Quota Bar macOS app. Use whenever working in this repository and you need project-specific guidance about code placement, Cursor or Codex quota semantics, local credential handling, menu bar behavior, validation commands, packaging, release constraints, or known integration caveats.
+name: ai-usage-meter
+description: Repository map and development workflow for the AI Usage Meter macOS app. Use whenever working in this repository and you need project-specific guidance about code placement, Cursor or Codex quota semantics, local credential handling, menu bar behavior, validation commands, packaging, release constraints, or known integration caveats.
 ---
 
-# Agent Quota Bar
+# AI Usage Meter
 
 Treat this file as a router. Read only the smallest reference that covers the task, then use the relevant Swift or macOS domain skill for implementation detail.
 

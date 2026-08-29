@@ -4,8 +4,8 @@
 
 - Native macOS menu bar application.
 - Deployment target: macOS 13 Ventura.
-- Xcode project: `AgentQuotaBar.xcodeproj`.
-- Main scheme: `AgentQuotaBar`.
+- Xcode project: `AIUsageMeter.xcodeproj`.
+- Main scheme: `AIUsageMeter`.
 - Checked-in Swift language mode: Swift 5.
 - No third-party runtime dependencies.
 - The app has no normal Dock-window workflow; its primary interface is `MenuBarExtra` with `.window` style.
@@ -14,17 +14,17 @@
 
 | Area | Owning path | Responsibility |
 | --- | --- | --- |
-| App entry and lifecycle | `AgentQuotaBar/AgentQuotaBarApp.swift` | `App`, `MenuBarExtra`, AppKit lifecycle bridge, login-item startup |
-| Cross-service state | `AgentQuotaBar/Controllers/QuotaController.swift` | Refresh orchestration, connection states, cache policy, automatic refresh |
-| Menu bar UI | `AgentQuotaBar/Views/` | Status-bar label, service sections, cards, toolbar, presentation-only formatting |
-| Cursor domain model | `AgentQuotaBar/Models/CursorUsage.swift` | Cursor parsing and computed usage values |
-| Codex domain model | `AgentQuotaBar/Models/CodexUsage.swift` | Codex quota state and display data |
-| Cursor integration | `AgentQuotaBar/Services/CursorAPIClient.swift`, `CursorTokenReader.swift` | Local session discovery, private dashboard requests, plan detection |
-| Codex integration | `AgentQuotaBar/Services/CodexIntegration.swift` | Locate Codex executable, run `app-server`, request and parse rate limits, terminate child process |
-| Credential storage | `AgentQuotaBar/Services/TokenKeychain.swift` | Manual Cursor token persistence in Keychain |
-| Cache and diagnostics | `AgentQuotaBar/Services/UsageCache.swift`, `AppLog.swift` | Non-secret cached usage and privacy-safe logging |
-| Login item | `AgentQuotaBar/Services/LaunchAtLoginService.swift` | Release-only registration through ServiceManagement |
-| Unit tests | `AgentQuotaBarTests/` | Parser, mapping, display settings, persistence constraints, failure, and child-process cleanup behavior |
+| App entry and lifecycle | `AIUsageMeter/AIUsageMeterApp.swift` | `App`, `MenuBarExtra`, AppKit lifecycle bridge, login-item startup |
+| Cross-service state | `AIUsageMeter/Controllers/QuotaController.swift` | Refresh orchestration, connection states, cache policy, automatic refresh |
+| Menu bar UI | `AIUsageMeter/Views/` | Status-bar label, service sections, cards, toolbar, presentation-only formatting |
+| Cursor domain model | `AIUsageMeter/Models/CursorUsage.swift` | Cursor parsing and computed usage values |
+| Codex domain model | `AIUsageMeter/Models/CodexUsage.swift` | Codex quota state and display data |
+| Cursor integration | `AIUsageMeter/Services/CursorAPIClient.swift`, `CursorTokenReader.swift` | Local session discovery, private dashboard requests, plan detection |
+| Codex integration | `AIUsageMeter/Services/CodexIntegration.swift` | Locate Codex executable, run `app-server`, request and parse rate limits, terminate child process |
+| Credential storage | `AIUsageMeter/Services/TokenKeychain.swift` | Manual Cursor token persistence in Keychain |
+| Cache and diagnostics | `AIUsageMeter/Services/UsageCache.swift`, `AppLog.swift` | Non-secret cached usage and privacy-safe logging |
+| Login item | `AIUsageMeter/Services/LaunchAtLoginService.swift` | Release-only registration through ServiceManagement |
+| Unit tests | `AIUsageMeterTests/` | Parser, mapping, display settings, persistence constraints, failure, and child-process cleanup behavior |
 | Packaging | `scripts/build-release.sh` | Universal build, metadata checks, ad-hoc signing, archive and checksum verification |
 
 ## Dependency Direction

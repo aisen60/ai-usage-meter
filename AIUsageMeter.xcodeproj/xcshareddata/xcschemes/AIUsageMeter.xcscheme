@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A5000001"
-               BuildableName = "AgentQuotaBar.app"
-               BlueprintName = "AgentQuotaBar"
-               ReferencedContainer = "container:AgentQuotaBar.xcodeproj">
+               BuildableName = "AIUsageMeter.app"
+               BlueprintName = "AIUsageMeter"
+               ReferencedContainer = "container:AIUsageMeter.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,9 +32,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B5000001"
-               BuildableName = "AgentQuotaBarTests.xctest"
-               BlueprintName = "AgentQuotaBarTests"
-               ReferencedContainer = "container:AgentQuotaBar.xcodeproj">
+               BuildableName = "AIUsageMeterTests.xctest"
+               BlueprintName = "AIUsageMeterTests"
+               ReferencedContainer = "container:AIUsageMeter.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -53,9 +53,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A5000001"
-            BuildableName = "AgentQuotaBar.app"
-            BlueprintName = "AgentQuotaBar"
-            ReferencedContainer = "container:AgentQuotaBar.xcodeproj">
+            BuildableName = "AIUsageMeter.app"
+            BlueprintName = "AIUsageMeter"
+            ReferencedContainer = "container:AIUsageMeter.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -69,9 +69,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A5000001"
-            BuildableName = "AgentQuotaBar.app"
-            BlueprintName = "AgentQuotaBar"
-            ReferencedContainer = "container:AgentQuotaBar.xcodeproj">
+            BuildableName = "AIUsageMeter.app"
+            BlueprintName = "AIUsageMeter"
+            ReferencedContainer = "container:AIUsageMeter.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

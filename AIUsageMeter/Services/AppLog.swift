@@ -3,7 +3,7 @@ import OSLog
 
 enum AppLog {
     private static let subsystem = Bundle.main.bundleIdentifier
-        ?? "com.agentquotabar.app"
+        ?? "com.aisen.aiusagemeter"
 
     static let app = Logger(subsystem: subsystem, category: "app")
     static let cursor = Logger(subsystem: subsystem, category: "cursor")

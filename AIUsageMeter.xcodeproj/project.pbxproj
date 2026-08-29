@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A1000001 /* AgentQuotaBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001 /* AgentQuotaBarApp.swift */; };
+		A1000001 /* AIUsageMeterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001 /* AIUsageMeterApp.swift */; };
 		A1000002 /* CursorUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* CursorUsage.swift */; };
 		A1000003 /* CodexUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* CodexUsage.swift */; };
 		A1000004 /* CursorTokenReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000004 /* CursorTokenReader.swift */; };
@@ -39,12 +39,12 @@
 			containerPortal = A7000001 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A5000001;
-			remoteInfo = AgentQuotaBar;
+			remoteInfo = AIUsageMeter;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A2000001 /* AgentQuotaBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentQuotaBarApp.swift; sourceTree = "<group>"; };
+		A2000001 /* AIUsageMeterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIUsageMeterApp.swift; sourceTree = "<group>"; };
 		A2000002 /* CursorUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorUsage.swift; sourceTree = "<group>"; };
 		A2000003 /* CodexUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUsage.swift; sourceTree = "<group>"; };
 		A2000004 /* CursorTokenReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorTokenReader.swift; sourceTree = "<group>"; };
@@ -58,7 +58,7 @@
 		A2000012 /* CursorSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorSection.swift; sourceTree = "<group>"; };
 		A2000013 /* CodexSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexSection.swift; sourceTree = "<group>"; };
 		A2000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A2000016 /* AgentQuotaBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgentQuotaBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2000016 /* AIUsageMeter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIUsageMeter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2000017 /* CursorIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CursorIcon.png; sourceTree = "<group>"; };
 		A2000018 /* CodexIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CodexIcon.png; sourceTree = "<group>"; };
 		A2000019 /* AppLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLog.swift; sourceTree = "<group>"; };
@@ -70,7 +70,7 @@
 		B2000001 /* QuotaParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaParsingTests.swift; sourceTree = "<group>"; };
 		B2000003 /* MenuBarDisplaySettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettingsTests.swift; sourceTree = "<group>"; };
 		B2000004 /* AdaptiveRefreshPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRefreshPolicyTests.swift; sourceTree = "<group>"; };
-		B2000002 /* AgentQuotaBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgentQuotaBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2000002 /* AIUsageMeterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIUsageMeterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,10 +110,10 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXGroup section */
-		A3000001 /* AgentQuotaBar */ = {
+		A3000001 /* AIUsageMeter */ = {
 			isa = PBXGroup;
 			children = (
-				A2000001 /* AgentQuotaBarApp.swift */,
+				A2000001 /* AIUsageMeterApp.swift */,
 				A2000015 /* Info.plist */,
 				A3000010 /* Models */,
 				A3000011 /* Services */,
@@ -121,7 +121,7 @@
 				A3000013 /* Views */,
 				A3000014 /* Resources */,
 			);
-			path = AgentQuotaBar;
+			path = AIUsageMeter;
 			sourceTree = "<group>";
 		};
 		A3000010 /* Models */ = {
@@ -182,8 +182,8 @@
 		A3000002 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A2000016 /* AgentQuotaBar.app */,
-				B2000002 /* AgentQuotaBarTests.xctest */,
+				A2000016 /* AIUsageMeter.app */,
+				B2000002 /* AIUsageMeterTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -191,28 +191,28 @@
 		A3000000 /* Root */ = {
 			isa = PBXGroup;
 			children = (
-				A3000001 /* AgentQuotaBar */,
-				B3000001 /* AgentQuotaBarTests */,
+				A3000001 /* AIUsageMeter */,
+				B3000001 /* AIUsageMeterTests */,
 				A3000002 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		B3000001 /* AgentQuotaBarTests */ = {
+		B3000001 /* AIUsageMeterTests */ = {
 			isa = PBXGroup;
 			children = (
 				B2000001 /* QuotaParsingTests.swift */,
 				B2000003 /* MenuBarDisplaySettingsTests.swift */,
 				B2000004 /* AdaptiveRefreshPolicyTests.swift */,
 			);
-			path = AgentQuotaBarTests;
+			path = AIUsageMeterTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A5000001 /* AgentQuotaBar */ = {
+		A5000001 /* AIUsageMeter */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A6000001 /* configuration list for NativeTarget "AgentQuotaBar" */;
+			buildConfigurationList = A6000001 /* configuration list for NativeTarget "AIUsageMeter" */;
 			buildPhases = (
 				A4000002 /* Sources */,
 				A4000001 /* Frameworks */,
@@ -222,14 +222,14 @@
 			);
 			dependencies = (
 			);
-			name = AgentQuotaBar;
-			productName = AgentQuotaBar;
-			productReference = A2000016 /* AgentQuotaBar.app */;
+			name = AIUsageMeter;
+			productName = AIUsageMeter;
+			productReference = A2000016 /* AIUsageMeter.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B5000001 /* AgentQuotaBarTests */ = {
+		B5000001 /* AIUsageMeterTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B6000001 /* configuration list for NativeTarget "AgentQuotaBarTests" */;
+			buildConfigurationList = B6000001 /* configuration list for NativeTarget "AIUsageMeterTests" */;
 			buildPhases = (
 				B4000003 /* Sources */,
 				B4000001 /* Frameworks */,
@@ -240,9 +240,9 @@
 			dependencies = (
 				B9000002 /* PBXTargetDependency */,
 			);
-			name = AgentQuotaBarTests;
-			productName = AgentQuotaBarTests;
-			productReference = B2000002 /* AgentQuotaBarTests.xctest */;
+			name = AIUsageMeterTests;
+			productName = AIUsageMeterTests;
+			productReference = B2000002 /* AIUsageMeterTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -263,7 +263,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A6000002 /* configuration list for PBXProject "AgentQuotaBar" */;
+			buildConfigurationList = A6000002 /* configuration list for PBXProject "AIUsageMeter" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -276,8 +276,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A5000001 /* AgentQuotaBar */,
-				B5000001 /* AgentQuotaBarTests */,
+				A5000001 /* AIUsageMeter */,
+				B5000001 /* AIUsageMeterTests */,
 			);
 		};
 /* End PBXProject section */
@@ -287,7 +287,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1000001 /* AgentQuotaBarApp.swift in Sources */,
+				A1000001 /* AIUsageMeterApp.swift in Sources */,
 				A1000002 /* CursorUsage.swift in Sources */,
 				A1000003 /* CodexUsage.swift in Sources */,
 				A1000004 /* CursorTokenReader.swift in Sources */,
@@ -381,14 +381,14 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = AgentQuotaBar/Info.plist;
+				INFOPLIST_FILE = AIUsageMeter/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.agentquotabar.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APPLICATION_GUID = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -406,14 +406,14 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = AgentQuotaBar/Info.plist;
+				INFOPLIST_FILE = AIUsageMeter/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.agentquotabar.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APPLICATION_GUID = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -430,10 +430,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.agentquotabar.app.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AgentQuotaBar.app/Contents/MacOS/AgentQuotaBar";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AIUsageMeter.app/Contents/MacOS/AIUsageMeter";
 			};
 			name = Debug;
 		};
@@ -446,17 +446,17 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.agentquotabar.app.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AgentQuotaBar.app/Contents/MacOS/AgentQuotaBar";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AIUsageMeter.app/Contents/MacOS/AIUsageMeter";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A6000002 /* configuration list for PBXProject "AgentQuotaBar" */ = {
+		A6000002 /* configuration list for PBXProject "AIUsageMeter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A8000001 /* Debug */,
@@ -465,7 +465,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A6000001 /* configuration list for NativeTarget "AgentQuotaBar" */ = {
+		A6000001 /* configuration list for NativeTarget "AIUsageMeter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A8000003 /* Debug */,
@@ -474,7 +474,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B6000001 /* configuration list for NativeTarget "AgentQuotaBarTests" */ = {
+		B6000001 /* configuration list for NativeTarget "AIUsageMeterTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B8000001 /* Debug */,
@@ -488,7 +488,7 @@
 /* Begin PBXTargetDependency section */
 		B9000002 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A5000001 /* AgentQuotaBar */;
+			target = A5000001 /* AIUsageMeter */;
 			targetProxy = B9000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */

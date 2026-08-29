@@ -1,11 +1,11 @@
 ---
 name: planning-gate
-description: Opt-in Agent Quota Bar planning workflow for reviewed design and implementation plans. Use only when the user explicitly asks for "详细计划", "头脑风暴", "完整计划", "planning gate", or an equivalent deliberate planning phrase. Do not activate automatically from task complexity alone.
+description: Opt-in AI Usage Meter planning workflow for reviewed design and implementation plans. Use only when the user explicitly asks for "详细计划", "头脑风暴", "完整计划", "planning gate", or an equivalent deliberate planning phrase. Do not activate automatically from task complexity alone.
 ---
 
 # Planning Gate
 
-Use this skill only when the user explicitly asks for the planning workflow. Adapt the `brainstorming` and `writing-plans` shape to Agent Quota Bar for reviewed design and execution planning before implementation. Do not create a second long-term knowledge system.
+Use this skill only when the user explicitly asks for the planning workflow. Adapt the `brainstorming` and `writing-plans` shape to AI Usage Meter for reviewed design and execution planning before implementation. Do not create a second long-term knowledge system.
 
 ## Activation
 
@@ -63,7 +63,7 @@ Do not skip directly from `brainstorming` to implementation. If the user asks to
 
 ## Core Rules
 
-- Do not use this skill for worktrees, subagents, mandatory TDD, automated code review, branch finishing, or release workflows. Those remain governed by normal Agent Quota Bar repository rules and task-specific skills.
+- Do not use this skill for worktrees, subagents, mandatory TDD, automated code review, branch finishing, or release workflows. Those remain governed by normal AI Usage Meter repository rules and task-specific skills.
 - Do not write code during `brainstorming`.
 - Do not start implementation during `writing-plans`.
 - Treat file persistence as required, not optional.
@@ -96,7 +96,7 @@ Use this stage to prevent premature implementation.
 5. Record assumptions and note which need verification.
 6. Identify impact areas: app lifecycle, menu bar UI, controller state, Cursor or Codex integrations, models and parsing, cache or Keychain, tests, docs, packaging, or release behavior.
 7. Propose 2-3 approaches with trade-offs.
-8. Recommend one approach and explain why it fits Agent Quota Bar's macOS 13 baseline, Swift 5 language mode, dependency policy, privacy boundaries, and product semantics.
+8. Recommend one approach and explain why it fits AI Usage Meter's macOS 13 baseline, Swift 5 language mode, dependency policy, privacy boundaries, and product semantics.
 9. Present the design in sections.
 10. Ask the user to approve or revise each section.
 11. Write the validated design to `design.md`, self-review it, and ask the user to review the written file before moving to `writing-plans`.
@@ -156,7 +156,7 @@ Before asking the user to review the written spec, fix issues inline:
 - missing validation strategy
 - scope too broad for one implementation plan
 - placeholder language such as `TBD`, `etc.`, or `handle edge cases`
-- likely conflict with Agent Quota Bar docs, skills, product invariants, deployment target, or ownership boundaries
+- likely conflict with AI Usage Meter docs, skills, product invariants, deployment target, or ownership boundaries
 
 ### Written Spec Review Gate
 
@@ -185,7 +185,7 @@ Before defining tasks, map the expected files or module boundaries and what each
 Use these rules:
 
 - Prefer clear boundaries and well-defined interfaces.
-- Follow the existing Agent Quota Bar flow of `App / Views -> QuotaController -> Services -> Models / system APIs` before inventing new structure.
+- Follow the existing AI Usage Meter flow of `App / Views -> QuotaController -> Services -> Models / system APIs` before inventing new structure.
 - Keep files and tasks small enough to fit in context.
 - Do not restructure large files unless that split clearly reduces risk for this task.
 
@@ -237,7 +237,7 @@ Before presenting `plan.md` as complete, fix issues inline:
 5. Verification is concrete and realistic.
 6. Each task maps to a focused component, file, or module boundary.
 
-Plans must name real verification signals. Read `.agents/skills/agent-quota-bar/references/validation-and-release.md` and use its focused evidence rules plus the root `xcodebuild test` gate when code changes are planned. Treat GUI launch, live credentials, private service calls, login-item behavior, signing, and Gatekeeper checks as unverified unless the user explicitly authorizes the required runtime work. If verification is manual, describe the concrete manual check.
+Plans must name real verification signals. Read `.agents/skills/ai-usage-meter/references/validation-and-release.md` and use its focused evidence rules plus the root `xcodebuild test` gate when code changes are planned. Treat GUI launch, live credentials, private service calls, login-item behavior, signing, and Gatekeeper checks as unverified unless the user explicitly authorizes the required runtime work. If verification is manual, describe the concrete manual check.
 
 ### No Placeholders
 
@@ -279,7 +279,7 @@ This skill must not create a parallel knowledge base.
 - If continuing an existing planning-gate task, reuse the existing task folder.
 - Do not commit `.agent-plans/` files.
 - Do not create `docs/superpowers/specs` or other long-term spec stores unless the user explicitly asks for them.
-- After implementation, update `agent-quota-bar` references only for durable repository learnings under that skill's maintenance rules. Update `macos-menu-bar-app` references only when the work changes reusable macOS menu bar guidance rather than project-specific behavior.
+- After implementation, update `ai-usage-meter` references only for durable repository learnings under that skill's maintenance rules. Update `macos-menu-bar-app` references only when the work changes reusable macOS menu bar guidance rather than project-specific behavior.
 
 ## Default Mode
 

@@ -1,5 +1,5 @@
 import XCTest
-@testable import AgentQuotaBar
+@testable import AIUsageMeter
 
 final class AdaptiveRefreshPolicyTests: XCTestCase {
     private let policy = AdaptiveRefreshPolicy()

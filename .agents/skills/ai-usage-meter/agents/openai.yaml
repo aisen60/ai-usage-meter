@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Usage Meter"
+  short_description: "Repository guidance for AI Usage Meter development."
+  default_prompt: "Use $ai-usage-meter to make a safe, repository-aware change."

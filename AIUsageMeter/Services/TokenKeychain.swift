@@ -4,7 +4,7 @@ import Security
 /// Keychain 封装 - 用于安全保存用户手动输入的 token
 enum TokenKeychain {
 
-    private static let service = "com.agentquotabar.app"
+    private static let service = "com.aisen.aiusagemeter"
 
     /// 保存 token 到 Keychain
     /// - Parameters:

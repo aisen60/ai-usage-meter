@@ -10,10 +10,10 @@ Run from the repository root:
 
 ```bash
 xcodebuild test \
-  -project AgentQuotaBar.xcodeproj \
-  -scheme AgentQuotaBar \
+  -project AIUsageMeter.xcodeproj \
+  -scheme AIUsageMeter \
   -destination 'platform=macOS' \
-  -derivedDataPath /private/tmp/AgentQuotaBar-DerivedData
+  -derivedDataPath /private/tmp/AIUsageMeter-DerivedData
 ```
 
 Use a task-specific temporary Derived Data directory if parallel work might collide. Do not write new generated build output into the repository.
@@ -42,7 +42,7 @@ The script writes release artifacts under `dist/` and replaces the version-match
 ## Distribution Constraints
 
 - Source code is MIT-licensed. Release artifacts are currently ad-hoc signed, without Developer ID notarization.
-- Preserve bundle identifier `com.agentquotabar.app` unless an explicit migration covers Keychain and login-item consequences.
+- Preserve bundle identifier `com.aisen.aiusagemeter` unless an explicit migration covers Keychain and login-item consequences.
 - Preserve universal architecture support while the release script promises `arm64 + x86_64`.
 - Treat `CHANGELOG.md` as the single checked-in version history. Keep its current entry, README requirements, GitHub Release text, and the script's version metadata aligned when preparing a release; do not add per-version release-note files unless automation requires one.
 - Do not claim Gatekeeper, login-item, Keychain persistence, or live-service compatibility from unit tests alone.

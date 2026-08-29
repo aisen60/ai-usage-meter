@@ -3,13 +3,13 @@ import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        AppLog.app.info("Agent Quota Bar launched")
+        AppLog.app.info("AI Usage Meter launched")
         LaunchAtLoginService.registerIfNeeded()
     }
 }
 
 @main
-struct AgentQuotaBarApp: App {
+struct AIUsageMeterApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var controller: QuotaController
 

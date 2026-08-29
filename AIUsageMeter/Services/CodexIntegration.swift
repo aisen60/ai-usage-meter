@@ -328,8 +328,8 @@ private final class AppServerSession: @unchecked Sendable {
             "method": "initialize",
             "params": [
                 "clientInfo": [
-                    "name": "agent-quota-bar",
-                    "title": "Agent Quota Bar",
+                    "name": "ai-usage-meter",
+                    "title": "AI Usage Meter",
                     "version": appVersion
                 ],
                 "capabilities": ["experimentalApi": true]

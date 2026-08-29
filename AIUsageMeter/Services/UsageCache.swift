@@ -8,7 +8,7 @@ enum UsageCache {
         let dir = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library")
             .appendingPathComponent("Application Support")
-            .appendingPathComponent("AgentQuotaBar")
+            .appendingPathComponent("AIUsageMeter")
         return dir.appendingPathComponent("usage-cache.json")
     }
 

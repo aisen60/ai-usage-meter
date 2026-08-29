@@ -183,7 +183,7 @@ struct MenuBarView: View {
         }
         .buttonStyle(.borderless)
         .foregroundStyle(.primary)
-        .help("退出 Agent Quota Bar")
+        .help("退出 AI Usage Meter")
     }
 
     /// 段间竖向分隔线

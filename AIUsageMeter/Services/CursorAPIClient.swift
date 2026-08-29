@@ -11,7 +11,7 @@ struct CursorAPIClient {
         let version = Bundle.main.object(
             forInfoDictionaryKey: "CFBundleShortVersionString"
         ) as? String ?? "0.0.0"
-        return "AgentQuotaBar/\(version)"
+        return "AIUsageMeter/\(version)"
     }
 
     /// 从 token 构造完整的 Cookie header 值

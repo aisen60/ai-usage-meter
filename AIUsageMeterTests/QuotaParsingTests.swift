@@ -1,6 +1,6 @@
 import Darwin
 import XCTest
-@testable import AgentQuotaBar
+@testable import AIUsageMeter
 
 final class QuotaParsingTests: XCTestCase {
 
