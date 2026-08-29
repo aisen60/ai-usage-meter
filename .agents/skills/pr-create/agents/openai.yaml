@@ -1,0 +1,7 @@
+interface:
+  display_name: "PR Create"
+  short_description: "审核摘要后提交、推送并创建 GitHub PR。"
+  default_prompt: "Use $pr-create to review this branch and create a GitHub pull request."
+
+policy:
+  allow_implicit_invocation: true
