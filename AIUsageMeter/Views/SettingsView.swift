@@ -11,6 +11,16 @@ struct SettingsView: View {
     @State private var showMinItemInfo = false
 
     var body: some View {
+        settingsContent
+            .overlay {
+                if showMinItemInfo {
+                    minItemInfoDialog
+                }
+            }
+    }
+
+    /// 设置页主体（不含「至少保留一项」说明弹层）。
+    private var settingsContent: some View {
         VStack(alignment: .leading, spacing: 0) {
             navigationBar
 
@@ -23,10 +33,54 @@ struct SettingsView: View {
         }
         .frame(width: MenuMetrics.width)
         .background(Color(nsColor: .windowBackgroundColor))
-        .alert("显示项目", isPresented: $showMinItemInfo) {
-            Button("好", role: .cancel) {}
-        } message: {
-            Text("菜单栏至少需要保留一个显示项目，最后一项开关不可关闭。")
+    }
+
+    /// 「至少保留一项」说明弹层。
+    ///
+    /// 普通 `.alert` 在 MenuBarExtra 弹层内无法正确定位并接收焦点：按钮点击会被
+    /// 菜单栏窗口吞掉，既不能关闭说明，还会连带收起整个弹层。因此在窗口内自绘，
+    /// 通过「好」按钮与遮罩点击关闭，行为更稳定。
+    private var minItemInfoDialog: some View {
+        ZStack {
+            Color.black.opacity(0.16)
+                .contentShape(Rectangle())
+                .onTapGesture { showMinItemInfo = false }
+
+            VStack(alignment: .leading, spacing: 14) {
+                Text("显示项目")
+                    .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
+                    .foregroundStyle(.primary)
+
+                Text("菜单栏至少需要保留一个显示项目，最后一项开关不可关闭。")
+                    .font(.system(size: MenuMetrics.bodyText + 1))
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button {
+                    showMinItemInfo = false
+                } label: {
+                    Text("好")
+                        .font(.system(size: MenuMetrics.cardTitle, weight: .medium))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .keyboardShortcut(.defaultAction)
+            }
+            .padding(20)
+            .frame(maxWidth: 236, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color(nsColor: .windowBackgroundColor))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color(nsColor: .separatorColor).opacity(0.5), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.18), radius: 18, y: 8)
+            .padding(.horizontal, 24)
+            .accessibilityElement(children: .contain)
+            .accessibilityAddTraits(.isModal)
         }
     }
 
