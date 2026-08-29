@@ -1,5 +1,32 @@
 # Changelog
 
+> 注：本项目已更名为 AI Usage Meter，工程 / 模块为 `AIUsageMeter`，Bundle ID 改为 `com.aisen.aiusagemeter`，仓库为 `aisen60/ai-usage-meter`。更名不改变版本号与既有功能语义。
+
+## 0.3.0 - 2026-08-29
+
+### 新增
+
+- Cursor 新增可选 On Demand 项目：读取 `spendLimitUsage.individualUsed` 与 `individualLimit`，以美元金额展示个人按量付费预算；仅在存在有效上限时显示，进度为已用金额除以上限。
+- ChatGPT 同时展示 5 小时与 1 周两个剩余额度窗口，按窗口时长分类而非字段顺序；短周期显示重置时间，周周期显示重置日期。
+- 状态栏与设置页扩展为五个独立显示项目：Cursor Models、Other Models、On Demand、ChatGPT 5 小时、ChatGPT 1 周，颜色依次为蓝、灰、紫、绿、绿。
+- 显示设置从 v0.2.0 三字段自动迁移为五字段，旧开关保留，新增 On Demand 与 ChatGPT 5 小时默认开启。
+
+### 界面调整
+
+- 主弹层改为 Cursor 与 ChatGPT 两个展开卡片区，移除 Cursor「用量概览」折叠交互；On Demand 显示美元金额、紫色进度条与中文按量付费说明。
+- 所有用户可见的 Codex 名称统一改为 ChatGPT，包括服务标题、设置页副标题、无障碍文案与未连接回退名称；内部类型与服务协议名保持不变。
+
+### 行为修正
+
+- Cursor 刷新失败但存在缓存时继续展示缓存，并明确标记「缓存数据」；On Demand 是否展示取决于该缓存中是否有有效上限。
+- ChatGPT 刷新、协议或解析失败时两个窗口同时断开并显示中性 `0%`，不使用旧额度。
+- 旧版缓存的 CursorUsage 不含 `individualUsed` 时，由上限与剩余反推，避免升级后短暂误报。
+
+### 工程与发布
+
+- 版本更新为 `0.3.0`，构建号 `20260829`。
+- 扩展 Cursor On Demand、ChatGPT 双窗口解析、五项偏好迁移与状态降级的确定性单元测试。
+
 ## 0.2.0 - 2026-08-04
 
 ### 新增
