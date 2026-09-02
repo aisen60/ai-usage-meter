@@ -8,6 +8,7 @@ enum MenuMetrics {
     static let horizontalPadding: CGFloat = 14
     static let serviceIcon: CGFloat = 27
     static let serviceTitle: CGFloat = 16
+    static let serviceHeaderTitle: CGFloat = 15
     static let statusText: CGFloat = 12
     static let summaryText: CGFloat = 12
     static let cardTitle: CGFloat = 14
@@ -69,6 +70,7 @@ struct MenuBarView: View {
     private enum Page {
         case main
         case settings
+        case supportedApps
     }
 
     @State private var page: Page = .main
@@ -82,6 +84,8 @@ struct MenuBarView: View {
                 SettingsView(controller: controller) {
                     page = .main
                 }
+            case .supportedApps:
+                supportedAppsPage
             }
         }
         // 两个页面共用同一宽度，切换时弹层不跳动
@@ -95,20 +99,7 @@ struct MenuBarView: View {
     /// 主页面：外层留白 + 服务组卡片区域 + 通栏底栏
     private var mainPage: some View {
         VStack(spacing: 0) {
-            VStack(spacing: MenuMetrics.groupSpacing) {
-                if controller.shouldShowCursor {
-                    CursorSection(
-                        usage: controller.cursorUsage,
-                        planName: controller.cursorPlanName,
-                        connectionState: controller.cursorConnectionState
-                    )
-                }
-
-                CodexSection(
-                    usage: controller.codexUsage,
-                    connectionState: controller.codexConnectionState
-                )
-            }
+            mainContent
             .padding(.horizontal, MenuMetrics.outerHorizontalPadding)
             .padding(.top, MenuMetrics.outerTopPadding)
             .padding(.bottom, MenuMetrics.outerBottomPadding)
@@ -120,15 +111,58 @@ struct MenuBarView: View {
         }
     }
 
+    @ViewBuilder
+    private var mainContent: some View {
+        if controller.shouldShowEmptyAssistantState {
+            EmptyAssistantStateView {
+                page = .supportedApps
+            }
+        } else {
+            VStack(spacing: MenuMetrics.groupSpacing) {
+                if controller.shouldShowCursor {
+                    CursorSection(
+                        usage: controller.cursorUsage,
+                        planName: controller.cursorPlanName,
+                        connectionState: controller.cursorConnectionState
+                    )
+                }
+
+                if controller.shouldShowChatGPT {
+                    CodexSection(
+                        usage: controller.codexUsage,
+                        connectionState: controller.codexConnectionState
+                    )
+                }
+            }
+        }
+    }
+
+    private var supportedAppsPage: some View {
+        VStack(spacing: 0) {
+            SupportedAppsView(controller: controller) {
+                page = .main
+            }
+
+            Divider()
+            bottomToolbar
+        }
+    }
+
     /// 底部工具栏（设计稿 home.png）：
     /// 三等分分段式底栏 —— 设置 | 刷新状态 | 退出，段间竖向分隔线。
     private var bottomToolbar: some View {
-        HStack(spacing: 0) {
-            settingsCell
-            segmentDivider
-            refreshCell
-            segmentDivider
-            quitCell
+        Group {
+            if controller.shouldShowEmptyAssistantState {
+                quitCell
+            } else {
+                HStack(spacing: 0) {
+                    settingsCell
+                    segmentDivider
+                    refreshCell
+                    segmentDivider
+                    quitCell
+                }
+            }
         }
         .padding(.vertical, MenuMetrics.toolbarVerticalPadding)
     }

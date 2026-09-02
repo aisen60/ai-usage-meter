@@ -24,6 +24,26 @@ final class QuotaParsingTests: XCTestCase {
         )
     }
 
+    func testChatGPTInstallationDetectionUsesApplicationBundle() throws {
+        let temporaryDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let chatGPTApplication = temporaryDirectory
+            .appendingPathComponent("ChatGPT.app", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+
+        XCTAssertFalse(
+            CodexIntegration.isChatGPTInstalled(applicationURLs: [chatGPTApplication])
+        )
+
+        try FileManager.default.createDirectory(
+            at: chatGPTApplication,
+            withIntermediateDirectories: true
+        )
+        XCTAssertTrue(
+            CodexIntegration.isChatGPTInstalled(applicationURLs: [chatGPTApplication])
+        )
+    }
+
     func testCursorPlanMapping() {
         XCTAssertEqual(CursorTokenReader.displayPlanName(for: "free"), "Cursor Hobby")
         XCTAssertEqual(CursorTokenReader.displayPlanName(for: "pro"), "Cursor Pro")
@@ -73,6 +93,7 @@ final class QuotaParsingTests: XCTestCase {
         )
 
         XCTAssertTrue(usage.onDemandAvailable)
+        XCTAssertEqual(usage.onDemandUsedAmountText, "$3.92")
         XCTAssertEqual(usage.onDemandAmountText, "$3.92 / $10")
         XCTAssertEqual(usage.onDemandPercentUsed, 39.2, accuracy: 0.001)
         XCTAssertEqual(usage.onDemandUsedDollars, 3.92, accuracy: 0.001)
@@ -103,6 +124,7 @@ final class QuotaParsingTests: XCTestCase {
             CursorUsage.from(json: cursorOnDemandJSON(individualUsed: "392", individualLimit: "1000"))
         )
         XCTAssertTrue(usage.onDemandAvailable)
+        XCTAssertEqual(usage.onDemandUsedAmountText, "$3.92")
         XCTAssertEqual(usage.onDemandAmountText, "$3.92 / $10")
     }
 

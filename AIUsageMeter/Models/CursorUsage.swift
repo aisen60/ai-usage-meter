@@ -129,9 +129,15 @@ struct CursorUsage: Codable, Equatable {
         individualLimit / 100
     }
 
+    /// On Demand 已用金额展示文本，例如 `$3.92`。
+    /// 用于空间紧凑的菜单栏与设置页；首页卡片仍使用带上限的完整文本。
+    var onDemandUsedAmountText: String {
+        Self.dollarText(individualUsed)
+    }
+
     /// On Demand 展示文本，例如 `$3.92 / $10`。
     var onDemandAmountText: String {
-        "\(Self.dollarText(individualUsed)) / \(Self.dollarText(individualLimit))"
+        "\(onDemandUsedAmountText) / \(Self.dollarText(individualLimit))"
     }
 
     private static func dollarText(_ cents: Double) -> String {

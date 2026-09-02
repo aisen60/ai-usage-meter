@@ -3,85 +3,26 @@ import SwiftUI
 /// 设置页（设计稿 design/v0.3.0/setting.png）。
 ///
 /// 与主视图共处于同一个 MenuBarExtra 弹层内，通过 onBack 回调返回。
-/// 包含五个显示项目开关，以及「至少保留一项」的约束提示。
+/// 包含已安装服务对应的显示项目开关。
 struct SettingsView: View {
     @ObservedObject var controller: QuotaController
     let onBack: () -> Void
 
-    @State private var showMinItemInfo = false
-
     var body: some View {
         settingsContent
-            .overlay {
-                if showMinItemInfo {
-                    minItemInfoDialog
-                }
-            }
     }
 
-    /// 设置页主体（不含「至少保留一项」说明弹层）。
+    /// 设置页主体。
     private var settingsContent: some View {
         VStack(alignment: .leading, spacing: 0) {
             navigationBar
 
             displayItemsSection
                 .padding(.top, 16)
-
-            footerHint
-                .padding(.top, 10)
                 .padding(.bottom, 12)
         }
         .frame(width: MenuMetrics.width)
         .background(Color(nsColor: .windowBackgroundColor))
-    }
-
-    /// 「至少保留一项」说明弹层。
-    ///
-    /// 普通 `.alert` 在 MenuBarExtra 弹层内无法正确定位并接收焦点：按钮点击会被
-    /// 菜单栏窗口吞掉，既不能关闭说明，还会连带收起整个弹层。因此在窗口内自绘，
-    /// 通过「好」按钮与遮罩点击关闭，行为更稳定。
-    private var minItemInfoDialog: some View {
-        ZStack {
-            Color.black.opacity(0.16)
-                .contentShape(Rectangle())
-                .onTapGesture { showMinItemInfo = false }
-
-            VStack(alignment: .leading, spacing: 14) {
-                Text("显示项目")
-                    .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
-                    .foregroundStyle(.primary)
-
-                Text("菜单栏至少需要保留一个显示项目，最后一项开关不可关闭。")
-                    .font(.system(size: MenuMetrics.bodyText + 1))
-                    .foregroundStyle(.primary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Button {
-                    showMinItemInfo = false
-                } label: {
-                    Text("好")
-                        .font(.system(size: MenuMetrics.cardTitle, weight: .medium))
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .keyboardShortcut(.defaultAction)
-            }
-            .padding(20)
-            .frame(maxWidth: 236, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color(nsColor: .windowBackgroundColor))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(Color(nsColor: .separatorColor).opacity(0.5), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.18), radius: 18, y: 8)
-            .padding(.horizontal, 24)
-            .accessibilityElement(children: .contain)
-            .accessibilityAddTraits(.isModal)
-        }
     }
 
     // MARK: - Navigation
@@ -109,8 +50,7 @@ struct SettingsView: View {
 
     // MARK: - Display Items
 
-    /// 设置页中实际可配置的项目：Cursor 未集成时隐藏两个 Cursor 百分比，
-    /// On Demand 无有效上限时隐藏，ChatGPT 两项始终可配置。
+    /// 设置页中仅列出已安装服务可配置的项目。
     private var availableItems: [MenuBarDisplaySettings.Item] {
         var items: [MenuBarDisplaySettings.Item] = []
         if controller.shouldShowCursor {
@@ -120,8 +60,10 @@ struct SettingsView: View {
         if controller.shouldShowOnDemand {
             items.append(.onDemand)
         }
-        items.append(.chatgptFiveHour)
-        items.append(.chatgptWeekly)
+        if controller.shouldShowChatGPT {
+            items.append(.chatgptFiveHour)
+            items.append(.chatgptWeekly)
+        }
         return items
     }
 
@@ -182,13 +124,6 @@ struct SettingsView: View {
             .labelsHidden()
             .toggleStyle(.switch)
             .controlSize(.small)
-            .disabled(
-                controller.displaySettings.isLastVisible(
-                    item,
-                    cursorAvailable: controller.shouldShowCursor,
-                    onDemandAvailable: controller.shouldShowOnDemand
-                )
-            )
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -197,30 +132,6 @@ struct SettingsView: View {
     private var rowDivider: some View {
         Divider()
             .padding(.leading, 30)
-    }
-
-    // MARK: - Footer
-
-    private var footerHint: some View {
-        HStack(spacing: 6) {
-            Text("至少保留一个显示项目")
-                .font(.system(size: MenuMetrics.bodyText))
-                .foregroundStyle(.secondary)
-
-            Button {
-                showMinItemInfo = true
-            } label: {
-                Label("为什么不能全部关闭？", systemImage: "info.circle")
-                    .labelStyle(.iconOnly)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            }
-            .buttonStyle(.borderless)
-            .help("为什么不能全部关闭？")
-
-            Spacer()
-        }
-        .padding(.horizontal, MenuMetrics.horizontalPadding)
     }
 
     // MARK: - Shared Bits
@@ -263,7 +174,7 @@ struct SettingsView: View {
         switch item {
         case .cursorModels: return percentText(cursorConnected ? controller.cursorUsage?.autoPercentUsed : nil)
         case .otherModels: return percentText(cursorConnected ? controller.cursorUsage?.apiPercentUsed : nil)
-        case .onDemand: return controller.cursorUsage?.onDemandAmountText ?? "$0 / $0"
+        case .onDemand: return controller.cursorUsage?.onDemandUsedAmountText ?? "$0"
         case .chatgptFiveHour: return codexConnected ? percentText(controller.codexUsage.shortWindow.percentRemaining) : "0%"
         case .chatgptWeekly: return codexConnected ? percentText(controller.codexUsage.weeklyWindow.percentRemaining) : "0%"
         }

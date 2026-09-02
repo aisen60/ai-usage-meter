@@ -26,7 +26,8 @@ struct MenuBarLabel: View {
             cursorAvailable: controller.shouldShowCursor,
             cursorState: controller.cursorConnectionState,
             codexUsage: controller.codexUsage,
-            codexState: controller.codexConnectionState
+            codexState: controller.codexConnectionState,
+            codexAvailable: controller.shouldShowChatGPT
         )
     }
 
