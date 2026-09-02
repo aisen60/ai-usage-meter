@@ -36,7 +36,7 @@ struct CodexSection: View {
         HStack(spacing: 9) {
             ServiceLogo(resourceName: "CodexIcon", fallbackSymbol: "terminal.fill")
             Text(isConnected ? usage.planName : "ChatGPT")
-                .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
+                .font(.system(size: MenuMetrics.serviceHeaderTitle, weight: .bold))
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .layoutPriority(1)

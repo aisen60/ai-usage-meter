@@ -21,7 +21,7 @@ struct CursorSection: View {
         HStack(spacing: 9) {
             ServiceLogo(resourceName: "CursorIcon", fallbackSymbol: "cursorarrow.rays")
             Text(canDisplayUsage ? planName : "Cursor")
-                .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
+                .font(.system(size: MenuMetrics.serviceHeaderTitle, weight: .bold))
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .layoutPriority(1)
@@ -194,6 +194,7 @@ struct QuotaRow: View {
 struct ServiceLogo: View {
     let resourceName: String
     let fallbackSymbol: String
+    var size: CGFloat = MenuMetrics.serviceIcon
 
     var body: some View {
         Group {
@@ -210,7 +211,7 @@ struct ServiceLogo: View {
                     .background(.black)
             }
         }
-        .frame(width: MenuMetrics.serviceIcon, height: MenuMetrics.serviceIcon)
+        .frame(width: size, height: size)
         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 
