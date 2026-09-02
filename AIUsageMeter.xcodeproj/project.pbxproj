@@ -23,6 +23,7 @@
 		A1000015 /* CursorIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A2000017 /* CursorIcon.png */; };
 		A1000016 /* CodexIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A2000018 /* CodexIcon.png */; };
 		A1000017 /* AppLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019 /* AppLog.swift */; };
+		A1000023 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000025 /* Assets.xcassets */; };
 		A1000018 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* LaunchAtLoginService.swift */; };
 		A1000019 /* MenuBarDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000021 /* MenuBarDisplaySettings.swift */; };
 		A1000020 /* StatusBarBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022 /* StatusBarBadge.swift */; };
@@ -63,6 +64,7 @@
 		A2000018 /* CodexIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CodexIcon.png; sourceTree = "<group>"; };
 		A2000019 /* AppLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLog.swift; sourceTree = "<group>"; };
 		A2000020 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
+		A2000025 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A2000021 /* MenuBarDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettings.swift; sourceTree = "<group>"; };
 		A2000022 /* StatusBarBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarBadge.swift; sourceTree = "<group>"; };
 		A2000023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 		};
 		B4000002 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
+				A1000023 /* Assets.xcassets in Resources */,
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -120,6 +123,7 @@
 				A3000012 /* Controllers */,
 				A3000013 /* Views */,
 				A3000014 /* Resources */,
+				A2000025 /* Assets.xcassets */,
 			);
 			path = AIUsageMeter;
 			sourceTree = "<group>";
@@ -374,7 +378,7 @@
 		A8000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 20260829;
@@ -399,7 +403,7 @@
 		A8000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 20260829;
