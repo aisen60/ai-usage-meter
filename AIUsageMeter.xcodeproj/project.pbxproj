@@ -59,7 +59,7 @@
 		A2000012 /* CursorSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorSection.swift; sourceTree = "<group>"; };
 		A2000013 /* CodexSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexSection.swift; sourceTree = "<group>"; };
 		A2000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A2000016 /* AIUsageMeter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIUsageMeter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2000016 /* AI Usage Meter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AI Usage Meter.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2000017 /* CursorIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CursorIcon.png; sourceTree = "<group>"; };
 		A2000018 /* CodexIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CodexIcon.png; sourceTree = "<group>"; };
 		A2000019 /* AppLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLog.swift; sourceTree = "<group>"; };
@@ -186,7 +186,7 @@
 		A3000002 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A2000016 /* AIUsageMeter.app */,
+				A2000016 /* AI Usage Meter.app */,
 				B2000002 /* AIUsageMeterTests.xctest */,
 			);
 			name = Products;
@@ -228,7 +228,7 @@
 			);
 			name = AIUsageMeter;
 			productName = AIUsageMeter;
-			productReference = A2000016 /* AIUsageMeter.app */;
+			productReference = A2000016 /* AI Usage Meter.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B5000001 /* AIUsageMeterTests */ = {
@@ -393,7 +393,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = AIUsageMeter;
+				PRODUCT_NAME = "AI Usage Meter";
 				REGISTER_APPLICATION_GUID = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -418,7 +419,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = AIUsageMeter;
+				PRODUCT_NAME = "AI Usage Meter";
 				REGISTER_APPLICATION_GUID = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -437,7 +439,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AIUsageMeter.app/Contents/MacOS/AIUsageMeter";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AI Usage Meter.app/Contents/MacOS/AI Usage Meter";
 			};
 			name = Debug;
 		};
@@ -453,7 +455,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AIUsageMeter.app/Contents/MacOS/AIUsageMeter";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AI Usage Meter.app/Contents/MacOS/AI Usage Meter";
 			};
 			name = Release;
 		};
