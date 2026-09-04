@@ -33,7 +33,7 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
         )
     }
 
-    // MARK: - Constraint
+    // MARK: - Toggling
 
     func testTogglingOffSingleItemSucceeds() {
         let next = MenuBarDisplaySettings.default.toggling(.cursorModels, to: false)
@@ -49,7 +49,7 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
         )
     }
 
-    func testTogglingOffLastVisibleItemIsRejected() throws {
+    func testTogglingOffLastVisibleItemSucceeds() {
         let settings = MenuBarDisplaySettings(
             showCursorModels: false,
             showOtherModels: false,
@@ -58,10 +58,8 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
             showChatGPTWeekly: true
         )
 
-        XCTAssertTrue(settings.isLastVisible(.chatgptWeekly))
-        XCTAssertNil(settings.toggling(.chatgptWeekly, to: false))
-        // 被拒绝后原设置不变
-        XCTAssertEqual(settings.visibleItems, [.chatgptWeekly])
+        let next = settings.toggling(.chatgptWeekly, to: false)
+        XCTAssertTrue(next.visibleItems.isEmpty)
     }
 
     func testTogglingOnAlwaysSucceeds() {
@@ -73,8 +71,7 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
             showChatGPTWeekly: true
         )
         let next = settings.toggling(.cursorModels, to: true)
-        XCTAssertNotNil(next)
-        XCTAssertEqual(next?.visibleItems, [.cursorModels, .chatgptWeekly])
+        XCTAssertEqual(next.visibleItems, [.cursorModels, .chatgptWeekly])
     }
 
     // MARK: - Visibility Helpers
@@ -88,8 +85,6 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
             showChatGPTWeekly: false
         )
         XCTAssertEqual(onlyOther.visibleItems, [.otherModels])
-        XCTAssertTrue(onlyOther.isLastVisible(.otherModels))
-        XCTAssertFalse(onlyOther.isLastVisible(.cursorModels))
 
         let cursorAndChatGPT = MenuBarDisplaySettings(
             showCursorModels: true,
@@ -137,8 +132,7 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
         )
     }
 
-    func testCannotHideOnlyAvailableChatGPTItem() throws {
-        // Cursor 不可用且 On Demand 无有效上限时，只剩 chatgptWeekly 可用。
+    func testCanHideOnlyAvailableChatGPTItem() {
         let settings = MenuBarDisplaySettings(
             showCursorModels: false,
             showOtherModels: false,
@@ -147,17 +141,7 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
             showChatGPTWeekly: true
         )
 
-        XCTAssertTrue(settings.isLastVisible(
-            .chatgptWeekly,
-            cursorAvailable: false,
-            onDemandAvailable: false
-        ))
-        XCTAssertNil(settings.toggling(
-            .chatgptWeekly,
-            to: false,
-            cursorAvailable: false,
-            onDemandAvailable: false
-        ))
+        XCTAssertTrue(settings.toggling(.chatgptWeekly, to: false).visibleItems.isEmpty)
     }
 
     // MARK: - Migration
@@ -208,18 +192,18 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
         )
     }
 
-    func testLoadWithAllItemsHiddenReturnsDefault() throws {
-        let invalidSettings = MenuBarDisplaySettings(
+    func testLoadWithAllItemsHiddenPreservesPreference() throws {
+        let hiddenSettings = MenuBarDisplaySettings(
             showCursorModels: false,
             showOtherModels: false,
             showOnDemand: false,
             showChatGPTFiveHour: false,
             showChatGPTWeekly: false
         )
-        let data = try JSONEncoder().encode(invalidSettings)
+        let data = try JSONEncoder().encode(hiddenSettings)
         defaults.set(data, forKey: MenuBarDisplaySettings.storageKey)
 
-        XCTAssertEqual(MenuBarDisplaySettings.load(from: defaults), .default)
+        XCTAssertEqual(MenuBarDisplaySettings.load(from: defaults), hiddenSettings)
     }
 }
 
@@ -231,12 +215,12 @@ final class QuotaControllerStateTests: XCTestCase {
     }
 
     @MainActor
-    func testCursorStaysHiddenWithoutDisplayableUsage() {
+    func testInstalledCursorRemainsVisibleWithoutDisplayableUsage() {
         let controller = QuotaController(autoStart: false, cursorInstalled: true)
 
         controller.cursorConnectionState = .error("failure")
 
-        XCTAssertFalse(controller.shouldShowCursor)
+        XCTAssertTrue(controller.shouldShowCursor)
     }
 
     @MainActor
@@ -277,6 +261,73 @@ final class QuotaControllerStateTests: XCTestCase {
         XCTAssertEqual(disconnected.shortWindow.percentRemaining, 0)
         XCTAssertEqual(disconnected.weeklyWindow.percentRemaining, 0)
     }
+
+    @MainActor
+    func testServiceCardsFollowApplicationInstallation() {
+        let cursorOnly = QuotaController(
+            autoStart: false,
+            cursorInstalled: true,
+            chatGPTInstalled: false
+        )
+        XCTAssertTrue(cursorOnly.shouldShowCursor)
+        XCTAssertFalse(cursorOnly.shouldShowChatGPT)
+
+        let chatGPTOnly = QuotaController(
+            autoStart: false,
+            cursorInstalled: false,
+            chatGPTInstalled: true
+        )
+        XCTAssertFalse(chatGPTOnly.shouldShowCursor)
+        XCTAssertTrue(chatGPTOnly.shouldShowChatGPT)
+    }
+
+    @MainActor
+    func testPreviewOverrideTreatsBothAppsAsNotInstalled() {
+        let controller = QuotaController(
+            autoStart: false,
+            cursorInstalled: true,
+            chatGPTInstalled: true,
+            forceNoAssistantApps: true
+        )
+
+        XCTAssertFalse(controller.isCursorInstalled)
+        XCTAssertFalse(controller.isChatGPTInstalled)
+        XCTAssertFalse(controller.shouldShowCursor)
+        XCTAssertFalse(controller.shouldShowChatGPT)
+        XCTAssertTrue(controller.shouldShowEmptyAssistantState)
+    }
+
+    @MainActor
+    func testCursorOnlyPreviewKeepsCursorAndHidesChatGPT() {
+        let controller = QuotaController(
+            autoStart: false,
+            cursorInstalled: true,
+            chatGPTInstalled: true,
+            forceCursorOnly: true
+        )
+
+        XCTAssertTrue(controller.isCursorInstalled)
+        XCTAssertFalse(controller.isChatGPTInstalled)
+        XCTAssertTrue(controller.shouldShowCursor)
+        XCTAssertFalse(controller.shouldShowChatGPT)
+        XCTAssertFalse(controller.shouldShowEmptyAssistantState)
+    }
+
+    @MainActor
+    func testChatGPTOnlyPreviewHidesCursorAndKeepsChatGPT() {
+        let controller = QuotaController(
+            autoStart: false,
+            cursorInstalled: true,
+            chatGPTInstalled: true,
+            forceChatGPTOnly: true
+        )
+
+        XCTAssertFalse(controller.isCursorInstalled)
+        XCTAssertTrue(controller.isChatGPTInstalled)
+        XCTAssertFalse(controller.shouldShowCursor)
+        XCTAssertTrue(controller.shouldShowChatGPT)
+        XCTAssertFalse(controller.shouldShowEmptyAssistantState)
+    }
 }
 
 final class StatusBarPresentationTests: XCTestCase {
@@ -299,7 +350,7 @@ final class StatusBarPresentationTests: XCTestCase {
             presentation.entries.map(\.item),
             [.cursorModels, .otherModels, .onDemand, .chatgptFiveHour, .chatgptWeekly]
         )
-        XCTAssertEqual(presentation.fallbackText, "CC 39% 100% $3.92 / $10 78% 85%")
+        XCTAssertEqual(presentation.fallbackText, "AI 39% 100% $3.92 78% 85%")
     }
 
     func testDefaultPresentationShowsOnlyCursorModelsAndFiveHour() {
@@ -318,7 +369,7 @@ final class StatusBarPresentationTests: XCTestCase {
         )
 
         XCTAssertEqual(presentation.entries.map(\.item), [.cursorModels, .chatgptFiveHour])
-        XCTAssertEqual(presentation.fallbackText, "CC 39% 78%")
+        XCTAssertEqual(presentation.fallbackText, "AI 39% 78%")
     }
 
     func testDisconnectedChatGPTShowsNeutralZeroPercent() {
@@ -332,7 +383,23 @@ final class StatusBarPresentationTests: XCTestCase {
         )
 
         XCTAssertEqual(presentation.entries.map(\.item), [.chatgptFiveHour, .chatgptWeekly])
-        XCTAssertEqual(presentation.fallbackText, "CC 0% 0%")
+        XCTAssertEqual(presentation.fallbackText, "AI 0% 0%")
+    }
+
+    func testNoInstalledAppsShowsOnlyAIStatusLabel() {
+        let presentation = StatusBarPresentation(
+            settings: allOnSettings(),
+            cursorUsage: nil,
+            cursorAvailable: false,
+            cursorState: .disconnected,
+            codexUsage: .disconnected,
+            codexState: .disconnected,
+            codexAvailable: false
+        )
+
+        XCTAssertTrue(presentation.entries.isEmpty)
+        XCTAssertEqual(presentation.fallbackText, "AI")
+        XCTAssertEqual(presentation.accessibilityDescription, "")
     }
 
     func testAccessibilityDescriptionDistinguishesUsedAndRemaining() {
@@ -352,7 +419,7 @@ final class StatusBarPresentationTests: XCTestCase {
 
         XCTAssertEqual(
             presentation.accessibilityDescription,
-            "Cursor Models 已用 39%，Other Models 已用 100%，On Demand 已用 $3.92 / $10，ChatGPT 5 小时剩余 78%，ChatGPT 1 周剩余 85%"
+            "Cursor Models 已用 39%，Other Models 已用 100%，On Demand 已用 $3.92，ChatGPT 5 小时剩余 78%，ChatGPT 1 周剩余 85%"
         )
     }
 }

@@ -12,6 +12,28 @@ enum CodexIntegration {
     /// 1 周窗口的典型时长（分钟）
     private static let weeklyWindowMins: Double = 10_080
 
+    /// ChatGPT 桌面客户端是否已安装。仅用应用包判断，避免卸载后遗留的 CLI
+    /// 或 PATH 项目被误当作可展示的 ChatGPT 卡片。
+    static var isChatGPTInstalled: Bool {
+        isChatGPTInstalled(applicationURLs: chatGPTApplicationURLs)
+    }
+
+    static func isChatGPTInstalled(applicationURLs: [URL]) -> Bool {
+        applicationURLs.contains { url in
+            FileManager.default.fileExists(atPath: url.path)
+        }
+    }
+
+    private static var chatGPTApplicationURLs: [URL] {
+        let homeApplications = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Applications", isDirectory: true)
+            .appendingPathComponent("ChatGPT.app", isDirectory: true)
+        return [
+            URL(fileURLWithPath: "/Applications/ChatGPT.app", isDirectory: true),
+            homeApplications,
+        ]
+    }
+
     /// 额度窗口分类。依赖窗口时长而非 `primary` / `secondary` 字段顺序。
     private enum QuotaWindowKind {
         case short

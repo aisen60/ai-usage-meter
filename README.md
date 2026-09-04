@@ -41,7 +41,7 @@ AI Usage Meter 是一个 macOS 菜单栏工具，用来同时查看 Cursor 和 C
 
 1. 从 [GitHub Releases](https://github.com/aisen60/ai-usage-meter/releases) 下载 `AIUsageMeter-0.3.0.zip` 和 `.sha256` 文件。
 2. 可选：运行 `shasum -a 256 -c AIUsageMeter-0.3.0.zip.sha256` 校验文件。
-3. 解压后将 `AIUsageMeter.app` 拖入 `/Applications`。
+3. 解压后将 `AI Usage Meter.app` 拖入 `/Applications`。
 4. 首次启动时，在 Finder 中右键应用并选择“打开”。若仍被拦截，请前往“系统设置 → 隐私与安全性”确认打开。
 
 v0.3.0 使用 ad-hoc 签名，未进行 Apple Developer ID 签名和公证，因此首次启动出现系统安全提示属于预期行为。
@@ -54,7 +54,7 @@ Release 版本首次运行时会自动添加登录项。可在“系统设置 �
 
 1. 退出菜单栏中的旧版本。
 2. 下载并解压新版。
-3. 用新版覆盖 `/Applications/AIUsageMeter.app`。
+3. 用新版覆盖 `/Applications/AI Usage Meter.app`。
 4. 重新启动应用。
 
 Bundle ID 和 Keychain service 保持不变，因此覆盖安装不会主动清除本地缓存、Cursor 手动凭据或登录项配置。

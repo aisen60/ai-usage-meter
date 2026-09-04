@@ -29,10 +29,9 @@ final class QuotaController: ObservableObject {
     /// 当前是否检测到 Cursor 本地状态。未安装时不展示 Cursor 相关界面。
     @Published private(set) var isCursorInstalled: Bool
 
-    /// Cursor 只有在存在当前或可明确标记的缓存用量时才进入界面。
-    /// 单纯安装了客户端并不代表集成可用。
+    /// Cursor 已安装时显示卡片；未登录或读取失败仍保留卡片，明确展示连接状态。
     var shouldShowCursor: Bool {
-        cursorConnectionState.canDisplayUsage && cursorUsage != nil
+        isCursorInstalled
     }
 
     /// On Demand 个人额度是否有有效上限，决定该项是否展示。
@@ -42,6 +41,18 @@ final class QuotaController: ObservableObject {
 
     /// ChatGPT 连接状态（内部仍使用 codex 命名）
     @Published var codexConnectionState: ConnectionState = .unknown
+
+    /// 当前是否检测到 ChatGPT 桌面客户端。未安装时不展示 ChatGPT 卡片。
+    @Published private(set) var isChatGPTInstalled: Bool
+
+    var shouldShowChatGPT: Bool {
+        isChatGPTInstalled
+    }
+
+    /// 两个支持的客户端均未安装时，主面板改为显示引导空状态。
+    var shouldShowEmptyAssistantState: Bool {
+        !shouldShowCursor && !shouldShowChatGPT
+    }
 
     /// 菜单栏显示项目设置（变更即持久化到 UserDefaults）
     @Published var displaySettings: MenuBarDisplaySettings
@@ -62,6 +73,15 @@ final class QuotaController: ObservableObject {
 
     /// Token 来源
     private let tokenAccount = "cursor-token"
+
+    /// Debug 预览时强制隐藏两个客户端，不读取或修改本机实际安装状态。
+    private let forceNoAssistantApps: Bool
+
+    /// Debug 预览时仅显示 Cursor，强制隐藏 ChatGPT。
+    private let forceCursorOnly: Bool
+
+    /// Debug 预览时仅显示 ChatGPT，强制隐藏 Cursor。
+    private let forceChatGPTOnly: Bool
 
     // MARK: - Types
 
@@ -93,9 +113,28 @@ final class QuotaController: ObservableObject {
 
     init(
         autoStart: Bool = true,
-        cursorInstalled: Bool = CursorTokenReader.isCursorInstalled
+        cursorInstalled: Bool = CursorTokenReader.isCursorInstalled,
+        chatGPTInstalled: Bool = CodexIntegration.isChatGPTInstalled,
+        forceNoAssistantApps: Bool? = nil,
+        forceCursorOnly: Bool? = nil,
+        forceChatGPTOnly: Bool? = nil
     ) {
-        isCursorInstalled = cursorInstalled
+        let commandLinePreview = Self.commandLinePreview
+        let shouldForceNoAssistantApps = forceNoAssistantApps
+            ?? (commandLinePreview == .noAssistantApps)
+        let shouldForceCursorOnly = forceCursorOnly
+            ?? (commandLinePreview == .cursorOnly)
+        let shouldForceChatGPTOnly = forceChatGPTOnly
+            ?? (commandLinePreview == .chatGPTOnly)
+        self.forceNoAssistantApps = shouldForceNoAssistantApps
+        self.forceCursorOnly = shouldForceCursorOnly
+        self.forceChatGPTOnly = shouldForceChatGPTOnly
+        isCursorInstalled = (shouldForceNoAssistantApps || shouldForceChatGPTOnly)
+            ? false
+            : cursorInstalled
+        isChatGPTInstalled = (shouldForceNoAssistantApps || shouldForceCursorOnly)
+            ? false
+            : chatGPTInstalled
         displaySettings = MenuBarDisplaySettings.load()
         if autoStart {
             start()
@@ -176,17 +215,9 @@ final class QuotaController: ObservableObject {
         return nil
     }
 
-    /// 切换菜单栏显示项目。至少保留一项，关闭最后一项的请求会被拒绝。
+    /// 切换菜单栏显示项目。用户可以选择隐藏全部用量胶囊。
     func setDisplayItem(_ item: MenuBarDisplaySettings.Item, visible: Bool) {
-        guard let next = displaySettings.toggling(
-            item,
-            to: visible,
-            cursorAvailable: shouldShowCursor,
-            onDemandAvailable: shouldShowOnDemand
-        ) else {
-            AppLog.app.debug("Display item change rejected: at least one item must stay visible")
-            return
-        }
+        let next = displaySettings.toggling(item, to: visible)
         displaySettings = next
         next.save()
     }
@@ -194,7 +225,9 @@ final class QuotaController: ObservableObject {
     // MARK: - Private Methods
 
     private func refreshCursor() async {
-        isCursorInstalled = CursorTokenReader.isCursorInstalled
+        isCursorInstalled = (forceNoAssistantApps || forceChatGPTOnly)
+            ? false
+            : CursorTokenReader.isCursorInstalled
         AppLog.cursor.debug(
             "Cursor local state detection: \(self.isCursorInstalled ? "installed" : "not-installed", privacy: .public)"
         )
@@ -235,6 +268,16 @@ final class QuotaController: ObservableObject {
     }
 
     private func refreshCodex() async {
+        isChatGPTInstalled = forceNoAssistantApps
+            ? false
+            : (forceCursorOnly ? false : CodexIntegration.isChatGPTInstalled)
+        guard isChatGPTInstalled else {
+            codexUsage = .disconnected
+            codexConnectionState = .disconnected
+            AppLog.codex.notice("ChatGPT is not installed; usage refresh skipped")
+            return
+        }
+
         do {
             codexUsage = try await CodexIntegration.fetchUsage()
             codexConnectionState = .connected
@@ -310,6 +353,31 @@ final class QuotaController: ObservableObject {
         default:
             return processInfo.isLowPowerModeEnabled
         }
+    }
+
+    private enum AppAvailabilityPreview {
+        case noAssistantApps
+        case cursorOnly
+        case chatGPTOnly
+    }
+
+    /// 仅 Debug 构建可通过启动参数预览安装状态。Release 构建忽略这些参数。
+    private static var commandLinePreview: AppAvailabilityPreview? {
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("--preview-no-assistant-apps") {
+            return .noAssistantApps
+        }
+        if arguments.contains("--preview-cursor-only") {
+            return .cursorOnly
+        }
+        if arguments.contains("--preview-chatgpt-only") {
+            return .chatGPTOnly
+        }
+        return nil
+        #else
+        nil
+        #endif
     }
 
     func stopAutoRefresh() {

@@ -69,12 +69,13 @@ struct MenuBarDisplaySettings: Codable, Equatable {
     ///
     /// - Cursor 集成不可用时临时过滤两个 Cursor 百分比项目。
     /// - On Demand 无有效个人上限时临时过滤。
-    /// - ChatGPT 两项始终可展示（断开时渲染中性 `0%`）。
+    /// - ChatGPT 未安装时临时过滤两项；已安装但断开时渲染中性 `0%`。
     ///
     /// 过滤只影响本次展示，不修改用户偏好，服务或额度恢复后自动恢复。
     func visibleItems(
         cursorAvailable: Bool,
-        onDemandAvailable: Bool
+        onDemandAvailable: Bool,
+        chatGPTAvailable: Bool = true
     ) -> [Item] {
         visibleItems.filter { item in
             switch item {
@@ -83,34 +84,16 @@ struct MenuBarDisplaySettings: Codable, Equatable {
             case .onDemand:
                 return onDemandAvailable
             case .chatgptFiveHour, .chatgptWeekly:
-                return true
+                return chatGPTAvailable
             }
         }
-    }
-
-    /// 该项目是否是唯一仍开启的项目（视图据此将其开关置灰）
-    func isLastVisible(_ item: Item) -> Bool {
-        isVisible(item) && visibleItems.count == 1
-    }
-
-    /// 该项目是否是当前环境中唯一仍开启且可用的项目。
-    func isLastVisible(
-        _ item: Item,
-        cursorAvailable: Bool,
-        onDemandAvailable: Bool
-    ) -> Bool {
-        isVisible(item) && visibleItems(
-            cursorAvailable: cursorAvailable,
-            onDemandAvailable: onDemandAvailable
-        ) == [item]
     }
 
     // MARK: - Mutation
 
     /// 返回切换某项目后的新设置。
-    ///
-    /// 约束：至少保留一个显示项目。若本次操作会导致全关，返回 nil 表示拒绝。
-    func toggling(_ item: Item, to value: Bool) -> MenuBarDisplaySettings? {
+    /// 用户可以关闭全部项目；状态栏会回退为简洁的「AI」标签。
+    func toggling(_ item: Item, to value: Bool) -> MenuBarDisplaySettings {
         var next = self
         switch item {
         case .cursorModels: next.showCursorModels = value
@@ -118,24 +101,6 @@ struct MenuBarDisplaySettings: Codable, Equatable {
         case .onDemand: next.showOnDemand = value
         case .chatgptFiveHour: next.showChatGPTFiveHour = value
         case .chatgptWeekly: next.showChatGPTWeekly = value
-        }
-        guard !next.visibleItems.isEmpty else { return nil }
-        return next
-    }
-
-    /// 返回切换项目后的新设置，并保证当前环境至少有一项可展示。
-    func toggling(
-        _ item: Item,
-        to value: Bool,
-        cursorAvailable: Bool,
-        onDemandAvailable: Bool
-    ) -> MenuBarDisplaySettings? {
-        guard let next = toggling(item, to: value),
-              !next.visibleItems(
-                cursorAvailable: cursorAvailable,
-                onDemandAvailable: onDemandAvailable
-              ).isEmpty else {
-            return nil
         }
         return next
     }
@@ -207,13 +172,12 @@ struct MenuBarDisplaySettings: Codable, Equatable {
 
     // MARK: - Persistence
 
-    /// 从 UserDefaults 读取设置；无历史数据或数据损坏时回退默认全开。
+    /// 从 UserDefaults 读取设置；无历史数据或数据损坏时回退默认设置。
     static func load(from defaults: UserDefaults = .standard) -> MenuBarDisplaySettings {
         guard let data = defaults.data(forKey: storageKey),
               let settings = try? JSONDecoder().decode(
                 MenuBarDisplaySettings.self, from: data
-              ),
-              !settings.visibleItems.isEmpty else {
+              ) else {
             return .default
         }
         return settings

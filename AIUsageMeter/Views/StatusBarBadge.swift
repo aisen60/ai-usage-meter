@@ -23,15 +23,17 @@ struct StatusBarPresentation: Equatable {
         cursorAvailable: Bool,
         cursorState: QuotaController.ConnectionState,
         codexUsage: CodexUsage,
-        codexState: QuotaController.ConnectionState
+        codexState: QuotaController.ConnectionState,
+        codexAvailable: Bool = true
     ) {
         let cursorConnected = cursorAvailable && cursorUsage != nil
         let onDemandAvailable = cursorAvailable && (cursorUsage?.onDemandAvailable ?? false)
-        let codexConnected = codexState.isConnected && codexUsage.isConnected
+        let codexConnected = codexAvailable && codexState.isConnected && codexUsage.isConnected
 
         let items = settings.visibleItems(
             cursorAvailable: cursorAvailable,
-            onDemandAvailable: onDemandAvailable
+            onDemandAvailable: onDemandAvailable,
+            chatGPTAvailable: codexAvailable
         )
 
         let entries: [Entry] = items.map { item in
@@ -53,7 +55,7 @@ struct StatusBarPresentation: Equatable {
                     accessibilityText: "Other Models 已用 \(text)\(Self.stateSuffix(cursorState))"
                 )
             case .onDemand:
-                let text = cursorUsage?.onDemandAmountText ?? "$0 / $0"
+                let text = cursorUsage?.onDemandUsedAmountText ?? "$0"
                 return Entry(
                     item: item,
                     text: text,
@@ -84,7 +86,7 @@ struct StatusBarPresentation: Equatable {
         }
 
         self.entries = entries
-        self.fallbackText = (["CC"] + entries.map(\.text)).joined(separator: " ")
+        self.fallbackText = (["AI"] + entries.map(\.text)).joined(separator: " ")
         self.accessibilityDescription = entries.map(\.accessibilityText).joined(separator: "，")
     }
 
@@ -120,7 +122,7 @@ enum QuotaPalette {
     }
 }
 
-/// 菜单栏徽章：固定「CC」前缀 + 按显示设置与可用性过滤的胶囊。
+/// 菜单栏徽章：固定「AI」前缀 + 按显示设置与可用性过滤的胶囊。
 ///
 /// 由 MenuBarLabel（经 ImageRenderer 渲染到状态栏）和 SettingsView
 /// （设置页内的预览卡片）共用，保证两处视觉完全一致。
@@ -129,7 +131,7 @@ struct StatusBarBadge: View {
 
     var body: some View {
         HStack(spacing: 3) {
-            Text("CC")
+            Text("AI")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color(nsColor: .labelColor))
 
