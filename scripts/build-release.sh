@@ -2,13 +2,29 @@
 
 set -euo pipefail
 
-readonly VERSION="0.3.0"
-readonly BUILD_NUMBER="20260829"
-readonly BUNDLE_ID="com.aisen.aiusagemeter"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 readonly PROJECT="$PROJECT_DIR/AIUsageMeter.xcodeproj"
 readonly SCHEME="AIUsageMeter"
+readonly TARGET="AIUsageMeter"
+
+build_setting() {
+    xcodebuild \
+        -showBuildSettings \
+        -project "$PROJECT" \
+        -target "$TARGET" \
+        -configuration Release | \
+        awk -v name="$1" '$1 == name && $2 == "=" { print $3; exit }'
+}
+
+readonly VERSION="$(build_setting MARKETING_VERSION)"
+readonly BUILD_NUMBER="$(build_setting CURRENT_PROJECT_VERSION)"
+readonly BUNDLE_ID="$(build_setting PRODUCT_BUNDLE_IDENTIFIER)"
+
+test -n "$VERSION"
+test -n "$BUILD_NUMBER"
+test -n "$BUNDLE_ID"
+
 readonly DIST_DIR="$PROJECT_DIR/dist"
 readonly ZIP_PATH="$DIST_DIR/AIUsageMeter-$VERSION.zip"
 readonly CHECKSUM_PATH="$ZIP_PATH.sha256"
