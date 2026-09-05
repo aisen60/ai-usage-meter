@@ -5,6 +5,7 @@ import AppKit
 /// 只保留第一个 Text，导致百分比胶囊被系统裁剪。
 struct MenuBarLabel: View {
     @ObservedObject var controller: QuotaController
+    @Environment(\.locale) private var locale
 
     var body: some View {
         Group {
@@ -27,7 +28,8 @@ struct MenuBarLabel: View {
             cursorState: controller.cursorConnectionState,
             codexUsage: controller.codexUsage,
             codexState: controller.codexConnectionState,
-            codexAvailable: controller.shouldShowChatGPT
+            codexAvailable: controller.shouldShowChatGPT,
+            locale: locale
         )
     }
 

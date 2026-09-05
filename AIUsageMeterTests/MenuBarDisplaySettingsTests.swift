@@ -422,6 +422,28 @@ final class StatusBarPresentationTests: XCTestCase {
             "Cursor Models 已用 39%，Other Models 已用 100%，On Demand 已用 $3.92，ChatGPT 5 小时剩余 78%，ChatGPT 1 周剩余 85%"
         )
     }
+
+    func testAccessibilityDescriptionUsesSelectedLanguage() {
+        let presentation = StatusBarPresentation(
+            settings: allOnSettings(),
+            cursorUsage: makeCursorUsage(
+                autoPercentUsed: 39,
+                apiPercentUsed: 100,
+                individualUsed: 392,
+                individualLimit: 1000
+            ),
+            cursorAvailable: true,
+            cursorState: .connected,
+            codexUsage: makeCodexUsage(short: 78, weekly: 85),
+            codexState: .connected,
+            locale: AppLanguage.english.locale
+        )
+
+        XCTAssertEqual(
+            presentation.accessibilityDescription,
+            "Cursor Models used 39%, Other Models used 100%, On Demand used $3.92, ChatGPT 5 Hours remaining 78%, ChatGPT 1 Week remaining 85%"
+        )
+    }
 }
 
 final class CursorRowLayoutTests: XCTestCase {

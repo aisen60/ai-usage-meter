@@ -24,7 +24,8 @@ struct StatusBarPresentation: Equatable {
         cursorState: QuotaController.ConnectionState,
         codexUsage: CodexUsage,
         codexState: QuotaController.ConnectionState,
-        codexAvailable: Bool = true
+        codexAvailable: Bool = true,
+        locale: Locale = AppLanguage.defaultLanguage.locale
     ) {
         let cursorConnected = cursorAvailable && cursorUsage != nil
         let onDemandAvailable = cursorAvailable && (cursorUsage?.onDemandAvailable ?? false)
@@ -44,7 +45,12 @@ struct StatusBarPresentation: Equatable {
                     item: item,
                     text: text,
                     isConnected: cursorConnected,
-                    accessibilityText: "Cursor Models 已用 \(text)\(Self.stateSuffix(cursorState))"
+                    accessibilityText: Self.accessibilityText(
+                        key: "statusBar.cursorModels.used",
+                        value: text,
+                        state: cursorState,
+                        locale: locale
+                    )
                 )
             case .otherModels:
                 let text = Self.percent(cursorConnected ? cursorUsage?.apiPercentUsed : nil)
@@ -52,7 +58,12 @@ struct StatusBarPresentation: Equatable {
                     item: item,
                     text: text,
                     isConnected: cursorConnected,
-                    accessibilityText: "Other Models 已用 \(text)\(Self.stateSuffix(cursorState))"
+                    accessibilityText: Self.accessibilityText(
+                        key: "statusBar.otherModels.used",
+                        value: text,
+                        state: cursorState,
+                        locale: locale
+                    )
                 )
             case .onDemand:
                 let text = cursorUsage?.onDemandUsedAmountText ?? "$0"
@@ -60,7 +71,12 @@ struct StatusBarPresentation: Equatable {
                     item: item,
                     text: text,
                     isConnected: cursorConnected,
-                    accessibilityText: "On Demand 已用 \(text)\(Self.stateSuffix(cursorState))"
+                    accessibilityText: Self.accessibilityText(
+                        key: "statusBar.onDemand.used",
+                        value: text,
+                        state: cursorState,
+                        locale: locale
+                    )
                 )
             case .chatgptFiveHour:
                 let text = codexConnected
@@ -70,7 +86,12 @@ struct StatusBarPresentation: Equatable {
                     item: item,
                     text: text,
                     isConnected: codexConnected,
-                    accessibilityText: "ChatGPT 5 小时剩余 \(text)\(Self.stateSuffix(codexState))"
+                    accessibilityText: Self.accessibilityText(
+                        key: "statusBar.chatGPTFiveHours.remaining",
+                        value: text,
+                        state: codexState,
+                        locale: locale
+                    )
                 )
             case .chatgptWeekly:
                 let text = codexConnected
@@ -80,27 +101,51 @@ struct StatusBarPresentation: Equatable {
                     item: item,
                     text: text,
                     isConnected: codexConnected,
-                    accessibilityText: "ChatGPT 1 周剩余 \(text)\(Self.stateSuffix(codexState))"
+                    accessibilityText: Self.accessibilityText(
+                        key: "statusBar.chatGPTWeek.remaining",
+                        value: text,
+                        state: codexState,
+                        locale: locale
+                    )
                 )
             }
         }
 
         self.entries = entries
         self.fallbackText = (["AI"] + entries.map(\.text)).joined(separator: " ")
-        self.accessibilityDescription = entries.map(\.accessibilityText).joined(separator: "，")
+        self.accessibilityDescription = entries.map(\.accessibilityText).joined(
+            separator: AppLanguage.localized("statusBar.separator", locale: locale)
+        )
     }
 
     private static func percent(_ value: Double?) -> String {
         "\(Int((value ?? 0).rounded()))%"
     }
 
-    private static func stateSuffix(_ state: QuotaController.ConnectionState) -> String {
+    private static func accessibilityText(
+        key: String,
+        value: String,
+        state: QuotaController.ConnectionState,
+        locale: Locale
+    ) -> String {
+        AppLanguage.localized(key, locale: locale, arguments: value)
+            + stateSuffix(state, locale: locale)
+    }
+
+    private static func stateSuffix(
+        _ state: QuotaController.ConnectionState,
+        locale: Locale
+    ) -> String {
         switch state {
         case .connected: return ""
-        case .stale: return "，缓存数据"
-        case .disconnected: return "，未连接"
-        case .error: return "，连接异常"
-        case .unknown: return "，检测中"
+        case .stale:
+            return AppLanguage.localized("statusBar.stateSuffix.cached", locale: locale)
+        case .disconnected:
+            return AppLanguage.localized("statusBar.stateSuffix.disconnected", locale: locale)
+        case .error:
+            return AppLanguage.localized("statusBar.stateSuffix.connectionIssue", locale: locale)
+        case .unknown:
+            return AppLanguage.localized("statusBar.stateSuffix.detecting", locale: locale)
         }
     }
 }

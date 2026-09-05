@@ -1,0 +1,420 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "connection.connected" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connected" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已连接" } }
+      }
+    },
+    "connection.detecting" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Checking" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检测中" } }
+      }
+    },
+    "connection.disconnected" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Disconnected" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未连接" } }
+      }
+    },
+    "connection.error" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Connection issue" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "连接异常" } }
+      }
+    },
+    "connection.stale" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cached data" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "缓存数据" } }
+      }
+    },
+    "empty.description" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "After you install and sign in to Cursor or ChatGPT,\n your usage will appear here automatically." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "安装并登录 Cursor 或 ChatGPT 后，\n这里会自动显示你的用量。" } }
+      }
+    },
+    "empty.learnSupportedApps" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View supported apps" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "了解支持的应用" } }
+      }
+    },
+    "empty.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No AI coding assistant available" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "还没有可用的 AI 编程助手应用" } }
+      }
+    },
+    "language.english" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "English" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "English" } }
+      }
+    },
+    "language.simplifiedChinese" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Simplified Chinese" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "简体中文" } }
+      }
+    },
+    "navigation.back" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Back" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "返回" } }
+      }
+    },
+    "quota.fiveHours" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "5 Hours" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "5 小时" } }
+      }
+    },
+    "quota.onDemand" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "On Demand" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "On Demand" } }
+      }
+    },
+    "quota.otherModels" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Other Models" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Other Models" } }
+      }
+    },
+    "quota.cursorModels" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cursor Models" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Cursor Models" } }
+      }
+    },
+    "quota.resetAt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Resets %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%@ 重置" } }
+      }
+    },
+    "quota.week" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "1 Week" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "1 周" } }
+      }
+    },
+    "settings.appLanguage" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "App Language" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "应用语言" } }
+      }
+    },
+    "settings.displayItems" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Menu Bar Display" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "菜单栏显示" } }
+      }
+    },
+    "settings.language" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Language" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "语言" } }
+      }
+    },
+    "settings.languageDescription" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Changes apply immediately" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "更改后立即生效" } }
+      }
+    },
+    "settings.launchAtLogin" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Launch at Login" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开机时启动" } }
+      }
+    },
+    "settings.launchAtLoginDescription" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start automatically when you log in" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "登录后自动启动 AI Usage Meter" } }
+      }
+    },
+    "settings.launchAtLoginNeedsApproval" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Allow AI Usage Meter in Login Items to finish enabling it." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请在“登录项”中允许 AI Usage Meter 以完成启用。" } }
+      }
+    },
+    "settings.launchAtLoginUnavailable" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Launch at login is unavailable for this app build." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "当前应用构建无法使用开机启动。" } }
+      }
+    },
+    "settings.launchAtLoginUpdateFailed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn’t update launch at login. Please try again." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法更新开机启动设置，请重试。" } }
+      }
+    },
+    "settings.openLoginItems" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Login Items Settings" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开“登录项”设置" } }
+      }
+    },
+    "settings.startup" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Startup" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "启动" } }
+      }
+    },
+    "settings.update.available" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Version %@ is available" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "发现新版本 %@" } }
+      }
+    },
+    "settings.update.check" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check for Updates" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检查更新" } }
+      }
+    },
+    "settings.update.checkDescription" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check for a newer version" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检查是否有新版本" } }
+      }
+    },
+    "settings.update.checking" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Checking for updates…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在检查更新…" } }
+      }
+    },
+    "settings.update.download" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Download Latest" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "下载最新版本" } }
+      }
+    },
+    "settings.update.downloading" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Downloading…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在下载…" } }
+      }
+    },
+    "settings.update.failed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Update check failed. Try again." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检查更新失败，请重试" } }
+      }
+    },
+    "settings.update.inProgress" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Working…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "处理中…" } }
+      }
+    },
+    "settings.update.installing" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Installing…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在安装…" } }
+      }
+    },
+    "settings.update.retry" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Try Again" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重试" } }
+      }
+    },
+    "settings.update.upToDate" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "You’re up to date" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "当前已是最新版本" } }
+      }
+    },
+    "settings.updates" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Updates" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "更新" } }
+      }
+    },
+    "settings.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置" } }
+      }
+    },
+    "statusBar.chatGPTFiveHours.remaining" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "ChatGPT 5 Hours remaining %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "ChatGPT 5 小时剩余 %@" } }
+      }
+    },
+    "statusBar.chatGPTWeek.remaining" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "ChatGPT 1 Week remaining %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "ChatGPT 1 周剩余 %@" } }
+      }
+    },
+    "statusBar.cursorModels.used" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cursor Models used %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Cursor Models 已用 %@" } }
+      }
+    },
+    "statusBar.onDemand.used" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "On Demand used %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "On Demand 已用 %@" } }
+      }
+    },
+    "statusBar.otherModels.used" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Other Models used %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Other Models 已用 %@" } }
+      }
+    },
+    "statusBar.separator" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : ", " } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "，" } }
+      }
+    },
+    "statusBar.stateSuffix.cached" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : ", cached data" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "，缓存数据" } }
+      }
+    },
+    "statusBar.stateSuffix.connectionIssue" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : ", connection issue" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "，连接异常" } }
+      }
+    },
+    "statusBar.stateSuffix.disconnected" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : ", disconnected" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "，未连接" } }
+      }
+    },
+    "statusBar.stateSuffix.detecting" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : ", checking" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "，检测中" } }
+      }
+    },
+    "supportedApps.description" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "After installation and sign-in, the app automatically reads available usage information." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "安装并登录后，应用会自动读取可用的用量信息。" } }
+      }
+    },
+    "supportedApps.downloadHelp" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open %@ download page" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开 %@ 下载页面" } }
+      }
+    },
+    "supportedApps.rowLabel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@, %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%@，%@" } }
+      }
+    },
+    "supportedApps.status.detecting" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Checking" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检测中" } }
+      }
+    },
+    "supportedApps.status.installed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Installed" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已安装" } }
+      }
+    },
+    "supportedApps.status.loggedIn" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Signed in" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已登录" } }
+      }
+    },
+    "supportedApps.status.notInstalled" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not installed" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未安装" } }
+      }
+    },
+    "supportedApps.status.unavailable" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unavailable" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法读取" } }
+      }
+    },
+    "supportedApps.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Supported AI Coding Assistants" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "支持的 AI 编程助手" } }
+      }
+    },
+    "toolbar.justUpdated" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Just now" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "刚刚更新" } }
+      }
+    },
+    "toolbar.minutesAgo" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%d min ago" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%d 分钟前" } }
+      }
+    },
+    "toolbar.neverRefreshed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not refreshed yet" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚未刷新" } }
+      }
+    },
+    "toolbar.quit" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quit" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "退出" } }
+      }
+    },
+    "toolbar.quitHelp" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quit AI Usage Meter" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "退出 AI Usage Meter" } }
+      }
+    },
+    "toolbar.refresh" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Refresh" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "刷新" } }
+      }
+    },
+    "toolbar.refreshing" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Refreshing…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在刷新…" } }
+      }
+    },
+    "toolbar.settings" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置" } }
+      }
+    },
+    "toolbar.hoursAgo" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%d hr ago" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%d 小时前" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

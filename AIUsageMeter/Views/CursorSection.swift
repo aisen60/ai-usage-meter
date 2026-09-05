@@ -58,21 +58,21 @@ struct CursorSection: View {
         switch kind {
         case .cursorModels:
             return QuotaRow(
-                label: "Cursor Models",
+                label: "quota.cursorModels",
                 percent: autoPercent,
                 tint: canDisplayUsage ? QuotaPalette.cursorModels : .gray,
                 detail: nil
             )
         case .otherModels:
             return QuotaRow(
-                label: "Other Models",
+                label: "quota.otherModels",
                 percent: apiPercent,
                 tint: canDisplayUsage ? QuotaPalette.otherModels : .gray,
                 detail: nil
             )
         case .onDemand:
             return QuotaRow(
-                label: "On Demand",
+                label: "quota.onDemand",
                 percent: onDemandPercent,
                 tint: QuotaPalette.onDemand,
                 detail: nil,
@@ -145,7 +145,7 @@ struct ServiceGroupCard<Content: View>: View {
 /// 服务组内的一条额度内容行：标签、右侧数值、单色进度条与可选说明。
 /// 无独立圆角卡片背景或边框；行间分隔由所属服务组容器绘制。
 struct QuotaRow: View {
-    let label: String
+    let label: LocalizedStringKey
     let percent: Double
     let tint: Color
     let detail: String?
@@ -236,13 +236,13 @@ struct ConnectionStatus: View {
         }
     }
 
-    private var label: String {
+    private var label: LocalizedStringKey {
         switch state {
-        case .connected: return "已连接"
-        case .stale: return "缓存数据"
-        case .disconnected: return "未连接"
-        case .error: return "连接异常"
-        case .unknown: return "检测中"
+        case .connected: return "connection.connected"
+        case .stale: return "connection.stale"
+        case .disconnected: return "connection.disconnected"
+        case .error: return "connection.error"
+        case .unknown: return "connection.detecting"
         }
     }
 

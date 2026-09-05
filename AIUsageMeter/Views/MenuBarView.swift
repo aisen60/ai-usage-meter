@@ -65,6 +65,9 @@ enum MenuMetrics {
 /// 菜单栏下拉菜单主视图
 struct MenuBarView: View {
     @ObservedObject var controller: QuotaController
+    @ObservedObject var appUpdateController: AppUpdateController
+    @Binding var appLanguage: AppLanguage
+    @Environment(\.locale) private var locale
 
     /// 弹层内页面：主视图或设置页
     private enum Page {
@@ -81,7 +84,11 @@ struct MenuBarView: View {
             case .main:
                 mainPage
             case .settings:
-                SettingsView(controller: controller) {
+                SettingsView(
+                    controller: controller,
+                    appUpdateController: appUpdateController,
+                    appLanguage: $appLanguage
+                ) {
                     page = .main
                 }
             case .supportedApps:
@@ -170,13 +177,13 @@ struct MenuBarView: View {
     /// 左段：设置入口（图标 + 文字）
     private var settingsCell: some View {
         Button(action: { page = .settings }) {
-            Label("设置", systemImage: "gearshape")
+            Label("toolbar.settings", systemImage: "gearshape")
                 .font(.system(size: 12.5, weight: .regular))
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.borderless)
         .foregroundStyle(.primary)
-        .help("设置")
+        .help(AppLanguage.localized("toolbar.settings", locale: locale))
     }
 
     /// 中段：刷新动作 + 上次更新时间（图标 + 状态文字）
@@ -203,21 +210,21 @@ struct MenuBarView: View {
         .buttonStyle(.borderless)
         .disabled(controller.isRefreshing)
         .foregroundStyle(.primary)
-        .help("刷新")
-        .accessibilityLabel("刷新")
+        .help(AppLanguage.localized("toolbar.refresh", locale: locale))
+        .accessibilityLabel(AppLanguage.localized("toolbar.refresh", locale: locale))
         .accessibilityValue(lastRefreshText)
     }
 
     /// 右段：退出（图标 + 文字）
     private var quitCell: some View {
         Button(action: { NSApplication.shared.terminate(nil) }) {
-            Label("退出", systemImage: "power")
+            Label("toolbar.quit", systemImage: "power")
                 .font(.system(size: 12.5, weight: .regular))
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.borderless)
         .foregroundStyle(.primary)
-        .help("退出 AI Usage Meter")
+        .help(AppLanguage.localized("toolbar.quitHelp", locale: locale))
     }
 
     /// 段间竖向分隔线
@@ -228,15 +235,45 @@ struct MenuBarView: View {
 
     /// 上次刷新文本
     private var lastRefreshText: String {
-        if controller.isRefreshing {
-            return "正在刷新…"
+        RefreshTimeFormatter.text(
+            isRefreshing: controller.isRefreshing,
+            lastRefreshTime: controller.lastRefreshTime,
+            now: Date(),
+            locale: locale
+        )
+    }
+}
+
+/// 供工具栏和单元测试共用的相对刷新时间格式化逻辑。
+enum RefreshTimeFormatter {
+    static func text(
+        isRefreshing: Bool,
+        lastRefreshTime: Date?,
+        now: Date,
+        locale: Locale
+    ) -> String {
+        if isRefreshing {
+            return AppLanguage.localized("toolbar.refreshing", locale: locale)
         }
-        if let date = controller.lastRefreshTime {
-            let elapsed = max(0, Date().timeIntervalSince(date))
-            if elapsed < 60 { return "刚刚更新" }
-            if elapsed < 3_600 { return "\(Int(elapsed / 60)) 分钟前" }
-            return "\(Int(elapsed / 3_600)) 小时前"
+        guard let lastRefreshTime else {
+            return AppLanguage.localized("toolbar.neverRefreshed", locale: locale)
         }
-        return "尚未刷新"
+
+        let elapsed = max(0, now.timeIntervalSince(lastRefreshTime))
+        if elapsed < 60 {
+            return AppLanguage.localized("toolbar.justUpdated", locale: locale)
+        }
+        if elapsed < 3_600 {
+            return AppLanguage.localized(
+                "toolbar.minutesAgo",
+                locale: locale,
+                arguments: Int(elapsed / 60)
+            )
+        }
+        return AppLanguage.localized(
+            "toolbar.hoursAgo",
+            locale: locale,
+            arguments: Int(elapsed / 3_600)
+        )
     }
 }

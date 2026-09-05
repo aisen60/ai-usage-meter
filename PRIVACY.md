@@ -1,40 +1,48 @@
-# 隐私说明
+# Privacy
 
-AI Usage Meter 只在本机读取 Cursor 和 Codex 的用量。应用不运营任何中转服务器，不包含遥测、统计或分析功能，也不会把任何数据发送给开发者或第三方。
+[中文说明](PRIVACY.zh-CN.md)
 
-## 应用在本机读取什么
+AI Usage Meter reads Cursor and ChatGPT usage locally. It does not operate a proxy server, include telemetry or analytics, or send data to the developer or any other third party.
 
-| 数据 | 来源 | 用途 |
+## What the app reads locally
+
+| Data | Source | Purpose |
 | --- | --- | --- |
-| Cursor 登录态 | Cursor 本地状态数据库（只读） | 调用 Cursor 账期接口查询用量 |
-| Cursor 手动 Token | 用户在应用内手动提供 | 自动登录态失效时的备用凭据 |
-| Codex 用量 | 本机 `codex app-server` 复用其现有登录会话 | 读取周剩余额度 |
-| 用量数据 | 上述两个服务 | 菜单栏与弹层展示 |
+| Cursor session | Cursor's local state database (read-only) | Request current usage from Cursor's billing service |
+| Manual Cursor token | Entered by the user in the app | Fallback credential when the local session is unavailable |
+| ChatGPT quota | The local `codex app-server` and its existing sign-in session | Read the 5-hour and 1-week quota windows |
+| Usage data | The two services above | Display usage in the menu bar and popover |
 
-AI Usage Meter 不读取、保存或上传 ChatGPT Token。
+AI Usage Meter does not read, save, or upload a ChatGPT token.
 
-## 数据保存在哪里
+## Where data is stored
 
-- **Cursor 手动 Token**：仅保存在 macOS Keychain，service 固定为 `com.aisen.aiusagemeter`，不落盘到任何普通文件。
-- **用量缓存**：仅保存在当前 macOS 用户的本地应用数据目录（`~/Library/Application Support/AIUsageMeter`），内容为用量数值和获取时间，不含凭据。
-- **显示设置**：菜单栏显示项目的开关状态保存在 macOS 用户偏好设置（UserDefaults）中，仅含三个布尔值，不含任何账号信息。
+- **Manual Cursor token:** Stored only in macOS Keychain under the `com.aisen.aiusagemeter` service. It is not written to an ordinary file.
+- **Usage cache:** Stored locally under `~/Library/Application Support/AIUsageMeter`. It contains usage values and timestamps, not credentials.
+- **App settings:** Menu bar display preferences, language, and update-check results are stored in macOS UserDefaults. They contain display preferences, a language identifier, version data, timestamps, and public download URLs, not account information.
 
-## 网络请求发给谁
+## Network requests
 
-- Cursor 用量请求直接发送到 Cursor 官方服务，不经过任何中间方。
-- Codex 用量通过本机 `codex app-server` 在本机进程间完成，子进程在读取结束、超时或失败后都会被关闭。
-- 除上述两类请求外，应用不发起任何其他网络连接。
+- Cursor usage requests go directly to Cursor's official service without an intermediary.
+- ChatGPT quota is read through the local `codex app-server`. The child process is closed after the request finishes, times out, or fails.
+- Update checks request public repository and release metadata from GitHub's Releases and Tags APIs. The requests contain only the public repository URL and a version User-Agent; they do not contain credentials, tokens, cookies, or usage data.
 
-## 日志记录什么
+The app makes no other network connections.
 
-应用日志只记录组件检测、成功、超时和错误类型，不包含 Token、Cookie、账号标识、授权请求头或完整服务响应。
+## What update checks save
 
-## 如何彻底删除数据
+To reuse a result during the five-hour check interval, the app may save the last check time, available version, Release page URL, archive URL, and SHA-256 URL in local preferences. This metadata contains no sensitive credentials and can be removed by deleting the app's preferences.
 
-删除应用本身不会自动清除以下残留，如需彻底移除：
+## Logging
 
-1. **Keychain 凭据**：打开“钥匙串访问”，搜索 `com.aisen.aiusagemeter`，删除对应项目。
-2. **用量缓存**：删除 `~/Library/Application Support/AIUsageMeter` 目录。
-3. **显示设置**：随用户偏好设置一并删除应用域即可（终端执行 `defaults delete com.aisen.aiusagemeter`）。
+App logs record only component detection, success, timeout, and error types. They do not contain tokens, cookies, account identifiers, authorization headers, or complete service responses.
 
-更简要的产品说明见 [README.md](README.md)。
+## Removing all data
+
+Deleting the app does not automatically remove the following local data. To remove it completely:
+
+1. **Keychain credentials:** Open Keychain Access, search for `com.aisen.aiusagemeter`, and delete the matching item.
+2. **Usage cache:** Delete `~/Library/Application Support/AIUsageMeter`.
+3. **App preferences:** Delete the app domain with `defaults delete com.aisen.aiusagemeter` in Terminal.
+
+For a shorter product overview, see [README.en.md](README.en.md).

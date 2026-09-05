@@ -3,6 +3,7 @@ import SwiftUI
 /// 当 Cursor 与 ChatGPT 均未安装时显示的主面板空状态。
 struct EmptyAssistantStateView: View {
     let onLearnSupportedApps: () -> Void
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(spacing: 0) {
@@ -10,7 +11,7 @@ struct EmptyAssistantStateView: View {
 
             title
 
-            Text("安装并登录 Cursor 或 ChatGPT 后，\n这里会自动显示你的用量。")
+            Text("empty.description")
                 .font(.system(size: 13))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
@@ -18,14 +19,14 @@ struct EmptyAssistantStateView: View {
                 .padding(.top, 20)
 
             Button(action: onLearnSupportedApps) {
-                Text("了解支持的应用")
+                Text("empty.learnSupportedApps")
                     .font(.system(size: 14, weight: .medium))
                     .frame(minWidth: 150)
             }
             .buttonStyle(.bordered)
             .controlSize(.large)
             .padding(.top, 24)
-            .help("了解支持的 AI 编程助手")
+            .help(AppLanguage.localized("empty.learnSupportedApps", locale: locale))
 
             Spacer(minLength: 34)
         }
@@ -33,14 +34,10 @@ struct EmptyAssistantStateView: View {
     }
 
     private var title: some View {
-        (
-            Text("还没有可用的 ")
-            + Text("AI 编程助手 ").foregroundColor(.blue)
-            + Text("应用")
-        )
-        .font(.system(size: 18, weight: .bold))
-        .multilineTextAlignment(.center)
-        .fixedSize(horizontal: false, vertical: true)
-        .accessibilityLabel("还没有可用的 AI 编程助手应用")
+        Text("empty.title")
+            .font(.system(size: 18, weight: .bold))
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityLabel(Text("empty.title"))
     }
 }

@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Stable release tag in vX.Y.Z format
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish ${{ inputs.tag }}
+    runs-on: macos-14
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.tag }}
+    steps:
+      - name: Check out requested main commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Validate release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "Release workflow must run from main, got $GITHUB_REF." >&2
+            exit 1
+          fi
+
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Release tag must use stable SemVer format vX.Y.Z: $RELEASE_TAG" >&2
+            exit 1
+          fi
+
+          version="${RELEASE_TAG#v}"
+          marketing_version="$(xcodebuild \
+            -showBuildSettings \
+            -project AIUsageMeter.xcodeproj \
+            -target AIUsageMeter \
+            -configuration Release | \
+            awk '$1 == "MARKETING_VERSION" && $2 == "=" { print $3; exit }')"
+
+          if [[ -z "$marketing_version" || "$marketing_version" != "$version" ]]; then
+            echo "MARKETING_VERSION ($marketing_version) must equal $version." >&2
+            exit 1
+          fi
+
+          ./scripts/release-notes.sh "$RELEASE_TAG" > "$RUNNER_TEMP/release-notes.md"
+          test -s "$RUNNER_TEMP/release-notes.md"
+
+      - name: Run tests
+        run: |
+          xcodebuild test \
+            -project AIUsageMeter.xcodeproj \
+            -scheme AIUsageMeter \
+            -destination 'platform=macOS' \
+            -derivedDataPath /private/tmp/AIUsageMeter-DerivedData
+
+      - name: Build release archive
+        run: ./scripts/build-release.sh
+
+      - name: Create or verify release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          release_commit="$(git rev-parse HEAD)"
+          existing_commit="$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG^{}" | awk 'NR == 1 { print $1 }')"
+          if [[ -z "$existing_commit" ]]; then
+            existing_commit="$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" | awk 'NR == 1 { print $1 }')"
+          fi
+
+          if [[ -n "$existing_commit" ]]; then
+            if [[ "$existing_commit" != "$release_commit" ]]; then
+              echo "Existing tag $RELEASE_TAG points to $existing_commit, not $release_commit." >&2
+              exit 1
+            fi
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$RELEASE_TAG" "$release_commit" -m "Release $RELEASE_TAG"
+          git push origin "refs/tags/$RELEASE_TAG"
+
+      - name: Publish GitHub Release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "A GitHub Release for $RELEASE_TAG already exists; refusing to overwrite it." >&2
+            exit 1
+          fi
+
+          version="${RELEASE_TAG#v}"
+          gh release create "$RELEASE_TAG" \
+            "dist/AIUsageMeter-$version.zip" \
+            "dist/AIUsageMeter-$version.zip.sha256" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "AI Usage Meter $RELEASE_TAG" \
+            --notes-file "$RUNNER_TEMP/release-notes.md"

@@ -1,12 +1,16 @@
 import SwiftUI
 
-/// 设置页（设计稿 design/v0.3.0/setting.png）。
+/// 设置页（设计稿 design/v0.3.2/setting.png）。
 ///
 /// 与主视图共处于同一个 MenuBarExtra 弹层内，通过 onBack 回调返回。
 /// 包含已安装服务对应的显示项目开关。
 struct SettingsView: View {
     @ObservedObject var controller: QuotaController
+    @ObservedObject var appUpdateController: AppUpdateController
+    @Binding var appLanguage: AppLanguage
     let onBack: () -> Void
+    @Environment(\.locale) private var locale
+    @StateObject private var launchAtLoginSettings = LaunchAtLoginSettings()
 
     var body: some View {
         settingsContent
@@ -16,6 +20,15 @@ struct SettingsView: View {
     private var settingsContent: some View {
         VStack(alignment: .leading, spacing: 0) {
             navigationBar
+
+            languageSection
+                .padding(.top, 16)
+
+            launchAtLoginSection
+                .padding(.top, 16)
+
+            updateSection
+                .padding(.top, 16)
 
             displayItemsSection
                 .padding(.top, 16)
@@ -30,15 +43,15 @@ struct SettingsView: View {
     private var navigationBar: some View {
         HStack(spacing: 6) {
             Button(action: onBack) {
-                Label("返回", systemImage: "chevron.left")
+                Label("navigation.back", systemImage: "chevron.left")
                     .labelStyle(.iconOnly)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.primary)
             }
             .buttonStyle(.borderless)
-            .help("返回")
+            .help(AppLanguage.localized("navigation.back", locale: locale))
 
-            Text("设置")
+            Text("settings.title")
                 .font(.system(size: MenuMetrics.serviceTitle, weight: .bold))
 
             Spacer()
@@ -46,6 +59,171 @@ struct SettingsView: View {
         .padding(.horizontal, MenuMetrics.horizontalPadding)
         .padding(.top, 12)
         .padding(.bottom, 10)
+    }
+
+    // MARK: - Language
+
+    private var languageSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionTitle("settings.language")
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 12) {
+                    Text("settings.appLanguage")
+                        .font(.system(size: MenuMetrics.cardTitle, weight: .semibold))
+
+                    Spacer(minLength: 12)
+
+                    Picker("settings.appLanguage", selection: $appLanguage) {
+                        Text("language.simplifiedChinese")
+                            .tag(AppLanguage.simplifiedChinese)
+                        Text("language.english")
+                            .tag(AppLanguage.english)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .accessibilityLabel(Text("settings.appLanguage"))
+                }
+
+                Text("settings.languageDescription")
+                    .font(.system(size: MenuMetrics.summaryText))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(.black.opacity(0.05))
+            )
+            .padding(.horizontal, MenuMetrics.horizontalPadding)
+        }
+    }
+
+    // MARK: - Updates
+
+    private var updateSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionTitle("settings.updates")
+
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(appUpdateController.currentVersionName)
+                        .font(.system(size: MenuMetrics.cardTitle, weight: .semibold))
+                    Text(appUpdateController.description(locale: locale))
+                        .font(.system(size: MenuMetrics.summaryText))
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+
+                Button(appUpdateController.buttonTitle(locale: locale)) {
+                    appUpdateController.activate()
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .disabled(appUpdateController.status.isBusy)
+                .accessibilityLabel(appUpdateController.buttonTitle(locale: locale))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(.black.opacity(0.05))
+            )
+            .padding(.horizontal, MenuMetrics.horizontalPadding)
+        }
+    }
+
+    // MARK: - Launch at Login
+
+    private var launchAtLoginSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionTitle("settings.startup")
+
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 12) {
+                        Text("settings.launchAtLogin")
+                            .font(.system(size: MenuMetrics.cardTitle, weight: .semibold))
+
+                        Spacer(minLength: 12)
+
+                        Toggle(
+                            isOn: Binding(
+                                get: { launchAtLoginSettings.isEnabled },
+                                set: { launchAtLoginSettings.setEnabled($0) }
+                            )
+                        ) {
+                            Text("settings.launchAtLogin")
+                        }
+                        .labelsHidden()
+                        .toggleStyle(.switch)
+                        .controlSize(.small)
+                        .accessibilityLabel(Text("settings.launchAtLogin"))
+                    }
+
+                    Text("settings.launchAtLoginDescription")
+                        .font(.system(size: MenuMetrics.summaryText))
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+
+                if launchAtLoginSettings.needsSystemApproval {
+                    launchAtLoginMessage(
+                        messageKey: "settings.launchAtLoginNeedsApproval",
+                        actionKey: "settings.openLoginItems"
+                    )
+                } else if launchAtLoginSettings.status == .unavailable {
+                    launchAtLoginMessage(messageKey: "settings.launchAtLoginUnavailable")
+                } else if launchAtLoginSettings.didFailLastUpdate {
+                    launchAtLoginMessage(messageKey: "settings.launchAtLoginUpdateFailed")
+                }
+            }
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(.black.opacity(0.05))
+            )
+            .padding(.horizontal, MenuMetrics.horizontalPadding)
+        }
+        .onAppear {
+            launchAtLoginSettings.refresh()
+        }
+    }
+
+    @ViewBuilder
+    private func launchAtLoginMessage(
+        messageKey: LocalizedStringKey,
+        actionKey: LocalizedStringKey? = nil
+    ) -> some View {
+        Divider()
+        VStack(alignment: .leading, spacing: 6) {
+            Text(messageKey)
+                .font(.system(size: MenuMetrics.summaryText))
+                .foregroundStyle(.secondary)
+
+            if let actionKey {
+                Link(destination: LaunchAtLoginSettings.loginItemsSettingsURL) {
+                    Text(actionKey)
+                        .font(.system(size: MenuMetrics.summaryText, weight: .medium))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Display Items
@@ -69,7 +247,7 @@ struct SettingsView: View {
 
     private var displayItemsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            sectionTitle("显示项目")
+            sectionTitle("settings.displayItems")
 
             VStack(spacing: 0) {
                 ForEach(Array(availableItems.enumerated()), id: \.element) { index, item in
@@ -96,7 +274,7 @@ struct SettingsView: View {
                 .frame(width: 8, height: 8)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(name(for: item))
+                Text(nameKey(for: item))
                     .font(.system(size: MenuMetrics.cardTitle, weight: .semibold))
                 Text(subtitle(for: item))
                     .font(.system(size: MenuMetrics.summaryText))
@@ -115,12 +293,13 @@ struct SettingsView: View {
                 )
 
             Toggle(
-                name(for: item),
                 isOn: Binding(
                     get: { controller.displaySettings.isVisible(item) },
                     set: { controller.setDisplayItem(item, visible: $0) }
                 )
-            )
+            ) {
+                Text(nameKey(for: item))
+            }
             .labelsHidden()
             .toggleStyle(.switch)
             .controlSize(.small)
@@ -136,8 +315,8 @@ struct SettingsView: View {
 
     // MARK: - Shared Bits
 
-    private func sectionTitle(_ text: String) -> some View {
-        Text(text)
+    private func sectionTitle(_ key: LocalizedStringKey) -> some View {
+        Text(key)
             .font(.system(size: MenuMetrics.summaryText, weight: .medium))
             .foregroundStyle(.secondary)
             .padding(.horizontal, MenuMetrics.horizontalPadding)
@@ -153,13 +332,13 @@ struct SettingsView: View {
         controller.codexConnectionState.isConnected && controller.codexUsage.isConnected
     }
 
-    private func name(for item: MenuBarDisplaySettings.Item) -> String {
+    private func nameKey(for item: MenuBarDisplaySettings.Item) -> LocalizedStringKey {
         switch item {
-        case .cursorModels: return "Cursor Models"
-        case .otherModels: return "Other Models"
-        case .onDemand: return "On Demand"
-        case .chatgptFiveHour: return "5 小时"
-        case .chatgptWeekly: return "1 周"
+        case .cursorModels: return "quota.cursorModels"
+        case .otherModels: return "quota.otherModels"
+        case .onDemand: return "quota.onDemand"
+        case .chatgptFiveHour: return "quota.fiveHours"
+        case .chatgptWeekly: return "quota.week"
         }
     }
 

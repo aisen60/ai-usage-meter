@@ -31,9 +31,17 @@
 		A1000022 /* AdaptiveRefreshPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000024 /* AdaptiveRefreshPolicy.swift */; };
 		A1000024 /* EmptyAssistantStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000026 /* EmptyAssistantStateView.swift */; };
 		A1000025 /* SupportedAppsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000027 /* SupportedAppsView.swift */; };
+		A1000026 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000028 /* AppLanguage.swift */; };
+		A1000027 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A2000029 /* Localizable.xcstrings */; };
+		A1000028 /* AppUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030 /* AppUpdate.swift */; };
+		A1000029 /* GitHubUpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031 /* GitHubUpdateService.swift */; };
+		A1000030 /* AppUpdateInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032 /* AppUpdateInstaller.swift */; };
+		A1000031 /* AppUpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033 /* AppUpdateController.swift */; };
 		B1000001 /* QuotaParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000001 /* QuotaParsingTests.swift */; };
 		B1000002 /* MenuBarDisplaySettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000003 /* MenuBarDisplaySettingsTests.swift */; };
 		B1000003 /* AdaptiveRefreshPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000004 /* AdaptiveRefreshPolicyTests.swift */; };
+		B1000004 /* AppLanguageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000005 /* AppLanguageTests.swift */; };
+		B1000005 /* AppUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000006 /* AppUpdateTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,9 +81,17 @@
 		A2000025 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A2000026 /* EmptyAssistantStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAssistantStateView.swift; sourceTree = "<group>"; };
 		A2000027 /* SupportedAppsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedAppsView.swift; sourceTree = "<group>"; };
+		A2000028 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		A2000029 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A2000030 /* AppUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdate.swift; sourceTree = "<group>"; };
+		A2000031 /* GitHubUpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUpdateService.swift; sourceTree = "<group>"; };
+		A2000032 /* AppUpdateInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateInstaller.swift; sourceTree = "<group>"; };
+		A2000033 /* AppUpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateController.swift; sourceTree = "<group>"; };
 		B2000001 /* QuotaParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaParsingTests.swift; sourceTree = "<group>"; };
 		B2000003 /* MenuBarDisplaySettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDisplaySettingsTests.swift; sourceTree = "<group>"; };
 		B2000004 /* AdaptiveRefreshPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRefreshPolicyTests.swift; sourceTree = "<group>"; };
+		B2000005 /* AppLanguageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguageTests.swift; sourceTree = "<group>"; };
+		B2000006 /* AppUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateTests.swift; sourceTree = "<group>"; };
 		B2000002 /* AIUsageMeterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIUsageMeterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -102,6 +118,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000023 /* Assets.xcassets in Resources */,
+				A1000027 /* Localizable.xcstrings in Resources */,
 				A1000015 /* CursorIcon.png in Resources */,
 				A1000016 /* CodexIcon.png in Resources */,
 			);
@@ -137,6 +154,8 @@
 			children = (
 				A2000002 /* CursorUsage.swift */,
 				A2000003 /* CodexUsage.swift */,
+				A2000028 /* AppLanguage.swift */,
+				A2000030 /* AppUpdate.swift */,
 				A2000021 /* MenuBarDisplaySettings.swift */,
 				A2000024 /* AdaptiveRefreshPolicy.swift */,
 			);
@@ -153,6 +172,8 @@
 				A2000008 /* UsageCache.swift */,
 				A2000019 /* AppLog.swift */,
 				A2000020 /* LaunchAtLoginService.swift */,
+				A2000031 /* GitHubUpdateService.swift */,
+				A2000032 /* AppUpdateInstaller.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -161,6 +182,7 @@
 			isa = PBXGroup;
 			children = (
 				A2000009 /* QuotaController.swift */,
+				A2000033 /* AppUpdateController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -185,6 +207,7 @@
 			children = (
 				A2000017 /* CursorIcon.png */,
 				A2000018 /* CodexIcon.png */,
+				A2000029 /* Localizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -213,6 +236,8 @@
 				B2000001 /* QuotaParsingTests.swift */,
 				B2000003 /* MenuBarDisplaySettingsTests.swift */,
 				B2000004 /* AdaptiveRefreshPolicyTests.swift */,
+				B2000005 /* AppLanguageTests.swift */,
+				B2000006 /* AppUpdateTests.swift */,
 			);
 			path = AIUsageMeterTests;
 			sourceTree = "<group>";
@@ -279,6 +304,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hans",
 				Base,
 			);
 			mainGroup = A3000000 /* Root */;
@@ -318,6 +344,11 @@
 				A1000022 /* AdaptiveRefreshPolicy.swift in Sources */,
 				A1000024 /* EmptyAssistantStateView.swift in Sources */,
 				A1000025 /* SupportedAppsView.swift in Sources */,
+				A1000026 /* AppLanguage.swift in Sources */,
+				A1000028 /* AppUpdate.swift in Sources */,
+				A1000029 /* GitHubUpdateService.swift in Sources */,
+				A1000030 /* AppUpdateInstaller.swift in Sources */,
+				A1000031 /* AppUpdateController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,6 +359,8 @@
 				B1000001 /* QuotaParsingTests.swift in Sources */,
 				B1000002 /* MenuBarDisplaySettingsTests.swift in Sources */,
 				B1000003 /* AdaptiveRefreshPolicyTests.swift in Sources */,
+				B1000004 /* AppLanguageTests.swift in Sources */,
+				B1000005 /* AppUpdateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,7 +422,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20260904;
+				CURRENT_PROJECT_VERSION = 20260905;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -399,7 +432,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
 				PRODUCT_MODULE_NAME = AIUsageMeter;
 				PRODUCT_NAME = "AI Usage Meter";
@@ -415,7 +448,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20260904;
+				CURRENT_PROJECT_VERSION = 20260905;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -425,7 +458,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
 				PRODUCT_MODULE_NAME = AIUsageMeter;
 				PRODUCT_NAME = "AI Usage Meter";
@@ -440,10 +473,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20260904;
+				CURRENT_PROJECT_VERSION = 20260905;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -456,10 +489,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20260904;
+				CURRENT_PROJECT_VERSION = 20260905;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
