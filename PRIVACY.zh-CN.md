@@ -45,4 +45,4 @@ AI Usage Meter 不读取、保存或上传 ChatGPT Token。
 2. **用量缓存**：删除 `~/Library/Application Support/AIUsageMeter` 目录。
 3. **应用偏好设置**：在终端执行 `defaults delete com.aisen.aiusagemeter`，删除应用偏好设置。
 
-更简要的产品说明见 [README.zh-CN.md](README.zh-CN.md)。
+更简要的产品说明见 [README.md](README.md)。

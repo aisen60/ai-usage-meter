@@ -45,4 +45,4 @@ Deleting the app does not automatically remove the following local data. To remo
 2. **Usage cache:** Delete `~/Library/Application Support/AIUsageMeter`.
 3. **App preferences:** Delete the app domain with `defaults delete com.aisen.aiusagemeter` in Terminal.
 
-For a shorter product overview, see [README.md](README.md).
+For a shorter product overview, see [README.en.md](README.en.md).
