@@ -57,6 +57,18 @@ xcodebuild test \
 
 脚本会在 `dist/` 中生成包含 `arm64 + x86_64` 的 ZIP 文件及其 SHA-256 校验文件。
 
+## 发布
+
+发布前，在一个 PR 中更新 Xcode 的 `MARKETING_VERSION`、构建号与 `CHANGELOG.md`，合并到 `main` 后再从干净且已同步的 `main` 执行：
+
+```bash
+./scripts/release.sh v0.3.2
+```
+
+该命令会手动触发 GitHub Actions。工作流校验版本和更新日志、运行完整测试、构建 Universal ZIP 与 SHA-256 文件；全部成功后创建同名 Git tag 和公开 GitHub Release。Release 正文取自该版本的 `CHANGELOG.md` 条目，并自动追加安装提示。
+
+仓库需要允许 GitHub Actions 的 `GITHUB_TOKEN` 使用 `contents: write` 权限，以便创建 tag 和 Release；发布不需要向仓库保存证书或其他密钥。当前自动化仍使用 ad-hoc 签名，未包含 Developer ID 签名或 Apple 公证。
+
 ## 关于项目
 
 - [发行版本](https://github.com/aisen60/ai-usage-meter/releases)

@@ -57,6 +57,18 @@ Build a Universal release archive with:
 
 The script produces an `arm64 + x86_64` ZIP and its SHA-256 checksum in `dist/`.
 
+## Releases
+
+Prepare a release in a PR by updating Xcode's `MARKETING_VERSION`, build number, and `CHANGELOG.md`. After it has merged to `main`, run this from a clean, synchronized `main` checkout:
+
+```bash
+./scripts/release.sh v0.3.2
+```
+
+The command manually dispatches GitHub Actions. The workflow validates the version and changelog, runs the full test suite, builds the Universal ZIP and SHA-256 checksum, then creates the matching Git tag and public GitHub Release after every check succeeds. The release body is extracted from the matching `CHANGELOG.md` entry and receives an installation note automatically.
+
+The repository must permit the GitHub Actions `GITHUB_TOKEN` to use `contents: write` so the workflow can create tags and Releases. No certificate or other secret is stored in the repository. This automation still uses ad-hoc signing; Developer ID signing and Apple notarization are not included.
+
 ## About
 
 - [Releases](https://github.com/aisen60/ai-usage-meter/releases)

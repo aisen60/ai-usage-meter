@@ -29,6 +29,14 @@ The XCTest host disables `QuotaController` startup effects; a normal unit-test r
 
 ## Release Workflow
 
+### GitHub release automation
+
+Prepare each version in a PR by aligning `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`, and the matching `CHANGELOG.md` entry. After it merges to `main`, run `./scripts/release.sh vX.Y.Z` from a clean checkout whose `HEAD` exactly matches `origin/main`.
+
+The command dispatches `.github/workflows/release.yml`. The workflow accepts stable `vX.Y.Z` tags only; it verifies the project version and Changelog entry, runs the repository test gate, builds the existing Universal ZIP and checksum, then creates an annotated tag and public GitHub Release. Release notes are extracted from the matching Changelog section and receive a generated installation note. The repository must allow the Actions `GITHUB_TOKEN` to use `contents: write`; do not add certificates or authentication material to the repository for this workflow.
+
+The workflow is intentionally not a signing or notarization migration. It continues to create the existing ad-hoc-signed archive.
+
 Run `./scripts/build-release.sh` only when packaging or release verification is in scope. The script currently:
 
 1. Builds a Release app for `arm64` and `x86_64`.
