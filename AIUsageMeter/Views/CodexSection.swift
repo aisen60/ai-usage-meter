@@ -5,6 +5,7 @@ import SwiftUI
 struct CodexSection: View {
     let usage: CodexUsage
     let connectionState: QuotaController.ConnectionState
+    @Environment(\.locale) private var locale
 
     var body: some View {
         ServiceGroupCard {
@@ -13,14 +14,14 @@ struct CodexSection: View {
 
                 VStack(alignment: .leading, spacing: 0) {
                     QuotaRow(
-                        label: "5 小时",
+                        label: "quota.fiveHours",
                         percent: shortPercent,
                         tint: isConnected ? QuotaPalette.chatgpt : .gray,
                         detail: shortResetDetail
                     )
                     Divider()
                     QuotaRow(
-                        label: "1 周",
+                        label: "quota.week",
                         percent: weeklyPercent,
                         tint: isConnected ? QuotaPalette.chatgpt : .gray,
                         detail: weeklyResetDetail
@@ -64,18 +65,38 @@ struct CodexSection: View {
     /// 5 小时窗口：显示重置时间，如「23:12 重置」。
     private var shortResetDetail: String? {
         guard isConnected, let resetsAt = usage.shortWindow.resetsAt else { return nil }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "HH:mm"
-        return "\(formatter.string(from: resetsAt)) 重置"
+        return QuotaResetFormatter.shortWindowDetail(resetsAt: resetsAt, locale: locale)
     }
 
     /// 1 周窗口：显示重置日期，如「9 月 4 日重置」。
     private var weeklyResetDetail: String? {
         guard isConnected, let resetsAt = usage.weeklyWindow.resetsAt else { return nil }
+        return QuotaResetFormatter.weeklyWindowDetail(resetsAt: resetsAt, locale: locale)
+    }
+}
+
+/// 按应用语言格式化配额重置时间，避免英文界面残留中文日期或后缀。
+enum QuotaResetFormatter {
+    static func shortWindowDetail(resetsAt: Date, locale: Locale) -> String {
+        resetDetail(resetsAt: resetsAt, template: "Hm", locale: locale)
+    }
+
+    static func weeklyWindowDetail(resetsAt: Date, locale: Locale) -> String {
+        resetDetail(resetsAt: resetsAt, template: "MMMd", locale: locale)
+    }
+
+    private static func resetDetail(
+        resetsAt: Date,
+        template: String,
+        locale: Locale
+    ) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "M月d日"
-        return "\(formatter.string(from: resetsAt))重置"
+        formatter.locale = locale
+        formatter.setLocalizedDateFormatFromTemplate(template)
+        return AppLanguage.localized(
+            "quota.resetAt",
+            locale: locale,
+            arguments: formatter.string(from: resetsAt)
+        )
     }
 }

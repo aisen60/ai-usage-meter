@@ -4,12 +4,13 @@ import SwiftUI
 struct SupportedAppsView: View {
     @ObservedObject var controller: QuotaController
     let onBack: () -> Void
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             navigationBar
 
-            Text("安装并登录后，应用会自动读取可用的用量信息。")
+            Text("supportedApps.description")
                 .font(.system(size: 12.5))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -21,7 +22,7 @@ struct SupportedAppsView: View {
                     name: "Cursor",
                     resourceName: "CursorIcon",
                     fallbackSymbol: "cursorarrow.rays",
-                    status: statusText(
+                    status: status(
                         installed: controller.isCursorInstalled,
                         connectionState: controller.cursorConnectionState
                     ),
@@ -32,7 +33,7 @@ struct SupportedAppsView: View {
                     name: "ChatGPT",
                     resourceName: "CodexIcon",
                     fallbackSymbol: "terminal.fill",
-                    status: statusText(
+                    status: status(
                         installed: controller.isChatGPTInstalled,
                         connectionState: controller.codexConnectionState
                     ),
@@ -51,15 +52,15 @@ struct SupportedAppsView: View {
     private var navigationBar: some View {
         HStack(spacing: 8) {
             Button(action: onBack) {
-                Label("返回", systemImage: "chevron.left")
+                Label("navigation.back", systemImage: "chevron.left")
                     .labelStyle(.iconOnly)
                     .font(.system(size: 14, weight: .semibold))
             }
             .buttonStyle(.borderless)
             .foregroundStyle(.primary)
-            .help("返回")
+            .help(AppLanguage.localized("navigation.back", locale: locale))
 
-            Text("支持的 AI 编程助手")
+            Text("supportedApps.title")
                 .font(.system(size: 17, weight: .bold))
 
             Spacer()
@@ -69,39 +70,70 @@ struct SupportedAppsView: View {
         .padding(.bottom, 8)
     }
 
-    private func statusText(
+    private func status(
         installed: Bool,
         connectionState: QuotaController.ConnectionState
-    ) -> String {
-        guard installed else { return "未安装" }
+    ) -> SupportedAppStatus {
+        guard installed else { return .notInstalled }
         switch connectionState {
         case .connected, .stale:
-            return "已登录"
+            return .loggedIn
         case .unknown:
-            return "检测中"
+            return .detecting
         case .disconnected:
-            return "已安装"
+            return .installed
         case .error:
-            return "无法读取"
+            return .unavailable
         }
     }
 }
 
-private struct SupportedAppRow: View {
+enum SupportedAppStatus: Equatable {
+    case notInstalled
+    case loggedIn
+    case detecting
+    case installed
+    case unavailable
+
+    var needsDownloadLink: Bool {
+        self == .notInstalled
+    }
+
+    private var localizationKey: String {
+        switch self {
+        case .notInstalled: return "supportedApps.status.notInstalled"
+        case .loggedIn: return "supportedApps.status.loggedIn"
+        case .detecting: return "supportedApps.status.detecting"
+        case .installed: return "supportedApps.status.installed"
+        case .unavailable: return "supportedApps.status.unavailable"
+        }
+    }
+
+    func localizedDescription(locale: Locale) -> String {
+        AppLanguage.localized(localizationKey, locale: locale)
+    }
+}
+
+struct SupportedAppRow: View {
     let name: String
     let resourceName: String
     let fallbackSymbol: String
-    let status: String
+    let status: SupportedAppStatus
     let downloadURL: URL?
+    @Environment(\.locale) private var locale
 
     @ViewBuilder
     var body: some View {
-        if status == "未安装", let downloadURL {
+        if status.needsDownloadLink, let downloadURL {
             Link(destination: downloadURL) {
                 rowContent
             }
             .buttonStyle(.plain)
-            .help("打开 \(name) 下载页面")
+            .help(AppLanguage.localized(
+                "supportedApps.downloadHelp",
+                locale: locale,
+                arguments: name
+            ))
         } else {
             rowContent
         }
@@ -121,7 +153,7 @@ private struct SupportedAppRow: View {
 
             Spacer()
 
-            Text(status)
+            Text(status.localizedDescription(locale: locale))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.secondary)
         }
@@ -134,6 +166,11 @@ private struct SupportedAppRow: View {
                 .stroke(.black.opacity(MenuMetrics.groupBorderOpacity))
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(name)，\(status)")
+        .accessibilityLabel(AppLanguage.localized(
+            "supportedApps.rowLabel",
+            locale: locale,
+            arguments: name,
+            status.localizedDescription(locale: locale)
+        ))
     }
 }
