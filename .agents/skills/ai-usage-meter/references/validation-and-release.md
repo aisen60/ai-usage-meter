@@ -44,7 +44,7 @@ Run `./scripts/build-release.sh` only when packaging or release verification is 
 1. Builds a Release app for `arm64` and `x86_64`.
 2. Verifies version, build number, bundle identifier, and architectures.
 3. Applies an ad-hoc hardened-runtime signature.
-4. Creates a versioned ZIP and a fixed-name `AI Usage Meter.dmg`, each with a SHA-256 checksum. The DMG includes an `Applications` shortcut for drag-and-drop installation.
+4. Creates a versioned ZIP and a fixed-name `AI-Usage-Meter.dmg`, each with a SHA-256 checksum. The hyphenated DMG filename avoids GitHub Release normalizing spaces to dots. The DMG includes an `Applications` shortcut for drag-and-drop installation.
 5. Extracts both archives and verifies the packaged application again.
 
 The script writes release artifacts under `dist/` and replaces the version-matching ZIP plus the fixed-name DMG and their checksums. Treat that as a material artifact change and do not run it merely as a generic compile check.

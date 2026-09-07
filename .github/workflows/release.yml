@@ -135,8 +135,8 @@ jobs:
           gh release create "$RELEASE_TAG" \
             "dist/AIUsageMeter-$version.zip" \
             "dist/AIUsageMeter-$version.zip.sha256" \
-            "dist/AI Usage Meter.dmg" \
-            "dist/AI Usage Meter.dmg.sha256" \
+            "dist/AI-Usage-Meter.dmg" \
+            "dist/AI-Usage-Meter.dmg.sha256" \
             --repo "$GITHUB_REPOSITORY" \
             --verify-tag \
             --title "AI Usage Meter $RELEASE_TAG" \

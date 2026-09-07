@@ -55,7 +55,7 @@ xcodebuild test \
 ./scripts/build-release.sh
 ```
 
-脚本会在 `dist/` 中生成包含 `arm64 + x86_64` 的版本化 ZIP，以及名称固定为 `AI Usage Meter.dmg` 的 DMG 和对应 SHA-256 校验文件。DMG 内含 `Applications` 快捷方式，适合拖拽安装。
+脚本会在 `dist/` 中生成包含 `arm64 + x86_64` 的版本化 ZIP，以及名称固定为 `AI-Usage-Meter.dmg` 的 DMG 和对应 SHA-256 校验文件。DMG 内含 `Applications` 快捷方式，适合拖拽安装。
 
 ## 发布
 

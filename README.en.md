@@ -55,7 +55,7 @@ Build a Universal release archive with:
 ./scripts/build-release.sh
 ```
 
-The script produces a versioned `arm64 + x86_64` ZIP plus a fixed-name `AI Usage Meter.dmg` and their SHA-256 checksums in `dist/`. The DMG includes an `Applications` shortcut for drag-and-drop installation.
+The script produces a versioned `arm64 + x86_64` ZIP plus a fixed-name `AI-Usage-Meter.dmg` and their SHA-256 checksums in `dist/`. The DMG includes an `Applications` shortcut for drag-and-drop installation.
 
 ## Releases
 

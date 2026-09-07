@@ -2,6 +2,12 @@
 
 > 注：本项目已更名为 AI Usage Meter，工程 / 模块为 `AIUsageMeter`，Bundle ID 改为 `com.aisen.aiusagemeter`，仓库为 `aisen60/ai-usage-meter`。更名不改变版本号与既有功能语义。
 
+## 0.3.4 - 2026-09-08
+
+### 工程与发布
+
+- 将 DMG 下载文件名改为 `AI-Usage-Meter.dmg`，避免 GitHub Release 对含空格的资产名进行点号规范化。
+
 ## 0.3.3 - 2026-09-07
 
 ### 行为修正
