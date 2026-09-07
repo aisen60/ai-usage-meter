@@ -20,7 +20,7 @@
 - Inspect current entitlements before recommending App Sandbox.
 - Sandbox adoption can block reads from another application's files, arbitrary executable discovery, subprocess launch, and direct file-system probing.
 - Treat enabling sandboxing as a product and integration migration, not a checkbox hardening change.
-- Add only the entitlements required by implemented behavior, and verify both Debug and distributed builds.
+- Add only the entitlements required by implemented behavior, and verify both Testing and distributed builds.
 
 ## Login Items
 

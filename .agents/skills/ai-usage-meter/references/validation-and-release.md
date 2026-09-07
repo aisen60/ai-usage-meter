@@ -18,6 +18,7 @@ xcodebuild test \
 
 Use a task-specific temporary Derived Data directory if parallel work might collide. Do not write new generated build output into the repository.
 The XCTest host disables `QuotaController` startup effects; a normal unit-test run must not read user credentials or call live Cursor/Codex services.
+The shared scheme uses the `Testing` configuration for its Test action and `Release` for Run, Profile, Analyze, and Archive. `Testing` enables `@testable` imports without shipping a Debug configuration or Debug-only preview behavior.
 
 ### Focused evidence
 
@@ -33,19 +34,20 @@ The XCTest host disables `QuotaController` startup effects; a normal unit-test r
 
 Prepare each version in a PR by aligning `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`, and the matching `CHANGELOG.md` entry. After it merges to `main`, run `./scripts/release.sh vX.Y.Z` from a clean checkout whose `HEAD` exactly matches `origin/main`.
 
-The command dispatches `.github/workflows/release.yml`. The workflow accepts stable `vX.Y.Z` tags only; it verifies the project version and Changelog entry, runs the repository test gate, builds the existing Universal ZIP and checksum, then creates an annotated tag and public GitHub Release. Release notes are extracted from the matching Changelog section and receive a generated installation note. The repository must allow the Actions `GITHUB_TOKEN` to use `contents: write`; do not add certificates or authentication material to the repository for this workflow.
+The command dispatches `.github/workflows/release.yml`. The workflow accepts stable `vX.Y.Z` tags only; it verifies the project version and Changelog entry, runs the repository test gate, builds the Universal ZIP, DMG, and checksums, then creates an annotated tag and public GitHub Release. Release notes are extracted from the matching Changelog section and receive a generated installation note. The repository must allow the Actions `GITHUB_TOKEN` to use `contents: write`; do not add certificates or authentication material to the repository for this workflow.
 
 The workflow is intentionally not a signing or notarization migration. It continues to create the existing ad-hoc-signed archive.
+The release job runs on `macos-26`, selects Xcode 26.6 explicitly, and fails if the macOS SDK is not 26.5. Keep the local development Xcode on the same 26.6 toolchain when visual or packaged-output parity matters.
 
 Run `./scripts/build-release.sh` only when packaging or release verification is in scope. The script currently:
 
 1. Builds a Release app for `arm64` and `x86_64`.
 2. Verifies version, build number, bundle identifier, and architectures.
 3. Applies an ad-hoc hardened-runtime signature.
-4. Creates a ZIP and SHA-256 checksum.
-5. Extracts the archive and verifies the packaged application again.
+4. Creates a versioned ZIP and a fixed-name `AI Usage Meter.dmg`, each with a SHA-256 checksum. The DMG includes an `Applications` shortcut for drag-and-drop installation.
+5. Extracts both archives and verifies the packaged application again.
 
-The script writes release artifacts under `dist/` and replaces the version-matching ZIP and checksum. Treat that as a material artifact change and do not run it merely as a generic compile check.
+The script writes release artifacts under `dist/` and replaces the version-matching ZIP plus the fixed-name DMG and their checksums. Treat that as a material artifact change and do not run it merely as a generic compile check.
 
 ## Distribution Constraints
 

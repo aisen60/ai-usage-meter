@@ -167,6 +167,7 @@ struct SettingsView: View {
                         .labelsHidden()
                         .toggleStyle(.switch)
                         .controlSize(.small)
+                        .disabled(!launchAtLoginSettings.canChange)
                         .accessibilityLabel(Text("settings.launchAtLogin"))
                     }
 
@@ -179,7 +180,9 @@ struct SettingsView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
 
-                if launchAtLoginSettings.needsSystemApproval {
+                if launchAtLoginSettings.status == .requiresInstallation {
+                    launchAtLoginMessage(messageKey: "settings.launchAtLoginRequiresInstallation")
+                } else if launchAtLoginSettings.needsSystemApproval {
                     launchAtLoginMessage(
                         messageKey: "settings.launchAtLoginNeedsApproval",
                         actionKey: "settings.openLoginItems"

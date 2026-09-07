@@ -21,7 +21,7 @@ Keep your most important AI quota numbers visible without opening either app. AI
 
 Download the latest release from [GitHub Releases](https://github.com/aisen60/ai-usage-meter/releases). AI Usage Meter requires macOS 13 Ventura or later. Install Cursor to view Cursor usage, and install ChatGPT for macOS or Codex CLI to view ChatGPT quota. Either integration can be used on its own.
 
-On macOS, download the ZIP, extract it, and move `AI Usage Meter.app` to `/Applications`. If macOS shows a security warning on first launch, Control-click the app, choose **Open**, and confirm once in **System Settings → Privacy & Security**.
+On macOS, download the DMG, drag `AI Usage Meter.app` to the `Applications` folder, and launch it from there. You can also download the ZIP, extract it, and move the app to `/Applications`. Do not launch it directly from the DMG, Downloads, or a temporary folder, because macOS may register a login item path that will not exist at the next login. If macOS shows a security warning on first launch, Control-click the app, choose **Open**, and confirm once in **System Settings → Privacy & Security**.
 
 Release archives currently use an ad-hoc signature and are not Developer ID signed or notarized. A first-launch security warning is therefore expected.
 
@@ -55,7 +55,7 @@ Build a Universal release archive with:
 ./scripts/build-release.sh
 ```
 
-The script produces an `arm64 + x86_64` ZIP and its SHA-256 checksum in `dist/`.
+The script produces a versioned `arm64 + x86_64` ZIP plus a fixed-name `AI Usage Meter.dmg` and their SHA-256 checksums in `dist/`. The DMG includes an `Applications` shortcut for drag-and-drop installation.
 
 ## Releases
 
@@ -65,7 +65,7 @@ Prepare a release in a PR by updating Xcode's `MARKETING_VERSION`, build number,
 ./scripts/release.sh v0.3.2
 ```
 
-The command manually dispatches GitHub Actions. The workflow validates the version and changelog, runs the full test suite, builds the Universal ZIP and SHA-256 checksum, then creates the matching Git tag and public GitHub Release after every check succeeds. The release body is extracted from the matching `CHANGELOG.md` entry and receives an installation note automatically.
+The command manually dispatches GitHub Actions. The workflow validates the version and changelog, runs the full test suite, builds the Universal ZIP, DMG, and SHA-256 checksums, then creates the matching Git tag and public GitHub Release after every check succeeds. The release body is extracted from the matching `CHANGELOG.md` entry and receives an installation note automatically.
 
 The repository must permit the GitHub Actions `GITHUB_TOKEN` to use `contents: write` so the workflow can create tags and Releases. No certificate or other secret is stored in the repository. This automation still uses ad-hoc signing; Developer ID signing and Apple notarization are not included.
 
