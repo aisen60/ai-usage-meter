@@ -37,7 +37,9 @@ jobs:
 
           sudo xcode-select -s /Applications/Xcode_26.6.app
 
-          xcode_version="$(xcodebuild -version | awk '$1 == "Xcode" { print $2; exit }')"
+          xcode_version_file="$RUNNER_TEMP/xcode-version.txt"
+          xcodebuild -version > "$xcode_version_file"
+          xcode_version="$(awk '$1 == "Xcode" { print $2 }' "$xcode_version_file")"
           sdk_version="$(xcrun --sdk macosx --show-sdk-version)"
 
           if [[ "$xcode_version" != "26.6" ]]; then
@@ -49,7 +51,7 @@ jobs:
             exit 1
           fi
 
-          xcodebuild -version
+          cat "$xcode_version_file"
           echo "macOS SDK $sdk_version"
 
       - name: Validate release metadata
@@ -68,12 +70,13 @@ jobs:
           fi
 
           version="${RELEASE_TAG#v}"
-          marketing_version="$(xcodebuild \
+          build_settings_file="$RUNNER_TEMP/ai-usage-meter-build-settings.txt"
+          xcodebuild \
             -showBuildSettings \
             -project AIUsageMeter.xcodeproj \
             -target AIUsageMeter \
-            -configuration Release | \
-            awk '$1 == "MARKETING_VERSION" && $2 == "=" { print $3; exit }')"
+            -configuration Release > "$build_settings_file"
+          marketing_version="$(awk '$1 == "MARKETING_VERSION" && $2 == "=" { print $3 }' "$build_settings_file")"
 
           if [[ -z "$marketing_version" || "$marketing_version" != "$version" ]]; then
             echo "MARKETING_VERSION ($marketing_version) must equal $version." >&2
