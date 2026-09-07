@@ -109,6 +109,29 @@ final class LaunchAtLoginSettingsTests: XCTestCase {
         XCTAssertTrue(settings.isEnabled)
     }
 
+    func testTemporaryInstallationIsNotSupportedForLaunchAtLogin() {
+        XCTAssertFalse(
+            LaunchAtLoginService.isSupportedInstallation(
+                at: URL(fileURLWithPath: "/private/tmp/AI Usage Meter.app")
+            )
+        )
+    }
+
+    func testApplicationsInstallationSupportsLaunchAtLogin() {
+        XCTAssertTrue(
+            LaunchAtLoginService.isSupportedInstallation(
+                at: URL(fileURLWithPath: "/Applications/AI Usage Meter.app")
+            )
+        )
+    }
+
+    func testNotFoundLoginItemIsTreatedAsDisabled() {
+        XCTAssertEqual(
+            LaunchAtLoginService.status(for: .notFound),
+            .disabled
+        )
+    }
+
     func testEnablingRegistersTheLoginItem() {
         let service = MockLaunchAtLoginService(status: .disabled)
         let settings = LaunchAtLoginSettings(service: service)

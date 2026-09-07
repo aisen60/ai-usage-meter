@@ -28,11 +28,17 @@ test -n "$BUNDLE_ID"
 readonly DIST_DIR="$PROJECT_DIR/dist"
 readonly ZIP_PATH="$DIST_DIR/AIUsageMeter-$VERSION.zip"
 readonly CHECKSUM_PATH="$ZIP_PATH.sha256"
+readonly DMG_FILENAME="AI Usage Meter.dmg"
+readonly DMG_PATH="$DIST_DIR/$DMG_FILENAME"
+readonly DMG_CHECKSUM_PATH="$DMG_PATH.sha256"
 readonly DERIVED_DATA="$(mktemp -d /private/tmp/AIUsageMeter-Release.XXXXXX)"
 readonly VERIFY_DIR="$(mktemp -d /private/tmp/AIUsageMeter-Verify.XXXXXX)"
+readonly DMG_STAGE="$(mktemp -d /private/tmp/AIUsageMeter-DMG.XXXXXX)"
+readonly DMG_MOUNT_POINT="$(mktemp -d /private/tmp/AIUsageMeter-DMG-Mount.XXXXXX)"
 
 cleanup() {
-    rm -rf "$DERIVED_DATA" "$VERIFY_DIR"
+    hdiutil detach "$DMG_MOUNT_POINT" -force >/dev/null 2>&1 || true
+    rm -rf "$DERIVED_DATA" "$VERIFY_DIR" "$DMG_STAGE" "$DMG_MOUNT_POINT"
 }
 trap cleanup EXIT
 
@@ -94,3 +100,35 @@ echo "Release artifacts:"
 echo "  $ZIP_PATH"
 echo "  $CHECKSUM_PATH"
 cat "$CHECKSUM_PATH"
+
+mkdir -p "$DMG_STAGE"
+ditto "$APP_PATH" "$DMG_STAGE/AI Usage Meter.app"
+ln -s /Applications "$DMG_STAGE/Applications"
+
+rm -f "$DMG_PATH" "$DMG_CHECKSUM_PATH"
+hdiutil create \
+    -volname "AI Usage Meter" \
+    -srcfolder "$DMG_STAGE" \
+    -format UDZO \
+    -imagekey zlib-level=9 \
+    -ov \
+    "$DMG_PATH"
+
+(
+    cd "$DIST_DIR"
+    shasum -a 256 "$DMG_FILENAME" > "$(basename "$DMG_CHECKSUM_PATH")"
+)
+hdiutil attach \
+    -readonly \
+    -nobrowse \
+    -mountpoint "$DMG_MOUNT_POINT" \
+    "$DMG_PATH"
+
+test -d "$DMG_MOUNT_POINT/AI Usage Meter.app"
+test -L "$DMG_MOUNT_POINT/Applications"
+codesign --verify --strict --verbose=2 "$DMG_MOUNT_POINT/AI Usage Meter.app"
+hdiutil detach "$DMG_MOUNT_POINT"
+
+echo "  $DMG_PATH"
+echo "  $DMG_CHECKSUM_PATH"
+cat "$DMG_CHECKSUM_PATH"

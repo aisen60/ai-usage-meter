@@ -21,7 +21,7 @@ AI Usage Meter 是一款以本地处理为核心的 macOS 菜单栏工具，用�
 
 从 [GitHub Releases](https://github.com/aisen60/ai-usage-meter/releases) 下载最新版本。AI Usage Meter 需要 macOS 13 Ventura 或更高版本。如需查看 Cursor 用量，请安装 Cursor；如需查看 ChatGPT 额度，请安装 ChatGPT macOS 应用或 Codex CLI。两个集成可以独立使用。
 
-在 macOS 上下载 ZIP 文件，解压后将 `AI Usage Meter.app` 移动到 `/Applications`。如果首次启动时 macOS 显示安全提示，请在 Finder 中右键点击应用，选择“打开”，然后在“系统设置 → 隐私与安全性”中确认一次。
+在 macOS 上推荐下载 DMG 文件，将其中的 `AI Usage Meter.app` 拖到 `Applications` 文件夹后再启动。也可以下载 ZIP，解压后将应用移动到 `/Applications`。请不要直接从 DMG、下载目录或临时目录运行，否则开机启动可能会登记到一个下次登录时不存在的路径。如果首次启动时 macOS 显示安全提示，请在 Finder 中右键点击应用，选择“打开”，然后在“系统设置 → 隐私与安全性”中确认一次。
 
 当前发行包使用 ad-hoc 签名，未使用 Developer ID 签名或公证。首次启动出现安全提示属于预期行为。
 
@@ -55,7 +55,7 @@ xcodebuild test \
 ./scripts/build-release.sh
 ```
 
-脚本会在 `dist/` 中生成包含 `arm64 + x86_64` 的 ZIP 文件及其 SHA-256 校验文件。
+脚本会在 `dist/` 中生成包含 `arm64 + x86_64` 的版本化 ZIP，以及名称固定为 `AI Usage Meter.dmg` 的 DMG 和对应 SHA-256 校验文件。DMG 内含 `Applications` 快捷方式，适合拖拽安装。
 
 ## 发布
 
@@ -65,7 +65,7 @@ xcodebuild test \
 ./scripts/release.sh v0.3.2
 ```
 
-该命令会手动触发 GitHub Actions。工作流校验版本和更新日志、运行完整测试、构建 Universal ZIP 与 SHA-256 文件；全部成功后创建同名 Git tag 和公开 GitHub Release。Release 正文取自该版本的 `CHANGELOG.md` 条目，并自动追加安装提示。
+该命令会手动触发 GitHub Actions。工作流校验版本和更新日志、运行完整测试、构建 Universal ZIP、DMG 与 SHA-256 文件；全部成功后创建同名 Git tag 和公开 GitHub Release。Release 正文取自该版本的 `CHANGELOG.md` 条目，并自动追加安装提示。
 
 仓库需要允许 GitHub Actions 的 `GITHUB_TOKEN` 使用 `contents: write` 权限，以便创建 tag 和 Release；发布不需要向仓库保存证书或其他密钥。当前自动化仍使用 ad-hoc 签名，未包含 Developer ID 签名或 Apple 公证。
 

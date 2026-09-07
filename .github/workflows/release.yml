@@ -18,16 +18,39 @@ concurrency:
 jobs:
   release:
     name: Build and publish ${{ inputs.tag }}
-    runs-on: macos-14
+    runs-on: macos-26
     env:
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ inputs.tag }}
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
       - name: Check out requested main commit
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+
+      - name: Select and verify pinned Xcode toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sudo xcode-select -s /Applications/Xcode_26.6.app
+
+          xcode_version="$(xcodebuild -version | awk '$1 == "Xcode" { print $2; exit }')"
+          sdk_version="$(xcrun --sdk macosx --show-sdk-version)"
+
+          if [[ "$xcode_version" != "26.6" ]]; then
+            echo "Expected Xcode 26.6, got $xcode_version." >&2
+            exit 1
+          fi
+          if [[ "$sdk_version" != "26.5" ]]; then
+            echo "Expected macOS SDK 26.5, got $sdk_version." >&2
+            exit 1
+          fi
+
+          xcodebuild -version
+          echo "macOS SDK $sdk_version"
 
       - name: Validate release metadata
         shell: bash
@@ -109,6 +132,8 @@ jobs:
           gh release create "$RELEASE_TAG" \
             "dist/AIUsageMeter-$version.zip" \
             "dist/AIUsageMeter-$version.zip.sha256" \
+            "dist/AI Usage Meter.dmg" \
+            "dist/AI Usage Meter.dmg.sha256" \
             --repo "$GITHUB_REPOSITORY" \
             --verify-tag \
             --title "AI Usage Meter $RELEASE_TAG" \

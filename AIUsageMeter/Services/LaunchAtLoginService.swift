@@ -7,6 +7,7 @@ enum LaunchAtLoginStatus: Equatable {
     case enabled
     case disabled
     case requiresApproval
+    case requiresInstallation
     case unavailable
 
     var isEnabled: Bool {
@@ -15,6 +16,15 @@ enum LaunchAtLoginStatus: Equatable {
 
     var needsSystemApproval: Bool {
         self == .requiresApproval
+    }
+
+    var canChange: Bool {
+        switch self {
+        case .requiresInstallation, .unavailable:
+            return false
+        case .enabled, .disabled, .requiresApproval:
+            return true
+        }
     }
 }
 
@@ -28,7 +38,17 @@ protocol LaunchAtLoginControlling {
 
 struct LaunchAtLoginService: LaunchAtLoginControlling {
     var status: LaunchAtLoginStatus {
-        switch SMAppService.mainApp.status {
+        guard Self.isSupportedInstallation(at: Bundle.main.bundleURL) else {
+            return .requiresInstallation
+        }
+
+        return Self.status(for: SMAppService.mainApp.status)
+    }
+
+    /// `.notFound` is the initial state before this app has ever registered
+    /// with Service Management. It is still a valid, changeable off state.
+    static func status(for serviceStatus: SMAppService.Status) -> LaunchAtLoginStatus {
+        switch serviceStatus {
         case .enabled:
             return .enabled
         case .notRegistered:
@@ -36,10 +56,31 @@ struct LaunchAtLoginService: LaunchAtLoginControlling {
         case .requiresApproval:
             return .requiresApproval
         case .notFound:
-            return .unavailable
+            return .disabled
         @unknown default:
             return .unavailable
         }
+    }
+
+    /// Login item registration must point to a stable installed application.
+    /// Registering an app from Xcode's DerivedData, a temporary directory, or a
+    /// mounted DMG can leave macOS pointing at a path that is not available at
+    /// the next login.
+    static func isSupportedInstallation(at appURL: URL) -> Bool {
+        let appPath = appURL
+            .standardizedFileURL
+            .resolvingSymlinksInPath()
+            .path
+        let systemApplicationsPath = URL(fileURLWithPath: "/Applications", isDirectory: true)
+            .standardizedFileURL
+            .path
+        let userApplicationsPath = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Applications", isDirectory: true)
+            .standardizedFileURL
+            .path
+
+        return appPath.hasPrefix(systemApplicationsPath + "/") ||
+            appPath.hasPrefix(userApplicationsPath + "/")
     }
 
     func register() throws {
@@ -76,6 +117,10 @@ final class LaunchAtLoginSettings: ObservableObject {
         status.needsSystemApproval
     }
 
+    var canChange: Bool {
+        status.canChange
+    }
+
     func refresh() {
         status = service.status
         didFailLastUpdate = false
@@ -83,6 +128,8 @@ final class LaunchAtLoginSettings: ObservableObject {
 
     func setEnabled(_ enabled: Bool) {
         didFailLastUpdate = false
+
+        guard canChange else { return }
 
         do {
             if enabled {
@@ -97,5 +144,8 @@ final class LaunchAtLoginSettings: ObservableObject {
         }
 
         status = service.status
+        if enabled && status != .enabled && status != .requiresApproval {
+            didFailLastUpdate = true
+        }
     }
 }

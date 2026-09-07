@@ -367,32 +367,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		A8000001 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCLABLE_SYMBOL_LEVEL = NO;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
 		A8000002 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -416,7 +390,33 @@
 			};
 			name = Release;
 		};
-		A8000003 /* Debug */ = {
+		A8000005 /* Testing */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCLABLE_SYMBOL_LEVEL = NO;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "TESTING";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Testing;
+		};
+		A8000006 /* Testing */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -424,6 +424,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 20260905;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_TESTABILITY = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AIUsageMeter/Info.plist;
@@ -432,7 +433,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.3.2;
+				MARKETING_VERSION = 0.3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
 				PRODUCT_MODULE_NAME = AIUsageMeter;
 				PRODUCT_NAME = "AI Usage Meter";
@@ -440,7 +441,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
-			name = Debug;
+			name = Testing;
 		};
 		A8000004 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -458,7 +459,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.3.2;
+				MARKETING_VERSION = 0.3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter;
 				PRODUCT_MODULE_NAME = AIUsageMeter;
 				PRODUCT_NAME = "AI Usage Meter";
@@ -468,7 +469,7 @@
 			};
 			name = Release;
 		};
-		B8000001 /* Debug */ = {
+		B8000003 /* Testing */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -476,13 +477,13 @@
 				CURRENT_PROJECT_VERSION = 20260905;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.3.2;
+				MARKETING_VERSION = 0.3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AI Usage Meter.app/Contents/MacOS/AI Usage Meter";
 			};
-			name = Debug;
+			name = Testing;
 		};
 		B8000002 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -492,7 +493,7 @@
 				CURRENT_PROJECT_VERSION = 20260905;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.3.2;
+				MARKETING_VERSION = 0.3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aisen.aiusagemeter.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -506,7 +507,7 @@
 		A6000002 /* configuration list for PBXProject "AIUsageMeter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A8000001 /* Debug */,
+				A8000005 /* Testing */,
 				A8000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -515,7 +516,7 @@
 		A6000001 /* configuration list for NativeTarget "AIUsageMeter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A8000003 /* Debug */,
+				A8000006 /* Testing */,
 				A8000004 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -524,7 +525,7 @@
 		B6000001 /* configuration list for NativeTarget "AIUsageMeterTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B8000001 /* Debug */,
+				B8000003 /* Testing */,
 				B8000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;

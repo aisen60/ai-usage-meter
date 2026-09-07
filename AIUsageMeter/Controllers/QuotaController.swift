@@ -74,13 +74,13 @@ final class QuotaController: ObservableObject {
     /// Token 来源
     private let tokenAccount = "cursor-token"
 
-    /// Debug 预览时强制隐藏两个客户端，不读取或修改本机实际安装状态。
+    /// 测试时强制隐藏两个客户端，不读取或修改本机实际安装状态。
     private let forceNoAssistantApps: Bool
 
-    /// Debug 预览时仅显示 Cursor，强制隐藏 ChatGPT。
+    /// 测试时仅显示 Cursor，强制隐藏 ChatGPT。
     private let forceCursorOnly: Bool
 
-    /// Debug 预览时仅显示 ChatGPT，强制隐藏 Cursor。
+    /// 测试时仅显示 ChatGPT，强制隐藏 Cursor。
     private let forceChatGPTOnly: Bool
 
     // MARK: - Types
@@ -119,13 +119,9 @@ final class QuotaController: ObservableObject {
         forceCursorOnly: Bool? = nil,
         forceChatGPTOnly: Bool? = nil
     ) {
-        let commandLinePreview = Self.commandLinePreview
-        let shouldForceNoAssistantApps = forceNoAssistantApps
-            ?? (commandLinePreview == .noAssistantApps)
-        let shouldForceCursorOnly = forceCursorOnly
-            ?? (commandLinePreview == .cursorOnly)
-        let shouldForceChatGPTOnly = forceChatGPTOnly
-            ?? (commandLinePreview == .chatGPTOnly)
+        let shouldForceNoAssistantApps = forceNoAssistantApps ?? false
+        let shouldForceCursorOnly = forceCursorOnly ?? false
+        let shouldForceChatGPTOnly = forceChatGPTOnly ?? false
         self.forceNoAssistantApps = shouldForceNoAssistantApps
         self.forceCursorOnly = shouldForceCursorOnly
         self.forceChatGPTOnly = shouldForceChatGPTOnly
@@ -353,31 +349,6 @@ final class QuotaController: ObservableObject {
         default:
             return processInfo.isLowPowerModeEnabled
         }
-    }
-
-    private enum AppAvailabilityPreview {
-        case noAssistantApps
-        case cursorOnly
-        case chatGPTOnly
-    }
-
-    /// 仅 Debug 构建可通过启动参数预览安装状态。Release 构建忽略这些参数。
-    private static var commandLinePreview: AppAvailabilityPreview? {
-        #if DEBUG
-        let arguments = ProcessInfo.processInfo.arguments
-        if arguments.contains("--preview-no-assistant-apps") {
-            return .noAssistantApps
-        }
-        if arguments.contains("--preview-cursor-only") {
-            return .cursorOnly
-        }
-        if arguments.contains("--preview-chatgpt-only") {
-            return .chatGPTOnly
-        }
-        return nil
-        #else
-        nil
-        #endif
     }
 
     func stopAutoRefresh() {

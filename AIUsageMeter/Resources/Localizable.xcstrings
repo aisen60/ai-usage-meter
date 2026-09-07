@@ -145,6 +145,12 @@
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请在“登录项”中允许 AI Usage Meter 以完成启用。" } }
       }
     },
+    "settings.launchAtLoginRequiresInstallation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move AI Usage Meter to the Applications folder before enabling Launch at Login." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请先将 AI Usage Meter 移动到“应用程序”文件夹，再开启开机启动。" } }
+      }
+    },
     "settings.launchAtLoginUnavailable" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Launch at login is unavailable for this app build." } },

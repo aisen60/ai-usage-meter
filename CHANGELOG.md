@@ -2,6 +2,21 @@
 
 > 注：本项目已更名为 AI Usage Meter，工程 / 模块为 `AIUsageMeter`，Bundle ID 改为 `com.aisen.aiusagemeter`，仓库为 `aisen60/ai-usage-meter`。更名不改变版本号与既有功能语义。
 
+## 0.3.3 - 2026-09-07
+
+### 行为修正
+
+- 修复首次未注册开机启动时被错误显示为构建不可用的问题。
+- 将 macOS 登录项的 `.notFound` 状态视为普通未开启状态，允许用户正常启用。
+
+### 工程与发布
+
+- 移除 Debug 专用预览参数，改用 Testing 与 Release 构建配置。
+- Release 构建统一支持 `arm64 + x86_64`。
+- DMG 名称统一为 `AI Usage Meter.dmg`，并同步 GitHub Actions 发布流程。
+- 将 App 版本更新为 `0.3.3`。
+- 增加登录项状态和发布产物校验测试。
+
 ## 0.3.2 - 2026-09-05
 
 ### 新增
