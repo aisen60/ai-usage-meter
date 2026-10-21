@@ -42,7 +42,7 @@ Do not force a broad MVVM or repository-layer rewrite. Add a new abstraction onl
 
 ## Current UI Contract
 
-- The status item shows configurable Cursor Models, Other Models, and Codex weekly-remaining capsules. Users may hide every capsule; the compact `AI` label remains as the menu-bar entry point.
+- The status item shows configurable Cursor and ChatGPT quota capsules. ChatGPT capsules follow the windows actually returned by the current plan: an enabled but unavailable window falls back to an available one (5-hour preferred), and the fallback is display-only so a window restored by a later plan reappears automatically. Users may hide every capsule; the compact `AI` label remains as the menu-bar entry point.
 - When Cursor has no current or explicitly stale usage to display, its popover section, status-item capsules, and settings rows are hidden without changing the user's saved display preferences.
 - Disconnected service values fall back to a neutral gray `0%` presentation.
 - Cursor cache remains displayable in an explicit stale state; Codex never presents stale quota as current.

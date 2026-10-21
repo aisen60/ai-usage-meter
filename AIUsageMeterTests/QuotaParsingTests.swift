@@ -44,6 +44,74 @@ final class QuotaParsingTests: XCTestCase {
         )
     }
 
+    func testCodexBundledExecutableDiscoveryUsesCodexCLILayout() throws {
+        let temporaryDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let chatGPTApplication = temporaryDirectory
+            .appendingPathComponent("ChatGPT.app", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+
+        let executable = chatGPTApplication
+            .appendingPathComponent("Contents/Resources/codex-cli/bin/codex")
+        try makeExecutable(at: executable)
+
+        let candidates = CodexIntegration.bundledExecutableCandidates(
+            inApplicationAt: chatGPTApplication
+        )
+        XCTAssertEqual(
+            CodexIntegration.firstExecutable(in: candidates)?.standardizedFileURL,
+            executable.standardizedFileURL
+        )
+    }
+
+    func testCodexBundledExecutableDiscoveryUsesPackageManifestEntrypoint() throws {
+        let temporaryDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let chatGPTApplication = temporaryDirectory
+            .appendingPathComponent("ChatGPT.app", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+
+        let codexCLI = chatGPTApplication
+            .appendingPathComponent("Contents/Resources/codex-cli", isDirectory: true)
+        let executable = codexCLI.appendingPathComponent("custom/codex-bin")
+        try makeExecutable(at: executable)
+        try FileManager.default.createDirectory(
+            at: codexCLI,
+            withIntermediateDirectories: true
+        )
+        let manifest = ["entrypoint": "custom/codex-bin"]
+        try JSONSerialization.data(withJSONObject: manifest)
+            .write(to: codexCLI.appendingPathComponent("codex-package.json"))
+
+        let candidates = CodexIntegration.bundledExecutableCandidates(
+            inApplicationAt: chatGPTApplication
+        )
+        XCTAssertEqual(
+            CodexIntegration.firstExecutable(in: candidates)?.standardizedFileURL,
+            executable.standardizedFileURL
+        )
+    }
+
+    func testCodexBundledExecutableDiscoveryFallsBackToLegacyLayout() throws {
+        let temporaryDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let chatGPTApplication = temporaryDirectory
+            .appendingPathComponent("ChatGPT.app", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+
+        let executable = chatGPTApplication
+            .appendingPathComponent("Contents/Resources/codex")
+        try makeExecutable(at: executable)
+
+        let candidates = CodexIntegration.bundledExecutableCandidates(
+            inApplicationAt: chatGPTApplication
+        )
+        XCTAssertEqual(
+            CodexIntegration.firstExecutable(in: candidates)?.standardizedFileURL,
+            executable.standardizedFileURL
+        )
+    }
+
     func testCursorPlanMapping() {
         XCTAssertEqual(CursorTokenReader.displayPlanName(for: "free"), "Cursor Hobby")
         XCTAssertEqual(CursorTokenReader.displayPlanName(for: "pro"), "Cursor Pro")
@@ -154,22 +222,53 @@ final class QuotaParsingTests: XCTestCase {
         XCTAssertEqual(usage.fetchedAt, fetchedAt)
     }
 
-    // MARK: - ChatGPT 双窗口
+    // MARK: - ChatGPT 额度窗口
 
     func testCodexParsesBothWindowsByDuration() throws {
         let usage = try CodexIntegration.parseResponse(codexResponse(planType: "pro"))
 
         XCTAssertEqual(usage.planName, "ChatGPT Pro")
-        XCTAssertEqual(usage.shortWindow.percentRemaining, 80)
+        XCTAssertEqual(usage.shortWindow?.percentRemaining, 80)
         XCTAssertEqual(
-            usage.shortWindow.resetsAt,
+            usage.shortWindow?.resetsAt,
             Date(timeIntervalSince1970: 1_800_000_000)
         )
-        XCTAssertEqual(usage.weeklyWindow.percentRemaining, 35)
+        XCTAssertEqual(usage.weeklyWindow?.percentRemaining, 35)
         XCTAssertEqual(
-            usage.weeklyWindow.resetsAt,
+            usage.weeklyWindow?.resetsAt,
             Date(timeIntervalSince1970: 1_800_500_000)
         )
+    }
+
+    func testCodexParsesWeeklyOnlyWindow() throws {
+        // 当前 Pro Lite 账号的真实响应：primary 为 1 周，secondary 为 null。
+        let usage = try CodexIntegration.parseResponse(codexResponse(
+            planType: "prolite",
+            primary: [
+                "usedPercent": 100,
+                "windowDurationMins": 10_080,
+                "resetsAt": 1_793_082_769
+            ],
+            includeSecondary: false
+        ))
+
+        XCTAssertEqual(usage.planName, "ChatGPT Pro Lite")
+        XCTAssertNil(usage.shortWindow)
+        XCTAssertEqual(usage.weeklyWindow?.percentRemaining, 0)
+        XCTAssertEqual(
+            usage.weeklyWindow?.resetsAt,
+            Date(timeIntervalSince1970: 1_793_082_769)
+        )
+    }
+
+    func testCodexParsesShortOnlyWindow() throws {
+        let usage = try CodexIntegration.parseResponse(codexResponse(
+            planType: "plus",
+            includeSecondary: false
+        ))
+
+        XCTAssertEqual(usage.shortWindow?.percentRemaining, 80)
+        XCTAssertNil(usage.weeklyWindow)
     }
 
     func testCodexClassifiesWindowsRegardlessOfFieldOrder() throws {
@@ -180,10 +279,10 @@ final class QuotaParsingTests: XCTestCase {
             secondary: ["usedPercent": 10, "windowDurationMins": 300, "resetsAt": 1_800_000_000]
         ))
 
-        XCTAssertEqual(usage.shortWindow.percentRemaining, 90)
-        XCTAssertEqual(usage.weeklyWindow.percentRemaining, 70)
-        XCTAssertEqual(usage.shortWindow.resetsAt, Date(timeIntervalSince1970: 1_800_000_000))
-        XCTAssertEqual(usage.weeklyWindow.resetsAt, Date(timeIntervalSince1970: 1_800_500_000))
+        XCTAssertEqual(usage.shortWindow?.percentRemaining, 90)
+        XCTAssertEqual(usage.weeklyWindow?.percentRemaining, 70)
+        XCTAssertEqual(usage.shortWindow?.resetsAt, Date(timeIntervalSince1970: 1_800_000_000))
+        XCTAssertEqual(usage.weeklyWindow?.resetsAt, Date(timeIntervalSince1970: 1_800_500_000))
     }
 
     func testCodexPlanMappingThroughResponse() throws {
@@ -205,16 +304,17 @@ final class QuotaParsingTests: XCTestCase {
             secondary: ["usedPercent": -10, "windowDurationMins": 10_080, "resetsAt": 1_800_500_000]
         ))
 
-        XCTAssertEqual(usage.shortWindow.percentRemaining, 0)
-        XCTAssertEqual(usage.weeklyWindow.percentRemaining, 100)
+        XCTAssertEqual(usage.shortWindow?.percentRemaining, 0)
+        XCTAssertEqual(usage.weeklyWindow?.percentRemaining, 100)
     }
 
-    func testCodexMissingWindowThrows() {
+    func testCodexMissingBothWindowsThrows() {
         XCTAssertThrowsError(
-            try CodexIntegration.parseResponse(codexResponse(planType: "plus", includeSecondary: false))
-        )
-        XCTAssertThrowsError(
-            try CodexIntegration.parseResponse(codexResponse(planType: "plus", includePrimary: false))
+            try CodexIntegration.parseResponse(codexResponse(
+                planType: "plus",
+                includePrimary: false,
+                includeSecondary: false
+            ))
         )
     }
 
@@ -301,6 +401,15 @@ final class QuotaParsingTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    private func makeExecutable(at url: URL) throws {
+        try FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try "#!/bin/sh\nexit 0\n".write(to: url, atomically: true, encoding: .utf8)
+        XCTAssertEqual(chmod(url.path, 0o700), 0)
+    }
 
     private func cursorOnDemandJSON(
         individualUsed: Any? = nil,

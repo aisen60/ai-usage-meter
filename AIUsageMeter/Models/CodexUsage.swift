@@ -15,16 +15,17 @@ struct QuotaWindow: Codable, Equatable {
 /// ChatGPT 额度数据。内部保留 Codex 命名以避免无关重构，
 /// 面向用户的可见文字统一为 ChatGPT。
 ///
-/// 包含短周期（5 小时）与周周期（1 周）两个窗口。
+/// 不同套餐可能只返回 5 小时或 1 周中的一个窗口；缺失的窗口用 nil 表示，
+/// 由界面隐藏对应行，避免把「不适用」误报成 `0%`。
 struct CodexUsage: Codable, Equatable {
     /// 套餐类型描述 (如 "ChatGPT Plus")
     let planName: String
 
-    /// 5 小时窗口额度
-    let shortWindow: QuotaWindow
+    /// 5 小时窗口额度；套餐未提供时为 nil
+    let shortWindow: QuotaWindow?
 
-    /// 1 周窗口额度
-    let weeklyWindow: QuotaWindow
+    /// 1 周窗口额度；套餐未提供时为 nil
+    let weeklyWindow: QuotaWindow?
 
     /// 数据来源
     let source: Source
@@ -47,7 +48,8 @@ struct CodexUsage: Codable, Equatable {
         source != .disconnected
     }
 
-    /// 空状态 (未连接)。两个窗口均以中性 `0%` 回退，避免状态栏为空。
+    /// 空状态 (未连接)。两个窗口均以中性 `0%` 回退，
+    /// 保持断开时两行占位，不暗示某个窗口不存在。
     static var disconnected: CodexUsage {
         CodexUsage(
             planName: "ChatGPT",

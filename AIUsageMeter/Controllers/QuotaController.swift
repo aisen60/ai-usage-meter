@@ -211,9 +211,34 @@ final class QuotaController: ObservableObject {
         return nil
     }
 
+    /// 菜单栏项目的有效显示状态。
+    ///
+    /// ChatGPT 窗口可能因套餐变化而不存在；此时启用项会自动落到可用窗口，
+    /// 设置页的开关需要反映这个最终结果，而不是仅反映持久化偏好。
+    func isDisplayItemEffectivelyVisible(_ item: MenuBarDisplaySettings.Item) -> Bool {
+        switch item {
+        case .chatgptFiveHour, .chatgptWeekly:
+            guard isChatGPTInstalled else { return false }
+            guard codexConnectionState.isConnected, codexUsage.isConnected else {
+                return displaySettings.isVisible(item)
+            }
+            return displaySettings.effectiveChatGPTItems(
+                shortAvailable: codexUsage.shortWindow != nil,
+                weeklyAvailable: codexUsage.weeklyWindow != nil
+            ).contains(item)
+        case .cursorModels, .otherModels, .onDemand:
+            return displaySettings.isVisible(item)
+        }
+    }
+
     /// 切换菜单栏显示项目。用户可以选择隐藏全部用量胶囊。
     func setDisplayItem(_ item: MenuBarDisplaySettings.Item, visible: Bool) {
-        let next = displaySettings.toggling(item, to: visible)
+        let next = displaySettings.togglingDisplayItem(
+            item,
+            to: visible,
+            shortAvailable: codexUsage.shortWindow != nil,
+            weeklyAvailable: codexUsage.weeklyWindow != nil
+        )
         displaySettings = next
         next.save()
     }

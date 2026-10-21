@@ -122,19 +122,23 @@ enum CodexIntegration {
     }
 
     /// 优先从已安装的 Codex/ChatGPT 应用定位，其次检查常见 CLI 路径和 PATH。
+    ///
+    /// ChatGPT 应用会随更新调整内置 CLI 的目录结构，因此先按应用内的
+    /// `codex-package.json` 入口定位，再回退到已知布局与 PATH。
     private static func findExecutable() -> URL? {
-        var candidates: [URL] = []
+        var applicationURLs: [URL] = []
 
         if let appURL = NSWorkspace.shared.urlForApplication(
             withBundleIdentifier: "com.openai.codex"
         ) {
-            candidates.append(
-                appURL.appendingPathComponent("Contents/Resources/codex")
-            )
+            applicationURLs.append(appURL)
         }
+        applicationURLs.append(contentsOf: chatGPTApplicationURLs)
 
+        var candidates = applicationURLs.flatMap {
+            bundledExecutableCandidates(inApplicationAt: $0)
+        }
         candidates.append(contentsOf: [
-            URL(fileURLWithPath: "/Applications/ChatGPT.app/Contents/Resources/codex"),
             URL(fileURLWithPath: "/opt/homebrew/bin/codex"),
             URL(fileURLWithPath: "/usr/local/bin/codex")
         ])
@@ -145,9 +149,54 @@ enum CodexIntegration {
                 .map { URL(fileURLWithPath: String($0)).appendingPathComponent("codex") })
         }
 
+        return firstExecutable(in: candidates)
+    }
+
+    /// 返回某个 ChatGPT 应用包内可能存在的 Codex 可执行文件，按优先级排列。
+    /// 当前版本使用 `Contents/Resources/codex-cli/bin/codex`；旧版本把二进制
+    /// 直接放在 `Contents/Resources/codex`。
+    static func bundledExecutableCandidates(inApplicationAt applicationURL: URL) -> [URL] {
+        let resources = applicationURL.appendingPathComponent(
+            "Contents/Resources",
+            isDirectory: true
+        )
+        let codexCLI = resources.appendingPathComponent("codex-cli", isDirectory: true)
+
+        var candidates: [URL] = []
+        if let entrypoint = packageEntrypoint(in: codexCLI) {
+            candidates.append(codexCLI.appendingPathComponent(entrypoint))
+        }
+        candidates.append(codexCLI.appendingPathComponent("bin/codex"))
+        candidates.append(resources.appendingPathComponent("codex"))
+        candidates.append(
+            codexCLI.appendingPathComponent("CodexCLI.app/Contents/MacOS/codex")
+        )
+        return candidates
+    }
+
+    /// 读取应用内 `codex-package.json` 的 `entrypoint`（相对于 `codex-cli`）。
+    /// 清单缺失、格式变化或路径越界时返回 nil，由调用方回退到已知布局。
+    private static func packageEntrypoint(in codexCLI: URL) -> String? {
+        let manifest = codexCLI.appendingPathComponent("codex-package.json")
+        guard let data = try? Data(contentsOf: manifest),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let entrypoint = object["entrypoint"] as? String,
+              !entrypoint.isEmpty,
+              !entrypoint.hasPrefix("/") else {
+            return nil
+        }
+
+        let resolved = codexCLI.appendingPathComponent(entrypoint).standardizedFileURL
+        let directory = codexCLI.standardizedFileURL.path
+        guard resolved.path.hasPrefix(directory + "/") else { return nil }
+        return entrypoint
+    }
+
+    /// 返回第一个实际可执行的候选路径，并跳过重复项。
+    static func firstExecutable(in candidates: [URL]) -> URL? {
         var seen = Set<String>()
         return candidates.first { url in
-            seen.insert(url.path).inserted
+            seen.insert(url.standardizedFileURL.path).inserted
                 && FileManager.default.isExecutableFile(atPath: url.path)
         }
     }
@@ -167,16 +216,22 @@ enum CodexIntegration {
         let rateLimits = (buckets?["codex"] as? [String: Any])
             ?? (result["rateLimits"] as? [String: Any])
 
-        guard let rateLimits,
-              let primary = rateLimits["primary"] as? [String: Any],
-              let secondary = rateLimits["secondary"] as? [String: Any] else {
+        guard let rateLimits else {
+            throw IntegrationError.invalidResponse
+        }
+
+        // 不同套餐可能只提供一个窗口；app-server 会用 null 表示缺失项。
+        let windows = ["primary", "secondary"].compactMap {
+            rateLimits[$0] as? [String: Any]
+        }
+        guard !windows.isEmpty else {
             throw IntegrationError.invalidResponse
         }
 
         // 按时长分类到两个窗口，不依赖 primary / secondary 的字段顺序。
         var short: [String: Any]?
         var weekly: [String: Any]?
-        for window in [primary, secondary] {
+        for window in windows {
             guard let duration = number(window["windowDurationMins"]),
                   let kind = windowKind(durationMins: duration) else {
                 throw IntegrationError.invalidResponse
@@ -192,14 +247,10 @@ enum CodexIntegration {
             }
         }
 
-        guard let short, let weekly else {
-            throw IntegrationError.invalidResponse
-        }
-
         return CodexUsage(
             planName: displayPlanName(rateLimits["planType"] as? String),
-            shortWindow: try parseWindow(short),
-            weeklyWindow: try parseWindow(weekly),
+            shortWindow: try short.map(parseWindow),
+            weeklyWindow: try weekly.map(parseWindow),
             source: .automatic,
             fetchedAt: Date(),
             note: nil

@@ -144,6 +144,112 @@ final class MenuBarDisplaySettingsTests: XCTestCase {
         XCTAssertTrue(settings.toggling(.chatgptWeekly, to: false).visibleItems.isEmpty)
     }
 
+    // MARK: - Automatic ChatGPT Window Selection
+
+    func testUnavailableEnabledChatGPTWindowFallsBackToAvailableWindow() {
+        let settings = MenuBarDisplaySettings.default
+
+        // Pro Lite 阶段没有 5 小时窗口，启用中的 5 小时自动落到 1 周。
+        XCTAssertEqual(
+            settings.effectiveChatGPTItems(shortAvailable: false, weeklyAvailable: true),
+            [.chatgptWeekly]
+        )
+        // Plus 恢复 5 小时窗口后自动回到 5 小时，偏好无需修改。
+        XCTAssertEqual(
+            settings.effectiveChatGPTItems(shortAvailable: true, weeklyAvailable: true),
+            [.chatgptFiveHour]
+        )
+    }
+
+    func testWeeklyOnlyPreferenceFallsBackWhenFiveHourIsTheOnlyWindow() {
+        let settings = MenuBarDisplaySettings(
+            showCursorModels: false,
+            showOtherModels: false,
+            showOnDemand: false,
+            showChatGPTFiveHour: false,
+            showChatGPTWeekly: true
+        )
+
+        XCTAssertEqual(
+            settings.effectiveChatGPTItems(shortAvailable: true, weeklyAvailable: false),
+            [.chatgptFiveHour]
+        )
+    }
+
+    func testBothEnabledChatGPTWindowsStayVisibleWhenAvailable() {
+        let settings = MenuBarDisplaySettings.default.toggling(.chatgptWeekly, to: true)
+
+        XCTAssertEqual(
+            settings.effectiveChatGPTItems(shortAvailable: true, weeklyAvailable: true),
+            [.chatgptFiveHour, .chatgptWeekly]
+        )
+        XCTAssertEqual(
+            settings.effectiveChatGPTItems(shortAvailable: false, weeklyAvailable: true),
+            [.chatgptWeekly]
+        )
+    }
+
+    func testDisablingOnlyEffectiveFallbackClearsUnavailablePreference() {
+        let next = MenuBarDisplaySettings.default.togglingDisplayItem(
+            .chatgptWeekly,
+            to: false,
+            shortAvailable: false,
+            weeklyAvailable: true
+        )
+
+        XCTAssertFalse(next.showChatGPTFiveHour)
+        XCTAssertFalse(next.showChatGPTWeekly)
+        XCTAssertTrue(
+            next.effectiveChatGPTItems(shortAvailable: false, weeklyAvailable: true).isEmpty
+        )
+    }
+
+    func testEnablingChatGPTPreferenceKeepsUnavailableWindowPreference() {
+        let next = MenuBarDisplaySettings.default.togglingDisplayItem(
+            .chatgptWeekly,
+            to: true,
+            shortAvailable: false,
+            weeklyAvailable: true
+        )
+
+        XCTAssertTrue(next.showChatGPTFiveHour)
+        XCTAssertTrue(next.showChatGPTWeekly)
+        XCTAssertEqual(
+            next.effectiveChatGPTItems(shortAvailable: false, weeklyAvailable: true),
+            [.chatgptWeekly]
+        )
+    }
+
+    func testDisablingOneAvailableChatGPTWindowKeepsTheOtherPreference() {
+        let bothEnabled = MenuBarDisplaySettings.default.togglingDisplayItem(
+            .chatgptWeekly,
+            to: true,
+            shortAvailable: true,
+            weeklyAvailable: true
+        )
+        let next = bothEnabled.togglingDisplayItem(
+            .chatgptFiveHour,
+            to: false,
+            shortAvailable: true,
+            weeklyAvailable: true
+        )
+
+        XCTAssertFalse(next.showChatGPTFiveHour)
+        XCTAssertTrue(next.showChatGPTWeekly)
+    }
+
+    func testVisibleItemsUsesAutomaticChatGPTWindowFallback() {
+        XCTAssertEqual(
+            MenuBarDisplaySettings.default.visibleItems(
+                cursorAvailable: true,
+                onDemandAvailable: false,
+                chatGPTShortAvailable: false,
+                chatGPTWeeklyAvailable: true
+            ),
+            [.cursorModels, .chatgptWeekly]
+        )
+    }
+
     // MARK: - Migration
 
     func testLegacyThreeFieldPayloadMigrates() throws {
@@ -258,8 +364,29 @@ final class QuotaControllerStateTests: XCTestCase {
         let disconnected = CodexUsage.disconnected
         XCTAssertFalse(disconnected.isConnected)
         XCTAssertEqual(disconnected.planName, "ChatGPT")
-        XCTAssertEqual(disconnected.shortWindow.percentRemaining, 0)
-        XCTAssertEqual(disconnected.weeklyWindow.percentRemaining, 0)
+        XCTAssertEqual(disconnected.shortWindow?.percentRemaining, 0)
+        XCTAssertEqual(disconnected.weeklyWindow?.percentRemaining, 0)
+    }
+
+    @MainActor
+    func testFallbackChatGPTItemReflectsEffectiveVisibilityAcrossPlanChanges() {
+        let controller = QuotaController(
+            autoStart: false,
+            cursorInstalled: false,
+            chatGPTInstalled: true
+        )
+        controller.displaySettings = .default
+        controller.codexConnectionState = .connected
+
+        // Pro Lite：没有 5 小时窗口，启用的 5 小时自动由 1 周替代。
+        controller.codexUsage = makeCodexUsage(short: nil, weekly: 0)
+        XCTAssertFalse(controller.isDisplayItemEffectivelyVisible(.chatgptFiveHour))
+        XCTAssertTrue(controller.isDisplayItemEffectivelyVisible(.chatgptWeekly))
+
+        // Plus：5 小时窗口恢复后自动重新出现，1 周保持用户原始的关闭状态。
+        controller.codexUsage = makeCodexUsage(short: 78, weekly: 85)
+        XCTAssertTrue(controller.isDisplayItemEffectivelyVisible(.chatgptFiveHour))
+        XCTAssertFalse(controller.isDisplayItemEffectivelyVisible(.chatgptWeekly))
     }
 
     @MainActor
@@ -386,6 +513,53 @@ final class StatusBarPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.fallbackText, "AI 0% 0%")
     }
 
+    func testConnectedWeeklyOnlyOmitsFiveHourEntry() {
+        let presentation = StatusBarPresentation(
+            settings: allOnSettings(),
+            cursorUsage: nil,
+            cursorAvailable: false,
+            cursorState: .disconnected,
+            codexUsage: makeCodexUsage(short: nil, weekly: 0),
+            codexState: .connected
+        )
+
+        XCTAssertEqual(presentation.entries.map(\.item), [.chatgptWeekly])
+        XCTAssertEqual(presentation.fallbackText, "AI 0%")
+        XCTAssertEqual(presentation.accessibilityDescription, "ChatGPT 1 周剩余 0%")
+    }
+
+    func testDefaultSettingsUseWeeklyAsFallbackWhenFiveHourIsUnavailable() {
+        let presentation = StatusBarPresentation(
+            settings: .default,
+            cursorUsage: makeCursorUsage(autoPercentUsed: 39),
+            cursorAvailable: true,
+            cursorState: .connected,
+            codexUsage: makeCodexUsage(short: nil, weekly: 85),
+            codexState: .connected
+        )
+
+        XCTAssertEqual(presentation.entries.map(\.item), [.cursorModels, .chatgptWeekly])
+        XCTAssertEqual(presentation.fallbackText, "AI 39% 85%")
+        XCTAssertEqual(
+            presentation.accessibilityDescription,
+            "Cursor Models 已用 39%，ChatGPT 1 周剩余 85%"
+        )
+    }
+
+    func testConnectedShortOnlyOmitsWeeklyEntry() {
+        let presentation = StatusBarPresentation(
+            settings: allOnSettings(),
+            cursorUsage: nil,
+            cursorAvailable: false,
+            cursorState: .disconnected,
+            codexUsage: makeCodexUsage(short: 78, weekly: nil),
+            codexState: .connected
+        )
+
+        XCTAssertEqual(presentation.entries.map(\.item), [.chatgptFiveHour])
+        XCTAssertEqual(presentation.fallbackText, "AI 78%")
+    }
+
     func testNoInstalledAppsShowsOnlyAIStatusLabel() {
         let presentation = StatusBarPresentation(
             settings: allOnSettings(),
@@ -507,17 +681,21 @@ private func makeCursorUsage(
     )
 }
 
-private func makeCodexUsage(short: Double = 78, weekly: Double = 85) -> CodexUsage {
+private func makeCodexUsage(short: Double? = 78, weekly: Double? = 85) -> CodexUsage {
     CodexUsage(
         planName: "ChatGPT Plus",
-        shortWindow: QuotaWindow(
-            percentRemaining: short,
-            resetsAt: Date(timeIntervalSince1970: 1_800_000_000)
-        ),
-        weeklyWindow: QuotaWindow(
-            percentRemaining: weekly,
-            resetsAt: Date(timeIntervalSince1970: 1_800_500_000)
-        ),
+        shortWindow: short.map {
+            QuotaWindow(
+                percentRemaining: $0,
+                resetsAt: Date(timeIntervalSince1970: 1_800_000_000)
+            )
+        },
+        weeklyWindow: weekly.map {
+            QuotaWindow(
+                percentRemaining: $0,
+                resetsAt: Date(timeIntervalSince1970: 1_800_500_000)
+            )
+        },
         source: .automatic,
         fetchedAt: Date(),
         note: nil
