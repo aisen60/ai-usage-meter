@@ -70,23 +70,60 @@ struct MenuBarDisplaySettings: Codable, Equatable {
     /// - Cursor 集成不可用时临时过滤两个 Cursor 百分比项目。
     /// - On Demand 无有效个人上限时临时过滤。
     /// - ChatGPT 未安装时临时过滤两项；已安装但断开时渲染中性 `0%`。
+    /// - `chatGPTShortAvailable` / `chatGPTWeeklyAvailable` 描述当前套餐
+    ///   实际返回的窗口；启用但缺失的窗口会被过滤，必要时自动替代。
     ///
     /// 过滤只影响本次展示，不修改用户偏好，服务或额度恢复后自动恢复。
     func visibleItems(
         cursorAvailable: Bool,
         onDemandAvailable: Bool,
-        chatGPTAvailable: Bool = true
+        chatGPTAvailable: Bool = true,
+        chatGPTShortAvailable: Bool = true,
+        chatGPTWeeklyAvailable: Bool = true
     ) -> [Item] {
-        visibleItems.filter { item in
+        let nonChatGPTItems = visibleItems.filter { item in
             switch item {
             case .cursorModels, .otherModels:
                 return cursorAvailable
             case .onDemand:
                 return onDemandAvailable
             case .chatgptFiveHour, .chatgptWeekly:
-                return chatGPTAvailable
+                return false
             }
         }
+
+        guard chatGPTAvailable else { return nonChatGPTItems }
+
+        return nonChatGPTItems + effectiveChatGPTItems(
+            shortAvailable: chatGPTShortAvailable,
+            weeklyAvailable: chatGPTWeeklyAvailable
+        )
+    }
+
+    /// 根据当前套餐实际返回的 ChatGPT 窗口，返回最终应展示的 ChatGPT 项目。
+    ///
+    /// 已启用且可用的窗口按 5 小时、1 周顺序保留。若用户启用了 ChatGPT
+    /// 但所选窗口当前不存在，则自动落到可用窗口：优先 5 小时，其次 1 周。
+    /// 用户偏好本身不被修改，因此套餐恢复某个窗口后会自动重新出现。
+    func effectiveChatGPTItems(
+        shortAvailable: Bool,
+        weeklyAvailable: Bool
+    ) -> [Item] {
+        let enabled = [Item.chatgptFiveHour, .chatgptWeekly].filter(isVisible)
+        guard !enabled.isEmpty else { return [] }
+
+        let available = enabled.filter { item in
+            switch item {
+            case .chatgptFiveHour: return shortAvailable
+            case .chatgptWeekly: return weeklyAvailable
+            default: return false
+            }
+        }
+        if !available.isEmpty { return available }
+
+        if shortAvailable { return [.chatgptFiveHour] }
+        if weeklyAvailable { return [.chatgptWeekly] }
+        return []
     }
 
     // MARK: - Mutation
@@ -103,6 +140,36 @@ struct MenuBarDisplaySettings: Codable, Equatable {
         case .chatgptWeekly: next.showChatGPTWeekly = value
         }
         return next
+    }
+
+    /// 按当前实际可用的 ChatGPT 窗口切换显示项目。
+    ///
+    /// 关闭唯一有效的 ChatGPT 窗口时，同时关闭已启用但当前套餐未提供的窗口；
+    /// 否则下一次刷新会再次通过自动替代把它加回来，开关看起来失效。
+    func togglingDisplayItem(
+        _ item: Item,
+        to value: Bool,
+        shortAvailable: Bool,
+        weeklyAvailable: Bool
+    ) -> MenuBarDisplaySettings {
+        var next = self
+
+        if !value, (item == .chatgptFiveHour || item == .chatgptWeekly) {
+            let effective = effectiveChatGPTItems(
+                shortAvailable: shortAvailable,
+                weeklyAvailable: weeklyAvailable
+            )
+            if effective == [item] {
+                if !shortAvailable {
+                    next = next.toggling(.chatgptFiveHour, to: false)
+                }
+                if !weeklyAvailable {
+                    next = next.toggling(.chatgptWeekly, to: false)
+                }
+            }
+        }
+
+        return next.toggling(item, to: value)
     }
 
     // MARK: - Codable

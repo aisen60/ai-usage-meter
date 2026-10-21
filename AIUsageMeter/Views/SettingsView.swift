@@ -242,8 +242,13 @@ struct SettingsView: View {
             items.append(.onDemand)
         }
         if controller.shouldShowChatGPT {
-            items.append(.chatgptFiveHour)
-            items.append(.chatgptWeekly)
+            // 只列出当前套餐实际提供的窗口；具体展示哪个由自动替代逻辑决定。
+            if !codexConnected || controller.codexUsage.shortWindow != nil {
+                items.append(.chatgptFiveHour)
+            }
+            if !codexConnected || controller.codexUsage.weeklyWindow != nil {
+                items.append(.chatgptWeekly)
+            }
         }
         return items
     }
@@ -297,7 +302,7 @@ struct SettingsView: View {
 
             Toggle(
                 isOn: Binding(
-                    get: { controller.displaySettings.isVisible(item) },
+                    get: { controller.isDisplayItemEffectivelyVisible(item) },
                     set: { controller.setDisplayItem(item, visible: $0) }
                 )
             ) {
@@ -357,8 +362,8 @@ struct SettingsView: View {
         case .cursorModels: return percentText(cursorConnected ? controller.cursorUsage?.autoPercentUsed : nil)
         case .otherModels: return percentText(cursorConnected ? controller.cursorUsage?.apiPercentUsed : nil)
         case .onDemand: return controller.cursorUsage?.onDemandUsedAmountText ?? "$0"
-        case .chatgptFiveHour: return codexConnected ? percentText(controller.codexUsage.shortWindow.percentRemaining) : "0%"
-        case .chatgptWeekly: return codexConnected ? percentText(controller.codexUsage.weeklyWindow.percentRemaining) : "0%"
+        case .chatgptFiveHour: return codexConnected ? percentText(controller.codexUsage.shortWindow?.percentRemaining) : "0%"
+        case .chatgptWeekly: return codexConnected ? percentText(controller.codexUsage.weeklyWindow?.percentRemaining) : "0%"
         }
     }
 

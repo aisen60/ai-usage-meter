@@ -34,7 +34,10 @@ struct StatusBarPresentation: Equatable {
         let items = settings.visibleItems(
             cursorAvailable: cursorAvailable,
             onDemandAvailable: onDemandAvailable,
-            chatGPTAvailable: codexAvailable
+            chatGPTAvailable: codexAvailable,
+            // 断开时保留两项中性 0% 占位；连接后按套餐实际窗口自动选择。
+            chatGPTShortAvailable: codexConnected ? codexUsage.shortWindow != nil : true,
+            chatGPTWeeklyAvailable: codexConnected ? codexUsage.weeklyWindow != nil : true
         )
 
         let entries: [Entry] = items.map { item in
@@ -80,7 +83,7 @@ struct StatusBarPresentation: Equatable {
                 )
             case .chatgptFiveHour:
                 let text = codexConnected
-                    ? Self.percent(codexUsage.shortWindow.percentRemaining)
+                    ? Self.percent(codexUsage.shortWindow?.percentRemaining)
                     : "0%"
                 return Entry(
                     item: item,
@@ -95,7 +98,7 @@ struct StatusBarPresentation: Equatable {
                 )
             case .chatgptWeekly:
                 let text = codexConnected
-                    ? Self.percent(codexUsage.weeklyWindow.percentRemaining)
+                    ? Self.percent(codexUsage.weeklyWindow?.percentRemaining)
                     : "0%"
                 return Entry(
                     item: item,

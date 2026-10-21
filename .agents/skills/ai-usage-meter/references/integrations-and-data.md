@@ -25,14 +25,17 @@ Failure policy:
 
 ## Codex
 
-Executable discovery checks the installed Codex application, ChatGPT application resources, common package-manager paths, and `PATH`.
+Executable discovery checks the installed ChatGPT/Codex application bundle first, then common package-manager paths and `PATH`. Inside the bundle it prefers the `codex-cli/codex-package.json` entrypoint, then the known `Contents/Resources/codex-cli/bin/codex` and legacy `Contents/Resources/codex` layouts, so ChatGPT app updates that relocate the CLI do not silently disable Codex reads.
 
-Each refresh starts a short-lived `codex app-server` process, initializes the protocol, requests `account/rateLimits/read`, parses the longest quota window, and terminates the process after success, failure, cancellation, or timeout.
+Each refresh starts a short-lived `codex app-server` process, initializes the protocol, requests `account/rateLimits/read`, parses the available 5-hour and/or weekly quota windows by duration, and terminates the process after success, failure, cancellation, or timeout. A plan may return only one non-null window (`secondary` can be `null`); the absent window stays `nil` so the card, settings, and status bar hide that row instead of presenting an invented `0%`.
+
+The status bar keeps user window preferences but resolves them against the windows actually returned: if every enabled ChatGPT window is unavailable, it displays an available window instead, preferring 5 hours over weekly. This fallback is not persisted, so a plan change that restores the preferred window switches back automatically. Disabling the only effective ChatGPT item also clears enabled-but-unavailable window preferences so the fallback does not immediately reappear.
 
 Failure policy:
 
 - On any Codex read failure, set `codexUsage` to `.disconnected`.
 - Do not show cached Codex quota as though it were current.
+- Do not synthesize a missing quota window; hide the row and its status-bar item instead.
 - Preserve the timeout race and guaranteed child-process cleanup when refactoring.
 
 Concurrency notes:

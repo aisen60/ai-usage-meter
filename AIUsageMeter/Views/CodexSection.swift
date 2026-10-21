@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// ChatGPT 服务组卡片：header 与 5 小时 / 1 周两条额度行共处同一圆角容器，
-/// 两行之间只有一条组内细分隔线（design/v0.3.0/home.png）。
+/// ChatGPT 服务组卡片：header 与可用的 5 小时 / 1 周额度行共处同一圆角容器。
+/// 套餐只返回一个窗口时只展示该行，避免把不存在的窗口显示成 `0%`。
 struct CodexSection: View {
     let usage: CodexUsage
     let connectionState: QuotaController.ConnectionState
@@ -13,19 +13,25 @@ struct CodexSection: View {
                 header
 
                 VStack(alignment: .leading, spacing: 0) {
-                    QuotaRow(
-                        label: "quota.fiveHours",
-                        percent: shortPercent,
-                        tint: isConnected ? QuotaPalette.chatgpt : .gray,
-                        detail: shortResetDetail
-                    )
-                    Divider()
-                    QuotaRow(
-                        label: "quota.week",
-                        percent: weeklyPercent,
-                        tint: isConnected ? QuotaPalette.chatgpt : .gray,
-                        detail: weeklyResetDetail
-                    )
+                    if usage.shortWindow != nil {
+                        QuotaRow(
+                            label: "quota.fiveHours",
+                            percent: shortPercent,
+                            tint: isConnected ? QuotaPalette.chatgpt : .gray,
+                            detail: shortResetDetail
+                        )
+                    }
+                    if usage.shortWindow != nil, usage.weeklyWindow != nil {
+                        Divider()
+                    }
+                    if usage.weeklyWindow != nil {
+                        QuotaRow(
+                            label: "quota.week",
+                            percent: weeklyPercent,
+                            tint: isConnected ? QuotaPalette.chatgpt : .gray,
+                            detail: weeklyResetDetail
+                        )
+                    }
                 }
                 .padding(.horizontal, MenuMetrics.groupInset)
                 .padding(.bottom, MenuMetrics.groupContentBottom)
@@ -55,22 +61,22 @@ struct CodexSection: View {
     }
 
     private var shortPercent: Double {
-        isConnected ? usage.shortWindow.percentRemaining : 0
+        isConnected ? usage.shortWindow?.percentRemaining ?? 0 : 0
     }
 
     private var weeklyPercent: Double {
-        isConnected ? usage.weeklyWindow.percentRemaining : 0
+        isConnected ? usage.weeklyWindow?.percentRemaining ?? 0 : 0
     }
 
     /// 5 小时窗口：显示重置时间，如「23:12 重置」。
     private var shortResetDetail: String? {
-        guard isConnected, let resetsAt = usage.shortWindow.resetsAt else { return nil }
+        guard isConnected, let resetsAt = usage.shortWindow?.resetsAt else { return nil }
         return QuotaResetFormatter.shortWindowDetail(resetsAt: resetsAt, locale: locale)
     }
 
     /// 1 周窗口：显示重置日期，如「9 月 4 日重置」。
     private var weeklyResetDetail: String? {
-        guard isConnected, let resetsAt = usage.weeklyWindow.resetsAt else { return nil }
+        guard isConnected, let resetsAt = usage.weeklyWindow?.resetsAt else { return nil }
         return QuotaResetFormatter.weeklyWindowDetail(resetsAt: resetsAt, locale: locale)
     }
 }
