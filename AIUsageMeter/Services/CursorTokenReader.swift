@@ -18,9 +18,18 @@ enum CursorTokenReader {
         .path
 
     /// 尝试从 Cursor 本地数据库读取 accessToken
-    /// - Returns: 原始 JWT token，如果未找到则返回 nil
+    /// - Returns: 可用 token（自动解封 safeStorage 密文），未找到或无法解封时返回 nil
     static func readAccessToken() -> String? {
-        readValue(forKey: "cursorAuth/accessToken")
+        guard let storedValue = readValue(forKey: "cursorAuth/accessToken") else {
+            return nil
+        }
+        if let token = CursorTokenUnsealer.unseal(storedValue: storedValue),
+           !token.isEmpty {
+            return token
+        }
+        // 只记录粗粒度失败类别，绝不输出存值本身
+        AppLog.cursor.error("Cursor stored token could not be unsealed")
+        return nil
     }
 
     /// Cursor 客户端会把服务端同步后的会员类型缓存到本地数据库。
