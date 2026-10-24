@@ -17,7 +17,12 @@ struct CursorAPIClient {
     /// 从 token 构造完整的 Cookie header 值
     /// Cookie 格式: WorkosCursorSessionToken=<sub>::<jwt>
     /// 其中 :: 需要 URL 编码为 %3A%3A
+    /// 已是 `<用户标识>::<会话值>` 形态的存值直接采用，不再按 JWT 解析。
     static func buildCookieValue(fromToken token: String) -> String? {
+        if token.contains("::") {
+            let encodedValue = token.replacingOccurrences(of: "::", with: "%3A%3A")
+            return "WorkosCursorSessionToken=\(encodedValue)"
+        }
         guard let sub = extractSubFromJWT(token) else { return nil }
         let raw = "\(sub)::\(token)"
         // 只编码 :: 分隔符，保留其他字符
