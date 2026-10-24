@@ -15,7 +15,9 @@ Credential resolution order:
 1. Manually saved token from Keychain account `cursor-token`.
 2. Read-only token discovery from Cursor's local application state.
 
-The dashboard cookie is derived in memory and must never be persisted or logged. Cursor currently uses a private dashboard endpoint, so treat HTTP status, fields, plan names, and payload shape as compatibility boundaries rather than public contracts.
+Cursor 3.27+ may store `cursorAuth/accessToken` as Electron safeStorage ciphertext (`cursor-safe-storage:v1:<base64("v10" + AES-128-CBC)>`). `CursorTokenUnsealer` unseals it in memory with the Keychain item `Cursor Safe Storage` / account `Cursor`: PBKDF2-HMAC-SHA1(password, "saltysalt", 1003 rounds) → 16-byte key, IV is 16 spaces, PKCS7 padding. Unsealing failure (missing item, denied Keychain access, corrupt envelope) counts as credential absence under the failure policy and is logged only as a coarse category. The Keychain read may prompt the user on first access; the password and unsealed token must never be logged, persisted, or put in fixtures.
+
+The dashboard cookie is derived in memory and must never be persisted or logged. Cookie construction accepts either a JWT (value taken from the `sub` claim, segment after `|`) or a pre-formed `<user-id>::<session>` value used as-is; the `::` separator is URL-encoded as `%3A%3A`. Cursor currently uses a private dashboard endpoint, so treat HTTP status, fields, plan names, and payload shape as compatibility boundaries rather than public contracts.
 
 Failure policy:
 
